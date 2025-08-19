@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Violet Marella Limited</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="assets/css/styles.css" rel="stylesheet">
+    <link href="assets/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-app" id="mainApp">
+        <!-- Sidebar - Will be loaded dynamically -->
+        <nav class="sidebar" id="sidebar">
+            <!-- Sidebar content will be loaded here -->
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation - Will be loaded dynamically -->
+            <nav class="top-navbar" id="topNavbar">
+                <!-- Top navigation content will be loaded here -->
+            </nav>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h1 class="page-title">Dashboard</h1>
+                            <p class="page-subtitle">Welcome to Violet Marella Management Suite</p>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-chart-line me-2"></i>Generate Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Section -->
+                <div class="dashboard-section">
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-value">₦2.4M</div>
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-change text-success">
+                                    <i class="fas fa-arrow-up"></i> +12% from last month
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-value">847</div>
+                                <div class="stat-label">Total Products</div>
+                                <div class="stat-change text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> 23 low stock
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-value">156</div>
+                                <div class="stat-label">Studio Sessions</div>
+                                <div class="stat-change text-success">
+                                    <i class="fas fa-arrow-up"></i> +8% this week
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-value">42</div>
+                                <div class="stat-label">Active Rentals</div>
+                                <div class="stat-change text-info">
+                                    <i class="fas fa-clock"></i> 12 due today
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Modules -->
+                    <div class="row mb-4">
+                        <div class="col-lg-4 mb-4">
+                            <div class="module-card gift-store">
+                                <div class="module-header">
+                                    <div class="module-icon">
+                                        <i class="fas fa-gift"></i>
+                                    </div>
+                                    <h3 class="module-title">Gift Store</h3>
+                                    <p class="module-description">Manage inventory, track sales, and monitor stock levels for your gift store business.</p>
+                                </div>
+                                <div class="module-body">
+                                    <a href="gift-store.html" class="quick-action">
+                                        <i class="fas fa-boxes"></i>
+                                        View Inventory
+                                    </a>
+                                    <button class="quick-action" onclick="showModal('addProductModal')">
+                                        <i class="fas fa-plus"></i>
+                                        Add New Product
+                                    </button>
+                                    <a href="reports.html?type=gift-store" class="quick-action">
+                                        <i class="fas fa-chart-line"></i>
+                                        Sales Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 mb-4">
+                            <div class="module-card supermarket">
+                                <div class="module-header">
+                                    <div class="module-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <h3 class="module-title">Mini Supermarket</h3>
+                                    <p class="module-description">Complete POS system with inventory management for your supermarket operations.</p>
+                                </div>
+                                <div class="module-body">
+                                    <a href="supermarket.html" class="quick-action">
+                                        <i class="fas fa-cash-register"></i>
+                                        Open POS
+                                    </a>
+                                    <a href="supermarket.html?tab=inventory" class="quick-action">
+                                        <i class="fas fa-warehouse"></i>
+                                        Manage Stock
+                                    </a>
+                                    <a href="reports.html?type=supermarket" class="quick-action">
+                                        <i class="fas fa-receipt"></i>
+                                        Daily Sales
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 mb-4">
+                            <div class="module-card music-studio">
+                                <div class="module-header">
+                                    <div class="module-icon">
+                                        <i class="fas fa-music"></i>
+                                    </div>
+                                    <h3 class="module-title">Music Studio</h3>
+                                    <p class="module-description">Time-based billing system with QR code generation for studio session management.</p>
+                                </div>
+                                <div class="module-body">
+                                    <a href="music-studio.html" class="quick-action">
+                                        <i class="fas fa-user-plus"></i>
+                                        Check-in Customer
+                                    </a>
+                                    <a href="music-studio.html?tab=qr" class="quick-action">
+                                        <i class="fas fa-qrcode"></i>
+                                        Generate QR Code
+                                    </a>
+                                    <a href="music-studio.html?tab=billing" class="quick-action">
+                                        <i class="fas fa-calculator"></i>
+                                        Calculate Billing
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Recent Activities</h5>
+                                    <button class="btn btn-sm btn-outline-primary">View All</button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="activity-item">
+                                        <div class="activity-icon bg-success">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h6>New sale recorded</h6>
+                                            <p class="text-muted mb-0">Valentine's Gift Box sold for ₦5,500</p>
+                                            <small class="text-muted">2 minutes ago</small>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon bg-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h6>Low stock alert</h6>
+                                            <p class="text-muted mb-0">Birthday Card Set - Only 5 items remaining</p>
+                                            <small class="text-muted">15 minutes ago</small>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon bg-info">
+                                            <i class="fas fa-music"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h6>Studio session completed</h6>
+                                            <p class="text-muted mb-0">John Smith - 2 hours, ₦4,000 billed</p>
+                                            <small class="text-muted">1 hour ago</small>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon bg-primary">
+                                            <i class="fas fa-guitar"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <h6>Instrument rental</h6>
+                                            <p class="text-muted mb-0">Guitar rented to Sarah Johnson for 3 days</p>
+                                            <small class="text-muted">2 hours ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="music-studio.html" class="btn btn-outline-primary">
+                                            <i class="fas fa-user-plus me-2"></i>New Studio Check-in
+                                        </a>
+                                        <a href="supermarket.html" class="btn btn-outline-success">
+                                            <i class="fas fa-cash-register me-2"></i>Open POS
+                                        </a>
+                                        <a href="gift-store.html?action=add" class="btn btn-outline-warning">
+                                            <i class="fas fa-plus me-2"></i>Add Product
+                                        </a>
+                                        <a href="reports.html" class="btn btn-outline-info">
+                                            <i class="fas fa-chart-bar me-2"></i>Generate Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+
+    <script>
+        // Fallback to show page if JavaScript takes too long
+        setTimeout(function() {
+            const mainApp = document.getElementById('mainApp');
+            if (mainApp && !mainApp.classList.contains('active')) {
+                console.log('Fallback: Showing main app');
+                mainApp.classList.add('show');
+            }
+        }, 2000);
+
+        // Show modal function
+        function showModal(modalId) {
+            VioletMarellaCommon.showNotification('Modal functionality would be implemented here', 'info');
+        }
+    </script>
+</body>
+</html>

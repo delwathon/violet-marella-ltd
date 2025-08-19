@@ -1,0 +1,335 @@
+/* =========================================
+   INSTRUMENT RENTAL PAGE SPECIFIC STYLES
+   ========================================= */
+
+/* Category filter buttons */
+.category-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.category-filter .btn {
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.category-filter .btn.active {
+    background: linear-gradient(135deg, var(--primary-violet), var(--secondary-violet));
+    color: white;
+    border-color: var(--primary-violet);
+}
+
+/* Instruments grid */
+.instruments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.instrument-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.instrument-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-violet);
+}
+
+.instrument-image {
+    background: var(--light-violet);
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.instrument-image i {
+    color: var(--primary-violet);
+    font-size: 3rem;
+}
+
+.instrument-info {
+    padding: 1.5rem;
+}
+
+.instrument-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.instrument-details {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.rental-rate {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-violet);
+    margin-bottom: 0.5rem;
+}
+
+.availability-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.availability-status.available {
+    background: var(--success);
+    color: white;
+}
+
+.availability-status.rented {
+    background: var(--warning);
+    color: white;
+}
+
+.availability-status.maintenance {
+    background: var(--danger);
+    color: white;
+}
+
+/* Rental table styling */
+.rental-table th {
+    background: var(--light-violet);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border: none;
+}
+
+.rental-table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+.rental-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.rental-table tbody tr:hover {
+    background: var(--light-violet);
+    transform: scale(1.01);
+}
+
+/* Calendar styling */
+.calendar-container {
+    background: white;
+    border-radius: var(--border-radius-lg);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e5e7eb;
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    overflow: hidden;
+}
+
+.calendar-day {
+    background: white;
+    padding: 1rem;
+    min-height: 100px;
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: var(--light-violet);
+}
+
+.calendar-day.other-month {
+    background: #f9fafb;
+    color: #9ca3af;
+}
+
+.calendar-day.today {
+    background: var(--primary-violet);
+    color: white;
+}
+
+.day-number {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.day-events {
+    font-size: 0.7rem;
+}
+
+.day-event {
+    background: var(--accent-gold);
+    color: var(--dark-violet);
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+    display: block;
+    truncate: true;
+}
+
+/* Customer profile cards */
+.customer-profile {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.customer-profile:hover {
+    border-color: var(--primary-violet);
+    box-shadow: var(--shadow-sm);
+}
+
+.customer-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.customer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-violet), var(--secondary-violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    margin-right: 1rem;
+    font-size: 1.1rem;
+}
+
+.customer-details h6 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.customer-details small {
+    color: var(--text-secondary);
+}
+
+.rental-history {
+    margin-top: 1rem;
+}
+
+.rental-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.rental-item:last-child {
+    border-bottom: none;
+}
+
+/* Due today alerts */
+.due-item {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.due-item:hover {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: var(--warning);
+}
+
+.due-item.overdue {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .instruments-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .category-filter {
+        justify-content: center;
+    }
+    
+    .category-filter .btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+    }
+    
+    .instruments-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .calendar-grid {
+        font-size: 0.8rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 0.5rem;
+    }
+    
+    .customer-profile {
+        padding: 1rem;
+    }
+    
+    .customer-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .customer-avatar {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .instruments-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rental-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

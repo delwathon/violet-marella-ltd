@@ -1,0 +1,506 @@
+/* =========================================
+   REPORTS PAGE SPECIFIC STYLES
+   ========================================= */
+
+/* Filter section styling */
+.filter-section .card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-lg);
+}
+
+.filter-section .form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.filter-section .form-select,
+.filter-section .form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.filter-section .form-select:focus,
+.filter-section .form-control:focus {
+    border-color: var(--primary-violet);
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.15);
+}
+
+/* Summary cards */
+.summary-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.summary-card.revenue::before {
+    background: linear-gradient(180deg, var(--success), #059669);
+}
+
+.summary-card.transactions::before {
+    background: linear-gradient(180deg, var(--primary-violet), var(--secondary-violet));
+}
+
+.summary-card.customers::before {
+    background: linear-gradient(180deg, var(--warning), #d97706);
+}
+
+.summary-card.average::before {
+    background: linear-gradient(180deg, #0dcaf0, #0aa2c0);
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.summary-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.summary-card.revenue .summary-icon {
+    background: linear-gradient(135deg, var(--success), #059669);
+}
+
+.summary-card.transactions .summary-icon {
+    background: linear-gradient(135deg, var(--primary-violet), var(--secondary-violet));
+}
+
+.summary-card.customers .summary-icon {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+}
+
+.summary-card.average .summary-icon {
+    background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
+}
+
+.summary-trend {
+    text-align: right;
+}
+
+.trend-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.summary-content {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.summary-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.summary-card.revenue .summary-amount {
+    color: var(--success);
+}
+
+.summary-card.transactions .summary-amount {
+    color: var(--primary-violet);
+}
+
+.summary-card.customers .summary-amount {
+    color: var(--warning);
+}
+
+.summary-card.average .summary-amount {
+    color: #0dcaf0;
+}
+
+.summary-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.summary-period {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* Chart cards */
+.chart-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.chart-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chart-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.chart-controls .btn-group .btn {
+    font-size: 0.85rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.chart-body {
+    padding: 1.5rem;
+    position: relative;
+    height: 300px;
+}
+
+.chart-container {
+    position: relative;
+    height: 100%;
+}
+
+/* Report tabs */
+.card-header-tabs {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.card-header-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card-header-tabs .nav-link:hover {
+    border-color: var(--secondary-violet);
+    color: var(--primary-violet);
+    background: var(--light-violet);
+}
+
+.card-header-tabs .nav-link.active {
+    border-color: var(--primary-violet);
+    color: var(--primary-violet);
+    background: white;
+    font-weight: 600;
+}
+
+/* Metric cards */
+.metric-card {
+    background: var(--light-violet);
+    border: 1px solid rgba(111, 66, 193, 0.1);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    border-color: var(--primary-violet);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-card h4 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-violet);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.metric-card p {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.metric-change {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.metric-change.positive {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.metric-change.negative {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.metric-change.neutral {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-secondary);
+}
+
+/* Report tables */
+.table th {
+    background: var(--light-violet);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background: var(--light-violet);
+    transform: scale(1.01);
+}
+
+/* Custom report modal */
+.modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--light-violet), rgba(255, 255, 255, 0.8));
+    border-bottom: 1px solid rgba(111, 66, 193, 0.1);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.modal-title {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.modal-body .form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-color: var(--primary-violet);
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.15);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--bg-light);
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+/* Loading states */
+.chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-secondary);
+}
+
+.loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-violet);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Export buttons */
+.export-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .summary-amount {
+        font-size: 1.75rem;
+    }
+    
+    .chart-body {
+        padding: 1rem;
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-section .row {
+        gap: 1rem;
+    }
+    
+    .summary-card {
+        margin-bottom: 1rem;
+    }
+    
+    .summary-header {
+        padding: 1rem 1rem 0;
+    }
+    
+    .summary-content {
+        padding: 0 1rem 1rem;
+    }
+    
+    .summary-amount {
+        font-size: 1.5rem;
+    }
+    
+    .chart-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .chart-controls {
+        width: 100%;
+    }
+    
+    .chart-body {
+        padding: 1rem;
+        height: 200px;
+    }
+    
+    .metric-card {
+        padding: 1rem;
+    }
+    
+    .metric-card h4 {
+        font-size: 1.5rem;
+    }
+    
+    .export-actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header .row {
+        text-align: center;
+    }
+    
+    .page-header .col-auto {
+        margin-top: 1rem;
+    }
+    
+    .summary-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .summary-trend {
+        text-align: center;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    .card-header-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar,
+    .top-navbar,
+    .btn,
+    .filter-section,
+    .chart-controls {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+    
+    .summary-card,
+    .chart-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header {
+        border-bottom: 2px solid #000;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+    }
+}
