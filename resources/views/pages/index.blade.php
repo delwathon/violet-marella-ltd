@@ -12,6 +12,11 @@
                     <div class="text-center mb-4">
                         <h1 class="brand-logo">Violet Marella</h1>
                         <p class="brand-subtitle">Business Management Suite</p>
+                        <div class="alert alert-info mt-3">
+                            <strong>Demo Credentials:</strong><br>
+                            Email: <code>admin@demo.com</code><br>
+                            Password: <code>password</code>
+                        </div>
                     </div>
                     <form id="loginForm">
                         <div class="form-floating mb-3">
