@@ -25,6 +25,8 @@
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
         @include('layouts.dashboard-header')
     @else
+    <div class="login-container">
+    <div class="container">
         @include('layouts.auth-header')
     @endif
     <div id="app">
@@ -36,6 +38,9 @@
         @include('layouts.dashboard-footer')
     @else
         @include('layouts.auth-footer')
+
+    </div>
+</div>
     @endif
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
