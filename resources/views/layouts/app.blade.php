@@ -23,19 +23,47 @@
 </head>
 <body>
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
-        @include('layouts.dashboard-header')
+        
+    
+     <div class="main-app" id="mainApp">
+        <!-- Sidebar - Will be loaded dynamically -->
+        <nav class="sidebar" id="sideba">
+            <!-- Sidebar content will be loaded here -->
+            @include('layouts.sidebar')
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation - Will be loaded dynamically -->
+            <nav class="top-navbar" id="topNavba">
+                <!-- Top navigation content will be loaded here -->
+            </nav>
+
+    @include('layouts.dashboard-header')
+
     @else
+
     <div class="login-container">
     <div class="container">
         @include('layouts.auth-header')
+
+
     @endif
-    <div id="app">
-        <main class="py-4">
+
+
+
+    {{-- <div id="app">
+        <main class="py-4"> --}}
             @yield('content')
-        </main>
-    </div>
+        {{-- </main>
+    </div> --}}
+
+
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
         @include('layouts.dashboard-footer')
+
+        </div>
+     </div>
     @else
         @include('layouts.auth-footer')
 
