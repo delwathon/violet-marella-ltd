@@ -26,21 +26,20 @@
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
         
     
-     <div class="main-ap" id="mainApp">
-        <!-- Sidebar - Will be loaded dynamically -->
-        <nav class="sidebar" id="sidebar">
-            <!-- Sidebar content will be loaded here -->
-            @include('layouts.sidebar')
-        </nav>
+     <div class="main-app" id="mainApp">
+        <!-- Sidebar -->
+        @include('layouts.sidebar')
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Top Navigation - Will be loaded dynamically -->
+            <!-- Top Navigation -->
             <nav class="top-navbar" id="topNavbar">
                 <!-- Top navigation content will be loaded here -->
             </nav>
 
     @include('layouts.dashboard-header')
+    @yield('content')
+    @include('layouts.dashboard-footer')
 
     @else
 
@@ -61,8 +60,6 @@
 
 
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
-        @include('layouts.dashboard-footer')
-
         </div>
      </div>
     @else
