@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <!-- Add user management content here -->
+        <!-- User statistics, tabs, tables, and modals would go here, matching vb/users.html structure -->
     </div>
 </div>
 @endsection
