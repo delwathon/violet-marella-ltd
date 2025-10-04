@@ -20,7 +20,7 @@
     <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
     @stack('styles')
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
 </head>
 <body>
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
@@ -32,12 +32,13 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Top Navigation -->
-            <nav class="top-navbar" id="topNavbar">
-                <!-- Top navigation content will be loaded here -->
-            </nav>
+            {{-- Top Navbar (commented out for sidebar-only layout) --}}
+            {{--
+                <nav class="top-navbar">
+                    @include('layouts.dashboard-header')
+                </nav>
+            --}}
 
-    @include('layouts.dashboard-header')
     @yield('content')
     @include('layouts.dashboard-footer')
 
@@ -71,5 +72,17 @@
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
+
+    {{-- Fallback script to force .main-app visible if hidden --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mainApp = document.querySelector('.main-app');
+            if (mainApp && (getComputedStyle(mainApp).display === 'none' || mainApp.style.opacity === '0')) {
+                mainApp.style.display = 'block';
+                mainApp.style.opacity = '1';
+                mainApp.classList.add('show');
+            }
+        });
+    </script>
 </body>
 </html>
