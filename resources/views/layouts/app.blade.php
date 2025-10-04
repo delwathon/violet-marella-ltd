@@ -17,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
     @stack('styles')
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -25,9 +26,9 @@
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
         
     
-     <div class="main-ap" id="mainAp">
+     <div class="main-ap" id="mainApp">
         <!-- Sidebar - Will be loaded dynamically -->
-        <nav class="sidebar" id="sideba">
+        <nav class="sidebar" id="sidebar">
             <!-- Sidebar content will be loaded here -->
             @include('layouts.sidebar')
         </nav>
@@ -35,7 +36,7 @@
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navigation - Will be loaded dynamically -->
-            <nav class="top-navbar" id="topNavba">
+            <nav class="top-navbar" id="topNavbar">
                 <!-- Top navigation content will be loaded here -->
             </nav>
 
