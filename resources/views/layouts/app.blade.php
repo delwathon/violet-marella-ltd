@@ -25,7 +25,7 @@
     @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
         
     
-     <div class="main-app" id="mainApp">
+     <div class="main-ap" id="mainAp">
         <!-- Sidebar - Will be loaded dynamically -->
         <nav class="sidebar" id="sideba">
             <!-- Sidebar content will be loaded here -->

@@ -65,15 +65,15 @@ function checkAuthentication() {
             // Clear invalid data and redirect to login
             sessionStorage.removeItem('violetMarellaUser');
             localStorage.removeItem('violetMarellaUser');
-            if (currentPage !== 'login.html' && currentPage !== '') {
-                window.location.href = 'login.html';
+            if (currentPage !== 'login' && currentPage !== '') {
+                window.location.href = 'login';
             }
             return;
         }
-    } else if (currentPage !== 'login.html' && currentPage !== '') {
+    } else if (currentPage !== 'login' && currentPage !== '') {
         // Redirect to login if not authenticated and not on login page
         console.log('No authentication found, redirecting to login');
-        window.location.href = 'login.html';
+        window.location.href = 'login';
         return;
     }
 }
@@ -103,38 +103,38 @@ function loadSidebar() {
         
         const sidebarHTML = `
             <div class="sidebar-header">
-                <a href="dashboard.html" class="sidebar-brand">Violet Marella</a>
+                <a href="dashboard" class="sidebar-brand">Violet Marella</a>
                 <small class="sidebar-subtitle">Management Suite</small>
             </div>
             
             <div class="sidebar-nav">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html" data-page="dashboard">
+                        <a class="nav-link" href="dashboard" data-page="dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gift-store.html" data-page="gift-store">
+                        <a class="nav-link" href="gift-store" data-page="gift-store">
                             <i class="fas fa-gift"></i>
                             Gift Store
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="supermarket.html" data-page="supermarket">
+                        <a class="nav-link" href="supermarket" data-page="supermarket">
                             <i class="fas fa-shopping-cart"></i>
                             Mini Supermarket
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="music-studio.html" data-page="music-studio">
+                        <a class="nav-link" href="music-studio" data-page="music-studio">
                             <i class="fas fa-music"></i>
                             Music Studio
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="instrument-rental.html" data-page="instrument-rental">
+                        <a class="nav-link" href="instrument-rental" data-page="instrument-rental">
                             <i class="fas fa-guitar"></i>
                             Instrument Rental
                         </a>
@@ -145,19 +145,19 @@ function loadSidebar() {
                 
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="reports.html" data-page="reports">
+                        <a class="nav-link" href="reports" data-page="reports">
                             <i class="fas fa-chart-bar"></i>
                             Reports
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="settings.html" data-page="settings">
+                        <a class="nav-link" href="settings" data-page="settings">
                             <i class="fas fa-cog"></i>
                             Settings
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="users.html" data-page="users">
+                        <a class="nav-link" href="users" data-page="users">
                             <i class="fas fa-users"></i>
                             User Management
                         </a>
@@ -207,7 +207,7 @@ function loadTopNavbar() {
                             <li><a class="dropdown-item" href="#"><i class="fas fa-clock text-info me-2"></i>Studio booking reminder</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-chart-bar text-success me-2"></i>Monthly report ready</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="notifications.html">View All Notifications</a></li>
+                            <li><a class="dropdown-item text-center" href="notifications">View All Notifications</a></li>
                         </ul>
                     </div>
                     
@@ -220,8 +220,8 @@ function loadTopNavbar() {
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><a class="dropdown-item" href="profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" onclick="VioletMarellaCommon.logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
@@ -276,7 +276,7 @@ function updatePageHeader(currentPage) {
 function getCurrentPageName() {
     const pathname = window.location.pathname;
     const filename = pathname.split('/').pop();
-    return filename.replace('.html', '') || 'dashboard';
+    return filename.replace('', '') || 'dashboard';
 }
 
 /**
@@ -407,7 +407,7 @@ function logout() {
     AppState.currentUser = null;
     
     // Redirect to login
-    window.location.href = 'login.html';
+    window.location.href = 'login';
 }
 
 /**
