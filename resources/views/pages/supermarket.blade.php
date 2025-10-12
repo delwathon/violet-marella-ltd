@@ -35,7 +35,7 @@
                     <i class="fas fa-cash-register"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value" id="todaySales">₦0</div>
+                    <div class="stat-value" id="todaySales">₦{{ number_format($todaySales ?? 0, 2) }}</div>
                     <div class="stat-label">Today's Sales</div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                     <i class="fas fa-receipt"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value" id="todayTransactions">0</div>
+                    <div class="stat-value" id="todayTransactions">{{ $todayTransactions ?? 0 }}</div>
                     <div class="stat-label">Transactions</div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                     <i class="fas fa-boxes"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value" id="totalStock">0</div>
+                    <div class="stat-value" id="totalStock">{{ $totalStock ?? 0 }}</div>
                     <div class="stat-label">Items in Stock</div>
                 </div>
             </div>
@@ -68,7 +68,7 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value" id="customersServed">0</div>
+                    <div class="stat-value" id="customersServed">{{ $customersServed ?? 0 }}</div>
                     <div class="stat-label">Customers Served</div>
                 </div>
             </div>
@@ -95,21 +95,64 @@
                     <div class="col-md-4">
                         <select class="form-select form-select-lg" id="categoryFilter">
                             <option value="">All Categories</option>
-                            <option value="groceries">Groceries</option>
-                            <option value="beverages">Beverages</option>
-                            <option value="snacks">Snacks</option>
-                            <option value="household">Household</option>
-                            <option value="personal-care">Personal Care</option>
-                            <option value="dairy">Dairy Products</option>
-                            <option value="frozen">Frozen Foods</option>
-                            <option value="bakery">Bakery</option>
+                            @if(isset($categories))
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>
             </div>
             <!-- Product Grid -->
             <div class="product-grid" id="productGrid">
-                <!-- Products will be loaded here -->
+                @if(isset($products) && $products->count() > 0)
+                    <div class="row">
+                        @foreach($products as $product)
+                            <div class="col-md-4 col-lg-3 mb-3">
+                                <div class="product-card card h-100" data-product-id="{{ $product->id }}">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="product-image mb-2">
+                                            @if($product->image)
+                                                <img src="{{ asset('storage/' . $product->image) }}" class="img-fluid rounded" alt="{{ $product->name }}">
+                                            @else
+                                                <div class="placeholder-image bg-light rounded d-flex align-items-center justify-content-center" style="height: 120px;">
+                                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <h6 class="card-title">{{ $product->name }}</h6>
+                                        <p class="card-text text-muted small">{{ $product->category->name }}</p>
+                                        <div class="product-info">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="price fw-bold">₦{{ number_format($product->price, 2) }}</span>
+                                                <span class="stock text-muted small">
+                                                    @if($product->track_stock)
+                                                        Stock: {{ $product->stock_quantity }}
+                                                    @else
+                                                        <i class="fas fa-infinity text-success"></i>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <input type="number" class="form-control form-control-sm quantity-input" value="1" min="1" max="{{ $product->track_stock ? $product->stock_quantity : 999 }}">
+                                                <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ $product->id }}">
+                                                    <i class="fas fa-cart-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No products available</h5>
+                        <p class="text-muted">Products will appear here once they are added to the system.</p>
+                    </div>
+                @endif
             </div>
             <!-- Pagination -->
             <nav aria-label="Product pagination" class="mt-4">
@@ -231,7 +274,51 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Transactions will be loaded here -->
+                                @if(isset($recentTransactions) && $recentTransactions->count() > 0)
+                                    @foreach($recentTransactions as $sale)
+                                        <tr>
+                                            <td>
+                                                <span class="fw-bold">{{ $sale->receipt_number }}</span>
+                                            </td>
+                                            <td>{{ $sale->sale_date->format('H:i') }}</td>
+                                            <td>
+                                                @if($sale->customer)
+                                                    {{ $sale->customer->full_name }}
+                                                @else
+                                                    <span class="text-muted">Walk-in</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">{{ $sale->saleItems->count() }} items</span>
+                                            </td>
+                                            <td>
+                                                <strong>₦{{ number_format($sale->total_amount, 2) }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ $sale->payment_method === 'cash' ? 'success' : ($sale->payment_method === 'card' ? 'primary' : 'info') }}">
+                                                    {{ ucfirst($sale->payment_method) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ $sale->status === 'completed' ? 'success' : 'warning' }}">
+                                                    {{ ucfirst($sale->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            <i class="fas fa-receipt fa-2x mb-2"></i>
+                                            <br>No recent transactions
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
