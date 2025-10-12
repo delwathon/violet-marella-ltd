@@ -464,9 +464,66 @@ class SupermarketController extends Controller
     }
 
     /**
+     * Get cart from session.
+     */
+    public function getCart()
+    {
+        $cart = Session::get('pos_cart', []);
+
+        return response()->json([
+            'success' => true,
+            'cart' => $cart
+        ]);
+    }
+
+    /**
      * Get cart summary.
      */
-    private function getCartSummary()
+    public function getCartSummary()
+    {
+        $cart = Session::get('pos_cart', []);
+        $subtotal = 0;
+        $taxAmount = 0;
+        $totalItems = 0;
+
+        foreach ($cart as $item) {
+            $itemSubtotal = $item['price'] * $item['quantity'];
+            $itemTax = $itemSubtotal * ($item['tax_rate'] / 100);
+
+            $subtotal += $itemSubtotal;
+            $taxAmount += $itemTax;
+            $totalItems += $item['quantity'];
+        }
+
+        $total = $subtotal + $taxAmount;
+
+        return response()->json([
+            'success' => true,
+            'subtotal' => $subtotal,
+            'tax_amount' => $taxAmount,
+            'total' => $total,
+            'total_items' => $totalItems,
+            'count' => count($cart)
+        ]);
+    }
+
+    /**
+     * Clear cart.
+     */
+    public function clearCart()
+    {
+        Session::forget('pos_cart');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart cleared successfully'
+        ]);
+    }
+
+    /**
+     * Get cart summary (private method for internal use).
+     */
+    private function getCartSummaryPrivate()
     {
         $cart = Session::get('pos_cart', []);
         $subtotal = 0;

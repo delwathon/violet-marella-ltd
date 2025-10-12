@@ -524,6 +524,6 @@
     </div>
 </div>
 @push('scripts')
-<script src="{{ asset('assets/js/supermarket.js') }}"></script>
+<script src="{{ asset('assets/js/supermarket-laravel.js') }}"></script>
 @endpush
 @endsection

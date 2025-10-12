@@ -33,12 +33,14 @@ Route::prefix('/')->controller(PagesController::class)->group(function(){
     Route::get('users', 'users')->name('users');
 });
 
+
 // Staff Authentication Routes
 Route::prefix('staff')->group(function () {
     Route::get('login', [App\Http\Controllers\Auth\StaffAuthController::class, 'showLoginForm'])->name('staff.login');
     Route::post('login', [App\Http\Controllers\Auth\StaffAuthController::class, 'login']);
     Route::post('logout', [App\Http\Controllers\Auth\StaffAuthController::class, 'logout'])->name('staff.logout');
 });
+Auth::routes();
 
 // Supermarket POS System Routes
 Route::prefix('supermarket')->middleware(['staff.auth'])->group(function () {
@@ -51,6 +53,11 @@ Route::prefix('supermarket')->middleware(['staff.auth'])->group(function () {
     Route::post('cart/update', [App\Http\Controllers\SupermarketController::class, 'updateCart'])->name('supermarket.cart.update');
     Route::delete('cart/remove/{item}', [App\Http\Controllers\SupermarketController::class, 'removeFromCart'])->name('supermarket.cart.remove');
     Route::post('checkout', [App\Http\Controllers\SupermarketController::class, 'checkout'])->name('supermarket.checkout');
+
+    // Cart Routes
+    Route::get('cart', [App\Http\Controllers\SupermarketController::class, 'getCart'])->name('supermarket.cart.get');
+    Route::get('cart/summary', [App\Http\Controllers\SupermarketController::class, 'getCartSummary'])->name('supermarket.cart.summary');
+    Route::post('cart/clear', [App\Http\Controllers\SupermarketController::class, 'clearCart'])->name('supermarket.cart.clear');
 
     // Product Management
     Route::get('products', [App\Http\Controllers\SupermarketController::class, 'products'])->name('supermarket.products');
@@ -70,6 +77,5 @@ Route::prefix('supermarket')->middleware(['staff.auth'])->group(function () {
     Route::post('inventory/adjust', [App\Http\Controllers\SupermarketController::class, 'adjustInventory'])->name('supermarket.inventory.adjust');
 });
 
-Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
