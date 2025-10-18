@@ -18,7 +18,7 @@ assets/images/
 │   │   ├── teddy-bears.jpg
 │   │   ├── wedding-cards.jpg
 │   │   └── chocolate-collection.jpg
-│   ├── supermarket/
+│   ├── lounge/
 │   │   ├── rice-50kg.jpg
 │   │   ├── coca-cola.jpg
 │   │   ├── pringles.jpg
@@ -43,7 +43,7 @@ assets/images/
 ├── icons/
 │   ├── business-units/
 │   │   ├── gift-store-icon.svg
-│   │   ├── supermarket-icon.svg
+│   │   ├── lounge-icon.svg
 │   │   ├── music-studio-icon.svg
 │   │   └── rental-icon.svg
 │   └── features/

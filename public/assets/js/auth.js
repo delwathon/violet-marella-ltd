@@ -19,7 +19,7 @@ const demoUsers = [
         name: 'Jane Smith',
         role: 'Manager',
         avatar: 'JS',
-        permissions: ['dashboard', 'gift-store', 'supermarket', 'music-studio', 'reports']
+        permissions: ['dashboard', 'gift-store', 'lounge', 'music-studio', 'reports']
     },
     {
         email: 'staff@violetmarella.com',
@@ -27,7 +27,7 @@ const demoUsers = [
         name: 'Mike Johnson',
         role: 'Staff',
         avatar: 'MJ',
-        permissions: ['dashboard', 'gift-store', 'supermarket', 'music-studio']
+        permissions: ['dashboard', 'gift-store', 'lounge', 'music-studio']
     }
 ];
 

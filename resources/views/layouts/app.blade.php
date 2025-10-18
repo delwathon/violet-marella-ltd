@@ -19,58 +19,156 @@
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
     @stack('styles')
-    <!-- Scripts -->
-    {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
 </head>
 <body>
-    @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
-        
-    
-     <div class="main-app" id="mainApp">
-        <!-- Sidebar -->
-        @include('layouts.sidebar')
-
-        <!-- Main Content -->
-        <div class="main-content">
-            {{-- Top Navbar (commented out for sidebar-only layout) --}}
-            {{--
-                <nav class="top-navbar">
-                    @include('layouts.dashboard-header')
-                </nav>
-            --}}
-
-    @yield('content')
-    @include('layouts.dashboard-footer')
-
-    @else
-
-    <div class="login-container">
-    <div class="container">
-        @include('layouts.auth-header')
-
-
-    @endif
-
-
-
-    {{-- <div id="app">
-        <main class="py-4"> --}}
-            @yield('content')
-        {{-- </main>
-    </div> --}}
-
-
-    @if (Request::is('dashboard') || Request::is('gift-store') || Request::is('instrument-rental') || Request::is('music-studio') || Request::is('reports') || Request::is('settings') || Request::is('supermarket') || Request::is('users'))
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        @if(session('success'))
+        <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
         </div>
-     </div>
-    @else
-        @include('layouts.auth-footer')
+        @endif
 
+        @if(session('error'))
+        <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ session('error') }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        @endif
+
+        @if(session('warning'))
+        <div class="toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ session('warning') }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        @endif
+
+        @if(session('info'))
+        <div class="toast align-items-center text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ session('info') }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        @endif
+
+        @if($errors->any())
+            @foreach($errors->all() as $error)
+            <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-times-circle me-2"></i>
+                        {{ $error }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+            @endforeach
+        @endif
     </div>
-</div>
+
+    @if (Request::is('app/*') || Request::is('users'))
+        <div class="main-app" id="mainApp">
+            <!-- Sidebar -->
+            @include('layouts.sidebar')
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <nav class="top-navbar">
+                    @include('layouts.header')
+                </nav>
+                @yield('content')
+                @include('layouts.footer')
+            </div>
+        </div>
+    @else
+        <div class="login-container">
+            <div class="container">
+                @include('layouts.auth-header')
+                @yield('content')
+                @include('layouts.auth-footer')
+            </div>
+        </div>
     @endif
+
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Initialize Bootstrap Toasts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all toasts
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    autohide: true,
+                    delay: 5000
+                });
+            });
+            
+            // Show all toasts
+            toastList.forEach(toast => toast.show());
+        });
+
+        // Global function to show toast programmatically
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            
+            const bgClass = {
+                success: 'text-bg-success',
+                error: 'text-bg-danger',
+                warning: 'text-bg-warning',
+                info: 'text-bg-info'
+            }[type];
+            
+            const icon = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            }[type];
+            
+            const toastHTML = `
+                <div class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${icon} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+            toast.show();
+            
+            // Remove after hidden
+            toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+        }
+    </script>
+    
     @stack('scripts')
 
     {{-- Fallback script to force .main-app visible if hidden --}}

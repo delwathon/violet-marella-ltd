@@ -15,7 +15,7 @@ class Sale extends Model
     protected $fillable = [
         'receipt_number',
         'customer_id',
-        'staff_id',
+        'user_id',
         'subtotal',
         'tax_amount',
         'discount_amount',
@@ -68,7 +68,7 @@ class Sale extends Model
      */
     public function staff(): BelongsTo
     {
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -114,9 +114,9 @@ class Sale extends Model
     /**
      * Scope a query to filter sales by staff member.
      */
-    public function scopeByStaff($query, $staffId)
+    public function scopeByStaff($query, $userId)
     {
-        return $query->where('staff_id', $staffId);
+        return $query->where('user_id', $userId);
     }
 
     /**
@@ -178,7 +178,7 @@ class Sale extends Model
                 // Log inventory change
                 InventoryLog::create([
                     'product_id' => $item->product_id,
-                    'staff_id' => $this->staff_id,
+                    'user_id' => $this->user_id,
                     'action_type' => 'sale',
                     'quantity_change' => -$item->quantity,
                     'previous_stock' => $item->product->stock_quantity + $item->quantity,

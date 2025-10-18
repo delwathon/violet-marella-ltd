@@ -1,7 +1,7 @@
 @extends('layouts.app')
-@section('title', 'Mini Supermarket POS')
+@section('title', 'Mini Lounge POS')
 @push('styles')
-<link href="{{ asset('assets/css/supermarket.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/lounge.css') }}" rel="stylesheet">
 @endpush
 @section('content')
 <div class="content-area">
@@ -9,11 +9,11 @@
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h1 class="page-title">Mini Supermarket POS</h1>
+                <h1 class="page-title">Mini Lounge POS</h1>
                 <p class="page-subtitle">Point of Sale system with inventory management</p>
             </div>
             <div class="col-auto">
-                <div class="d-flex gap-2">
+                <!-- <div class="d-flex gap-2">
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newSaleModal">
                         <i class="fas fa-plus me-2"></i>New Sale
                     </button>
@@ -23,57 +23,153 @@
                     <button class="btn btn-outline-secondary">
                         <i class="fas fa-print me-2"></i>X-Report
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
-    <!-- Quick Stats -->
+
+    <!-- Quick Actions & Stats -->
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon bg-success">
-                    <i class="fas fa-cash-register"></i>
+        <!-- Quick Stats -->
+        <div class="col-lg-7">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success">
+                            <i class="fas fa-cash-register"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="todaySales">₦{{ number_format($todaySales ?? 0, 2) }}</div>
+                            <div class="stat-label">Today's Sales</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="todaySales">₦{{ number_format($todaySales ?? 0, 2) }}</div>
-                    <div class="stat-label">Today's Sales</div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="todayTransactions">{{ $todayTransactions ?? 0 }}</div>
+                            <div class="stat-label">Transactions</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalStock">{{ $totalStock ?? 0 }}</div>
+                            <div class="stat-label">Items in Stock</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-info">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="customersServed">{{ $customersServed ?? 0 }}</div>
+                            <div class="stat-label">Customers Served</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon bg-primary">
-                    <i class="fas fa-receipt"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="todayTransactions">{{ $todayTransactions ?? 0 }}</div>
-                    <div class="stat-label">Transactions</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon bg-warning">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="totalStock">{{ $totalStock ?? 0 }}</div>
-                    <div class="stat-label">Items in Stock</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon bg-info">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="customersServed">{{ $customersServed ?? 0 }}</div>
-                    <div class="stat-label">Customers Served</div>
+
+        <!-- Quick Management Actions Bar -->
+        <div class="col-lg-5">
+            <div class="quick-actions-bar mb-4">
+                <div class="row g-2">
+                    <!-- Product Management Quick Actions -->
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-primary mb-3">
+                                    <i class="fas fa-boxes"></i> Products
+                                </h6>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ route('products.create') }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus"></i> Add New Product
+                                    </a>
+                                    <a href="{{ route('products.index') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-list"></i> Manage Products
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="viewLowStock()">
+                                        <i class="fas fa-exclamation-triangle"></i> Low Stock Items
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Management Quick Actions -->
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-success mb-3">
+                                    <i class="fas fa-users"></i> Customers
+                                </h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#quickCustomerModal">
+                                        <i class="fas fa-user-plus"></i> Quick Add Customer
+                                    </button>
+                                    <a href="{{ route('customers.create') }}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-user-plus"></i> Add Customer (Full)
+                                    </a>
+                                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-list"></i> Manage Customers
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Management -->
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-info mb-3">
+                                    <i class="fas fa-tags"></i> Categories
+                                </h6>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ route('categories.create') }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-plus"></i> Add Category
+                                    </a>
+                                    <a href="{{ route('categories.index') }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-list"></i> Manage Categories
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reports & Analytics -->
+                    <div class="col-md-6">
+                        <div class="card border-warning">
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-warning mb-3">
+                                    <i class="fas fa-chart-line"></i> Reports
+                                </h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-sm btn-warning" onclick="viewDailySales()">
+                                        <i class="fas fa-calendar-day"></i> Daily Sales
+                                    </button>
+                                    <a href="{{ route('reports.index') }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-chart-bar"></i> Full Reports
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- POS Interface -->
     <div class="row">
         <!-- Product Search & Selection -->
@@ -242,6 +338,7 @@
             </div>
         </div>
     </div>
+
     <!-- Recent Transactions -->
     <div class="row mt-4">
         <div class="col-12">
@@ -249,13 +346,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Recent Transactions</h5>
                     <div class="d-flex gap-2">
-                        <input type="date" class="form-control form-control-sm" style="width: 150px;">
-                        <button class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-eye me-1"></i>View All
-                        </button>
-                        <button class="btn btn-sm btn-outline-success">
-                            <i class="fas fa-download me-1"></i>Export
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -305,9 +398,14 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button class="btn btn-outline-secondary" onclick="printReceipt({{ $sale->id }})" title="Print Receipt">
+                                                        <i class="fas fa-print"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -326,7 +424,9 @@
             </div>
         </div>
     </div>
+
 </div>
+
 <!-- New Sale Modal -->
 <div class="modal fade" id="newSaleModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -387,6 +487,7 @@
         </div>
     </div>
 </div>
+
 <!-- Payment Modal -->
 <div class="modal fade" id="paymentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -396,6 +497,50 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <!-- Customer Selection Section -->
+                <div class="customer-selection-section mb-4">
+                    <h6 class="mb-3">Customer Information (Optional)</h6>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="customerSearchInput" 
+                                       placeholder="Search customer by name or phone...">
+                                <button class="btn btn-outline-primary" type="button" onclick="searchCustomers()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <!-- Customer Search Results -->
+                            <div id="customerSearchResults" class="list-group mt-2" style="display: none; max-height: 200px; overflow-y: auto;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#quickCustomerModal">
+                                <i class="fas fa-user-plus"></i> New Customer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Customer Display -->
+                    <div id="selectedCustomerDisplay" class="alert alert-info mt-3" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Selected Customer:</strong>
+                                <span id="selectedCustomerName"></span>
+                                <br>
+                                <small id="selectedCustomerDetails"></small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="clearSelectedCustomer()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedCustomerId" value="">
+                </div>
+
+                <hr>
+
+                <!-- Payment Summary -->
                 <div class="payment-summary mb-4">
                     <h4 class="text-center mb-3">Total Amount</h4>
                     <div class="total-display text-center">
@@ -418,7 +563,10 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Payment Methods -->
                 <div class="payment-methods">
+                    <h6 class="mb-3">Select Payment Method</h6>
                     <div class="row">
                         <div class="col-6">
                             <button class="btn btn-outline-success payment-method w-100" data-method="cash">
@@ -441,43 +589,38 @@
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-warning payment-method w-100" data-method="split">
-                                <i class="fas fa-layer-group fa-2x mb-2"></i>
-                                <div>Split Payment</div>
+                            <button class="btn btn-outline-warning payment-method w-100" data-method="mobile_money">
+                                <i class="fas fa-wallet fa-2x mb-2"></i>
+                                <div>Mobile Money</div>
                             </button>
                         </div>
                     </div>
                 </div>
+
                 <!-- Cash Payment Section -->
                 <div class="cash-input mt-4" id="cashInput" style="display: none;">
                     <div class="mb-3">
                         <label class="form-label">Amount Received</label>
-                        <input type="number" class="form-control form-control-lg text-center" id="amountReceived" placeholder="0" step="0.01">
+                        <input type="number" class="form-control form-control-lg text-center" 
+                               id="amountReceived" placeholder="0" step="0.01" 
+                               onchange="calculateChange()">
                     </div>
                     <div class="change-display text-center">
                         <strong>Change: <span id="changeAmount" class="text-success">₦0</span></strong>
                     </div>
                 </div>
-                <!-- Split Payment Section -->
-                <div class="split-payment mt-4" id="splitPayment" style="display: none;">
-                    <h6>Split Payment</h6>
-                    <div class="split-methods" id="splitMethods">
-                        <!-- Split payment methods will be added here -->
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary mt-2">
-                        <i class="fas fa-plus me-1"></i>Add Payment Method
-                    </button>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" id="completePaymentBtn" disabled>
+                <button type="button" class="btn btn-success" id="completePaymentBtn" 
+                        onclick="completePayment()" disabled>
                     <i class="fas fa-check me-2"></i>Complete Payment
                 </button>
             </div>
         </div>
     </div>
 </div>
+
 <!-- Product Details Modal -->
 <div class="modal fade" id="productModal" tabindex="-1">
     <div class="modal-dialog">
@@ -498,6 +641,7 @@
         </div>
     </div>
 </div>
+
 <!-- Receipt Preview Modal -->
 <div class="modal fade" id="receiptModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -523,7 +667,131 @@
         </div>
     </div>
 </div>
+
+<!-- Quick Customer Creation Modal -->
+<div class="modal fade" id="quickCustomerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Quick Add Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quickCustomerForm">
+                    <div class="mb-3">
+                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="quickFirstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="quickLastName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="quickPhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="quickEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Type</label>
+                        <select class="form-select" id="quickCustomerType">
+                            <option value="walk-in">Walk-in</option>
+                            <option value="regular">Regular</option>
+                            <option value="wholesale">Wholesale</option>
+                            <option value="staff">Staff</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle"></i> For more details, use the <a href="{{ route('customers.create') }}" target="_blank">full customer form</a></small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="saveQuickCustomer()">
+                    <i class="fas fa-save"></i> Save Customer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Items Modal -->
+<div class="modal fade" id="lowStockModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Low Stock Items
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Current Stock</th>
+                                <th>Min Level</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ route('products.index') }}?stock_status=low" class="btn btn-primary">
+                    <i class="fas fa-list"></i> View All Low Stock
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Sales Report Modal -->
+<div class="modal fade" id="dailySalesModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-day"></i> Today's Sales Report
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="dailySalesContent">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ route('sales.today') }}" class="btn btn-primary">
+                    <i class="fas fa-chart-bar"></i> Full Reports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
-<script src="{{ asset('assets/js/supermarket-laravel.js') }}"></script>
+<script src="{{ asset('assets/js/lounge-laravel.js') }}"></script>
 @endpush
 @endsection

@@ -161,7 +161,7 @@
     color: var(--white);
 }
 
-.supermarket .module-icon {
+.lounge .module-icon {
     background: linear-gradient(135deg, var(--success), #059669);
     color: var(--white);
 }
@@ -467,7 +467,7 @@
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 
-.module-card.supermarket {
+.module-card.lounge {
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 

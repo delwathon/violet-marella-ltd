@@ -122,9 +122,9 @@ function loadSidebar() {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="supermarket" data-page="supermarket">
+                        <a class="nav-link" href="lounge" data-page="lounge">
                             <i class="fas fa-shopping-cart"></i>
-                            Mini Supermarket
+                            Mini Lounge
                         </a>
                     </li>
                     <li class="nav-item">
@@ -286,7 +286,7 @@ function getPageTitle() {
     const pageTitles = {
         'dashboard': 'Dashboard',
         'gift-store': 'Gift Store',
-        'supermarket': 'Mini Supermarket',
+        'lounge': 'Mini Lounge',
         'music-studio': 'Music Studio',
         'instrument-rental': 'Instrument Rental',
         'reports': 'Reports',
@@ -304,7 +304,7 @@ function getPageSubtitle() {
     const pageSubtitles = {
         'dashboard': 'Welcome to Violet Marella Management Suite',
         'gift-store': 'Manage inventory, sales, and customer orders',
-        'supermarket': 'POS system and inventory management',
+        'lounge': 'POS system and inventory management',
         'music-studio': 'Studio sessions and time-based billing',
         'instrument-rental': 'Manage instrument bookings and availability',
         'reports': 'Business analytics and insights',

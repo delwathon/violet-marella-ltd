@@ -40,9 +40,9 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'staff' => [
+        'user' => [
             'driver' => 'session',
-            'provider' => 'staff',
+            'provider' => 'users',
         ],
     ],
 
@@ -70,7 +70,7 @@ return [
         ],
         'staff' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Staff::class,
+            'model' => App\Models\User::class,
         ],
 
         // 'users' => [

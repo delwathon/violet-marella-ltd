@@ -53,7 +53,7 @@ const sampleUsers = [
         email: 'staff@violetmarella.com',
         phone: '+234 803 456 7890',
         role: 'staff',
-        department: 'supermarket',
+        department: 'lounge',
         employeeId: 'EMP-003',
         status: 'active',
         lastLogin: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -75,14 +75,14 @@ const sampleRoles = [
         id: 'role-002',
         name: 'Manager',
         description: 'Business operations and reporting access',
-        permissions: ['dashboard.view', 'gift-store.manage', 'supermarket.manage', 'music-studio.manage', 'reports.view'],
+        permissions: ['dashboard.view', 'gift-store.manage', 'lounge.manage', 'music-studio.manage', 'reports.view'],
         userCount: 2
     },
     {
         id: 'role-003',
         name: 'Staff',
         description: 'Basic operational access',
-        permissions: ['dashboard.view', 'gift-store.view', 'supermarket.operate'],
+        permissions: ['dashboard.view', 'gift-store.view', 'lounge.operate'],
         userCount: 3
     }
 ];
@@ -379,7 +379,7 @@ function formatDepartment(department) {
     const departments = {
         'all': 'All Departments',
         'gift-store': 'Gift Store',
-        'supermarket': 'Supermarket',
+        'lounge': 'Lounge',
         'music-studio': 'Music Studio'
     };
     return departments[department] || department;
@@ -408,8 +408,8 @@ function formatPermission(permission) {
         'dashboard.view': 'View Dashboard',
         'gift-store.manage': 'Manage Gift Store',
         'gift-store.view': 'View Gift Store',
-        'supermarket.manage': 'Manage Supermarket',
-        'supermarket.operate': 'Operate POS',
+        'lounge.manage': 'Manage Lounge',
+        'lounge.operate': 'Operate POS',
         'music-studio.manage': 'Manage Studio',
         'reports.view': 'View Reports',
         'users.manage': 'Manage Users',

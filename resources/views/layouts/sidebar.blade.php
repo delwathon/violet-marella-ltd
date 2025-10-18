@@ -1,24 +1,207 @@
-<nav class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <a href="{{ route('dashboard') }}" class="sidebar-brand">Violet Marella</a>
-        <small class="sidebar-subtitle">Management Suite</small>
+<!-- Sidebar Navigation -->
+<aside class="d-flex flex-column bg-dark text-white vh-100 position-fixed start-0 top-0 overflow-auto" style="width: 300px; z-index: 1000;">
+    <!-- Sidebar Header -->
+    <div class="p-4 border-bottom border-secondary border-opacity-25">
+        <h3 class="h5 mb-0 fw-semibold">Violet Marella</h3>
     </div>
-
-    <div class="sidebar-nav">
+    
+    <!-- Sidebar Navigation -->
+    <nav class="flex-grow-1 py-3">
         <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('gift-store') }}"><i class="fas fa-gift me-2"></i>Gift Store</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('supermarket') }}"><i class="fas fa-shopping-cart me-2"></i>Supermarket</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('music-studio') }}"><i class="fas fa-music me-2"></i>Music Studio</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('instrument-rental') }}"><i class="fas fa-guitar me-2"></i>Instrument Rental</a></li>
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a href="{{ route('dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('dashboard') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-home me-3" style="width: 20px;"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <!-- Lounge Section Header -->
+            <li class="nav-item mt-3">
+                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                    <i class="fas fa-store me-2 small"></i>
+                    <span>Lounge</span>
+                </div>
+            </li>
+            
+            <!-- Point of Sale -->
+            <li class="nav-item">
+                <a href="{{ route('lounge.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-cash-register me-3" style="width: 20px;"></i>
+                    <span>Point of Sale</span>
+                </a>
+            </li>
+            
+            <!-- Product Management -->
+            <li class="nav-item">
+                <a href="#productsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-boxes me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Products</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'show' : '' }}" id="productsMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('products.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('products.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-plus me-2"></i> Add Product
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('products.low-stock') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.low-stock') ? 'text-white' : '' }}">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Low Stock
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('categories.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('categories.*') ? 'text-white' : '' }}">
+                                <i class="fas fa-tags me-2"></i> Categories
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            <!-- Customer Management -->
+            <li class="nav-item">
+                <a href="#customersMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('customers.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('customers.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-users me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Customers</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('customers.*') ? 'show' : '' }}" id="customersMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('customers.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('customers.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('customers.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-plus me-2"></i> Add Customer
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            <!-- Sales & Transactions -->
+            <li class="nav-item">
+                <a href="#salesMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('sales.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('sales.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-receipt me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Sales</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('sales.*') ? 'show' : '' }}" id="salesMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('sales.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
+                                <i class="fas fa-list me-2"></i> All Sales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('sales.today') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
+                                <i class="fas fa-calendar-day me-2"></i> Today's Sales
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            <!-- Inventory -->
+            <li class="nav-item">
+                <a href="{{ route('inventory.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('inventory.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-warehouse me-3" style="width: 20px;"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            
+            <!-- Other Services Section Header -->
+            <li class="nav-item mt-4">
+                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                    <i class="fas fa-ellipsis-h me-2 small"></i>
+                    <span>Other Services</span>
+                </div>
+            </li>
+            
+            <!-- Gift Store -->
+            <li class="nav-item">
+                <a href="{{ route('gift-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('gift-store.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-gift me-3" style="width: 20px;"></i>
+                    <span>Gift Store</span>
+                </a>
+            </li>
+            
+            <!-- Instrument Rental -->
+            <li class="nav-item">
+                <a href="{{ route('instrument-rental.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('instrument-rental.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-guitar me-3" style="width: 20px;"></i>
+                    <span>Instrument Rental</span>
+                </a>
+            </li>
+            
+            <!-- Music Studio -->
+            <li class="nav-item">
+                <a href="{{ route('music-studio.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('music-studio.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-music me-3" style="width: 20px;"></i>
+                    <span>Music Studio</span>
+                </a>
+            </li>
+            
+            <!-- Reports -->
+            <li class="nav-item">
+                <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            
+            <!-- Settings -->
+            {{-- @if(auth()->user()->isAdmin()) --}}
+            <li class="nav-item">
+                <a href="#settingsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-cog me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Settings</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'show' : '' }}" id="settingsMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('settings.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('settings.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-sliders-h me-2"></i> General Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('users.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.*') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-shield me-2"></i> User Management
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {{-- @endif --}}
         </ul>
-
-        <hr class="sidebar-divider">
-
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="{{ route('reports') }}"><i class="fas fa-chart-bar me-2"></i>Reports</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}"><i class="fas fa-cog me-2"></i>Settings</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('users') }}"><i class="fas fa-users me-2"></i>Users</a></li>
-        </ul>
+    </nav>
+    
+    <!-- User Profile Section -->
+    <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
+        <div class="d-flex align-items-center gap-3">
+            <div class="text-primary fs-1">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="flex-grow-1 small">
+                <div class="text-white fw-semibold">{{ $user->first_name }} {{ $user->last_name }}</div>
+                <div class="text-secondary">{{ ucfirst($user->role) }}</div>
+            </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-link text-danger p-0" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
     </div>
-</nav>
+</aside>

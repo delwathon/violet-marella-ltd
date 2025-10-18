@@ -294,7 +294,7 @@ function loadBusinessMetrics() {
             orders: 234,
             avgOrderValue: 1923
         },
-        supermarket: {
+        lounge: {
             revenue: 1200000,
             transactions: 1847,
             avgTransaction: 650

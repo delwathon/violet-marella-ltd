@@ -1,9 +1,9 @@
 /**
- * VIOLET MARELLA LIMITED - SUPERMARKET POS FUNCTIONALITY
+ * VIOLET MARELLA LIMITED - LOUNGE POS FUNCTIONALITY
  * Point of Sale system with inventory management
  */
 
-// Supermarket state and data
+// Lounge state and data
 const SupermarketState = {
     products: [],
     cart: [],
@@ -100,10 +100,10 @@ const sampleTransactions = [
 ];
 
 /**
- * Initialize Supermarket POS
+ * Initialize Lounge POS
  */
 function initializeSupermarket() {
-    console.log('Initializing supermarket POS...');
+    console.log('Initializing lounge POS...');
     
     // Load data
     loadSupermarketData();
@@ -120,11 +120,11 @@ function initializeSupermarket() {
     updateTransactionsTable();
     updateStats();
     
-    console.log('Supermarket POS initialized successfully');
+    console.log('Lounge POS initialized successfully');
 }
 
 /**
- * Load Supermarket Data
+ * Load Lounge Data
  */
 function loadSupermarketData() {
     SupermarketState.products = [...sampleProducts];
@@ -167,7 +167,7 @@ function initializeCart() {
 }
 
 /**
- * Bind Supermarket Events
+ * Bind Lounge Events
  */
 function bindSupermarketEvents() {
     // Payment method buttons
@@ -648,7 +648,7 @@ function generateReceiptNumber() {
 function printReceipt(transaction) {
     const receiptContent = `
         VIOLET MARELLA LIMITED
-        Mini Supermarket
+        Mini Lounge
         ========================
         Receipt: ${transaction.receiptNumber}
         Date: ${VioletMarellaCommon.formatDate(transaction.timestamp, 'datetime')}
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeSupermarket, 100);
 });
 
-// Export supermarket functions for global access
+// Export lounge functions for global access
 window.VioletMarellaSupermarket = {
     addToCart,
     removeFromCart,

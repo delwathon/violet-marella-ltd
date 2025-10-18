@@ -1,6 +1,6 @@
 # Violet Marella Limited - Business Management Suite
 
-A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Supermarket, and Music Studio with Instrument Rental services.
+A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Lounge, and Music Studio with Instrument Rental services.
 
 ![Violet Marella Limited](assets/images/logos/logo-primary.svg)
 
@@ -13,7 +13,7 @@ A comprehensive multi-page business management application built with HTML, Boot
 - Sales tracking and reporting
 - Supplier management
 
-### 🛒 **Mini Supermarket POS**
+### 🛒 **Mini Lounge POS**
 - Full Point of Sale system
 - Barcode scanning support
 - Multiple payment methods (Cash, Card, Transfer, Split)
@@ -64,7 +64,7 @@ violet-marella-app/
 ├── 📄 index.html                    # Authentication page
 ├── 📄 dashboard.html                # Main business dashboard
 ├── 📄 gift-store.html              # Inventory management
-├── 📄 supermarket.html             # POS system
+├── 📄 lounge.html             # POS system
 ├── 📄 music-studio.html            # Studio management
 ├── 📄 instrument-rental.html       # Rental system
 ├── 📄 reports.html                 # Analytics & reports
@@ -84,7 +84,7 @@ violet-marella-app/
 │   │   ├── dashboard.js            # Dashboard functionality
 │   │   ├── gift-store.js           # Inventory management
 │   │   ├── music-studio.js         # Studio operations
-│   │   ├── supermarket.js          # POS system
+│   │   ├── lounge.js          # POS system
 │   │   └── [additional JS files]
 │   └── 📁 images/
 │       ├── logos/                  # Company branding
@@ -144,7 +144,7 @@ violet-marella-app/
 - **Stock Monitoring**: Real-time stock levels with alerts
 - **Search & Filter**: Advanced product search capabilities
 
-### Supermarket POS
+### Lounge POS
 - **Product Scanning**: Barcode support and manual entry
 - **Shopping Cart**: Add, remove, modify quantities
 - **Payment Processing**: Multiple payment methods

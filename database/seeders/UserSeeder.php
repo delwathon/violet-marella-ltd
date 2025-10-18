@@ -2,25 +2,24 @@
 
 namespace Database\Seeders;
 
-use App\Models\Staff;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class StaffSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $staff = [
+        $user = [
             [
-                'employee_id' => 'EMP001',
                 'first_name' => 'Admin',
                 'last_name' => 'User',
                 'email' => 'admin@violetmarella.com',
                 'phone' => '+234 800 000 0000',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('admin123'),
                 'role' => 'admin',
                 'hire_date' => now()->subYear(),
                 'address' => '123 Admin Street, Lagos',
@@ -29,12 +28,11 @@ class StaffSeeder extends Seeder
                 'permissions' => ['all'],
             ],
             [
-                'employee_id' => 'EMP002',
                 'first_name' => 'Manager',
                 'last_name' => 'User',
                 'email' => 'manager@violetmarella.com',
                 'phone' => '+234 800 000 0002',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('manager123'),
                 'role' => 'manager',
                 'hire_date' => now()->subMonths(6),
                 'address' => '456 Manager Avenue, Lagos',
@@ -43,12 +41,11 @@ class StaffSeeder extends Seeder
                 'permissions' => ['sales', 'inventory', 'reports', 'customers'],
             ],
             [
-                'employee_id' => 'EMP003',
-                'first_name' => 'John',
-                'last_name' => 'Cashier',
+                'first_name' => 'Cashier',
+                'last_name' => 'User',
                 'email' => 'cashier@violetmarella.com',
                 'phone' => '+234 800 000 0004',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('cashier123'),
                 'role' => 'cashier',
                 'hire_date' => now()->subMonths(3),
                 'address' => '789 Cashier Road, Lagos',
@@ -57,12 +54,11 @@ class StaffSeeder extends Seeder
                 'permissions' => ['sales', 'customers'],
             ],
             [
-                'employee_id' => 'EMP004',
-                'first_name' => 'Jane',
-                'last_name' => 'Stock Keeper',
-                'email' => 'stock@violetmarella.com',
+                'first_name' => 'User',
+                'last_name' => 'User',
+                'email' => 'staff@violetmarella.com',
                 'phone' => '+234 800 000 0006',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('staff123'),
                 'role' => 'stock_keeper',
                 'hire_date' => now()->subMonths(2),
                 'address' => '321 Stock Street, Lagos',
@@ -72,8 +68,8 @@ class StaffSeeder extends Seeder
             ],
         ];
 
-        foreach ($staff as $staffMember) {
-            Staff::create($staffMember);
+        foreach ($user as $users) {
+            User::create($users);
         }
     }
 }

@@ -16,20 +16,20 @@ class StaffAuth
      */
     public function handle(Request $request, Closure $next, string $role = null): Response
     {
-        if (!Auth::guard('staff')->check()) {
-            return redirect()->route('staff.login');
+        if (!Auth::guard('user')->check()) {
+            return redirect()->route('login');
         }
 
-        $staff = Auth::guard('staff')->user();
+        $user = Auth::guard('user')->user();
 
-        // Check if staff is active
-        if (!$staff->is_active) {
-            Auth::guard('staff')->logout();
-            return redirect()->route('staff.login')->with('error', 'Your account has been deactivated.');
+        // Check if user is active
+        if (!$user->is_active) {
+            Auth::guard('user')->logout();
+            return redirect()->route('login')->with('error', 'Your account has been deactivated.');
         }
 
         // Check role if specified
-        if ($role && !$staff->hasRole($role)) {
+        if ($role && !$user->hasRole($role)) {
             abort(403, 'You do not have permission to access this resource.');
         }
 

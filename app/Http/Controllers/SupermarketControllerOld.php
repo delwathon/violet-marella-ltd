@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
-class SupermarketController extends Controller
+class LoungeController extends Controller
 {
     /**
-     * Display the supermarket dashboard.
+     * Display the lounge dashboard.
      */
     public function index()
     {
-        $staff = Auth::guard('staff')->user();
+        $user = Auth::guard('user')->user();
 
         // Get today's sales data
         $todaySales = Sale::whereDate('sale_date', today())->sum('total_amount');
@@ -44,7 +44,7 @@ class SupermarketController extends Controller
                             ->take(5)
                             ->get();
 
-        return view('supermarket.dashboard', compact(
+        return view('lounge.dashboard', compact(
             'todaySales',
             'todayTransactions',
             'totalStock',
@@ -66,7 +66,7 @@ class SupermarketController extends Controller
         // Get cart from session
         $cart = Session::get('pos_cart', []);
 
-        return view('supermarket.pos', compact('categories', 'products', 'cart'));
+        return view('lounge.pos', compact('categories', 'products', 'cart'));
     }
 
     /**
@@ -193,14 +193,14 @@ class SupermarketController extends Controller
         DB::beginTransaction();
 
         try {
-            $staff = Auth::guard('staff')->user();
+            $user = Auth::guard('user')->user();
             $subtotal = 0;
             $taxAmount = 0;
 
             // Create sale
             $sale = Sale::create([
                 'customer_id' => $request->customer_id,
-                'staff_id' => $staff->id,
+                'user_id' => $user->id,
                 'subtotal' => 0, // Will be calculated
                 'tax_amount' => 0, // Will be calculated
                 'discount_amount' => $request->discount_amount ?? 0,
@@ -242,7 +242,7 @@ class SupermarketController extends Controller
                     // Log inventory change
                     InventoryLog::create([
                         'product_id' => $product->id,
-                        'staff_id' => $staff->id,
+                        'user_id' => $user->id,
                         'action_type' => 'sale',
                         'quantity_change' => -$item['quantity'],
                         'previous_stock' => $product->stock_quantity + $item['quantity'],
@@ -320,7 +320,7 @@ class SupermarketController extends Controller
         $categories = Category::active()->ordered()->get();
         $products = Product::with('category')->paginate(20);
 
-        return view('supermarket.products', compact('categories', 'products'));
+        return view('lounge.products', compact('categories', 'products'));
     }
 
     /**
@@ -332,7 +332,7 @@ class SupermarketController extends Controller
             $query->latest()->limit(3);
         }])->paginate(20);
 
-        return view('supermarket.customers', compact('customers'));
+        return view('lounge.customers', compact('customers'));
     }
 
     /**
@@ -365,7 +365,7 @@ class SupermarketController extends Controller
                     ->latest()
                     ->paginate(20);
 
-        return view('supermarket.sales', compact('sales'));
+        return view('lounge.sales', compact('sales'));
     }
 
     /**
@@ -375,7 +375,7 @@ class SupermarketController extends Controller
     {
         $sale->load(['customer', 'staff', 'saleItems.product', 'payments']);
 
-        return view('supermarket.sale-details', compact('sale'));
+        return view('lounge.sale-details', compact('sale'));
     }
 
     /**
@@ -408,7 +408,7 @@ class SupermarketController extends Controller
                          ->orderBy('date')
                          ->get();
 
-        return view('supermarket.reports', compact(
+        return view('lounge.reports', compact(
             'totalSales',
             'totalTransactions',
             'topProducts',
@@ -426,7 +426,7 @@ class SupermarketController extends Controller
         $products = Product::with('category')->paginate(20);
         $lowStockProducts = Product::lowStock()->get();
 
-        return view('supermarket.inventory', compact('products', 'lowStockProducts'));
+        return view('lounge.inventory', compact('products', 'lowStockProducts'));
     }
 
     /**
@@ -442,12 +442,12 @@ class SupermarketController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
-        $staff = Auth::guard('staff')->user();
+        $user = Auth::guard('user')->user();
 
         // Create inventory log
         $log = InventoryLog::logStockChange(
             $request->product_id,
-            $staff->id,
+            $user->id,
             $request->action_type,
             $request->quantity_change,
             $request->reason

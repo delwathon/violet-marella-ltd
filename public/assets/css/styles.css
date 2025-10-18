@@ -226,7 +226,7 @@ body {
     display: flex;
     align-items: center;
     transition: var(--transition);
-    margin-bottom: 0.5rem;
+    /* margin-bottom: 0.5rem; */
     font-weight: 500;
 }
 
@@ -360,7 +360,7 @@ body {
     color: var(--white);
 }
 
-.supermarket .module-icon {
+.lounge .module-icon {
     background: linear-gradient(135deg, var(--success), #059669);
     color: var(--white);
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('inventory_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('staff_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->enum('action_type', ['sale', 'purchase', 'adjustment', 'return', 'damage', 'expiry', 'transfer']);
             $table->integer('quantity_change'); // Positive for additions, negative for deductions
             $table->integer('previous_stock');
@@ -27,7 +27,7 @@ return new class extends Migration
             
             $table->index(['product_id', 'action_date']);
             $table->index(['action_type', 'action_date']);
-            $table->index(['staff_id', 'action_date']);
+            $table->index(['user_id', 'action_date']);
         });
     }
 

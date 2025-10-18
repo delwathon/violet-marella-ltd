@@ -12,7 +12,7 @@ class InventoryLog extends Model
 
     protected $fillable = [
         'product_id',
-        'staff_id',
+        'user_id',
         'action_type',
         'quantity_change',
         'previous_stock',
@@ -41,7 +41,7 @@ class InventoryLog extends Model
      */
     public function staff(): BelongsTo
     {
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -63,9 +63,9 @@ class InventoryLog extends Model
     /**
      * Scope a query to filter by staff member.
      */
-    public function scopeByStaff($query, $staffId)
+    public function scopeByStaff($query, $userId)
     {
-        return $query->where('staff_id', $staffId);
+        return $query->where('user_id', $userId);
     }
 
     /**
@@ -129,7 +129,7 @@ class InventoryLog extends Model
     /**
      * Create a new inventory log entry.
      */
-    public static function logStockChange($productId, $staffId, $actionType, $quantityChange, $reason = null, $referenceNumber = null)
+    public static function logStockChange($productId, $userId, $actionType, $quantityChange, $reason = null, $referenceNumber = null)
     {
         $product = Product::find($productId);
         if (!$product) {
@@ -141,7 +141,7 @@ class InventoryLog extends Model
 
         return self::create([
             'product_id' => $productId,
-            'staff_id' => $staffId,
+            'user_id' => $userId,
             'action_type' => $actionType,
             'quantity_change' => $quantityChange,
             'previous_stock' => $previousStock,

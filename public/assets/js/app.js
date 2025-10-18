@@ -37,8 +37,8 @@ const pageConfig = {
         title: 'Gift Store',
         subtitle: 'Manage inventory, sales, and customer orders'
     },
-    'supermarket': {
-        title: 'Mini Supermarket',
+    'lounge': {
+        title: 'Mini Lounge',
         subtitle: 'POS system and inventory management'
     },
     'music-studio': {
@@ -320,7 +320,7 @@ function loadSectionData(sectionName) {
         case 'gift-store':
             loadGiftStoreData();
             break;
-        case 'supermarket':
+        case 'lounge':
             loadSupermarketData();
             break;
         case 'music-studio':
@@ -366,10 +366,10 @@ function loadGiftStoreData() {
 }
 
 /**
- * Load Supermarket Data
+ * Load Lounge Data
  */
 function loadSupermarketData() {
-    console.log('Loading supermarket data...');
+    console.log('Loading lounge data...');
     // Here you would typically fetch POS and inventory data from an API
 }
 

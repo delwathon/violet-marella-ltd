@@ -15,6 +15,9 @@ class PagesController extends Controller
     public function giftStore() {
         return view('pages.gift-store');
     }
+    public function lounge() {
+        return view('pages.lounge');
+    }
     public function instrumentRental() {
         return view('pages.instrument-rental');
     }
@@ -27,37 +30,37 @@ class PagesController extends Controller
     public function settings() {
         return view('pages.settings');
     }
-    public function supermarket() {
-        // Get today's sales data
-        $todaySales = \App\Models\Sale::whereDate('sale_date', today())->sum('total_amount');
-        $todayTransactions = \App\Models\Sale::whereDate('sale_date', today())->count();
-        $totalStock = \App\Models\Product::sum('stock_quantity');
-        $customersServed = \App\Models\Customer::where('total_orders', '>', 0)->count();
+    // public function lounge() {
+    //     // Get today's sales data
+    //     $todaySales = \App\Models\Sale::whereDate('sale_date', today())->sum('total_amount');
+    //     $todayTransactions = \App\Models\Sale::whereDate('sale_date', today())->count();
+    //     $totalStock = \App\Models\Product::sum('stock_quantity');
+    //     $customersServed = \App\Models\Customer::where('total_orders', '>', 0)->count();
 
-        // Get categories and products
-        $categories = \App\Models\Category::active()->ordered()->get();
-        $products = \App\Models\Product::active()->with('category')->take(20)->get();
+    //     // Get categories and products
+    //     $categories = \App\Models\Category::active()->ordered()->get();
+    //     $products = \App\Models\Product::active()->with('category')->take(20)->get();
 
-        // Get recent transactions
-        $recentTransactions = \App\Models\Sale::with(['customer', 'saleItems.product'])
-                                            ->latest()
-                                            ->take(10)
-                                            ->get();
+    //     // Get recent transactions
+    //     $recentTransactions = \App\Models\Sale::with(['customer', 'saleItems.product'])
+    //                                         ->latest()
+    //                                         ->take(10)
+    //                                         ->get();
 
-        return view('pages.supermarket', compact(
-            'todaySales',
-            'todayTransactions', 
-            'totalStock',
-            'customersServed',
-            'categories',
-            'products',
-            'recentTransactions'
-        ));
-    }
-    public function test() {
-        return view('pages.test');
-    }
-    public function users() {
-        return view('pages.users');
-    }
+    //     return view('pages.lounge', compact(
+    //         'todaySales',
+    //         'todayTransactions', 
+    //         'totalStock',
+    //         'customersServed',
+    //         'categories',
+    //         'products',
+    //         'recentTransactions'
+    //     ));
+    // }
+    // public function test() {
+    //     return view('pages.test');
+    // }
+    // public function users() {
+    //     return view('pages.users');
+    // }
 }

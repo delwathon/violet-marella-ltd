@@ -360,7 +360,7 @@ body {
     color: var(--white);
 }
 
-.supermarket .module-icon {
+.lounge .module-icon {
     background: linear-gradient(135deg, var(--success), #059669);
     color: var(--white);
 }

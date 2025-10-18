@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('receipt_number')->unique();
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax_amount', 10, 2)->default(0);
             $table->decimal('discount_amount', 10, 2)->default(0);
@@ -32,7 +32,7 @@ return new class extends Migration
 
             $table->index(['sale_date', 'status']);
             $table->index(['customer_id', 'sale_date']);
-            $table->index(['staff_id', 'sale_date']);
+            $table->index(['user_id', 'sale_date']);
             $table->index(['payment_method', 'sale_date']);
         });
     }
