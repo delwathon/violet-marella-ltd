@@ -1,6 +1,6 @@
 # Violet Marella Limited - Business Management Suite
 
-A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Lounge, and Music Studio with Instrument Rental services.
+A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Lounge, and Music Studio with Prop Rental services.
 
 ![Violet Marella Limited](assets/images/logos/logo-primary.svg)
 
@@ -27,8 +27,8 @@ A comprehensive multi-page business management application built with HTML, Boot
 - Session duration monitoring
 - Automatic billing calculation: `extra_time_fee = (base_amount / base_time) * extra_minutes`
 
-### 🎸 **Instrument Rental Service**
-- Musical instrument booking system
+### 🎸 **Prop Rental Service**
+- Musical prop booking system
 - Customer database management
 - Rental calendar with availability tracking
 - Due date reminders and notifications
@@ -66,7 +66,7 @@ violet-marella-app/
 ├── 📄 gift-store.html              # Inventory management
 ├── 📄 lounge.html             # POS system
 ├── 📄 music-studio.html            # Studio management
-├── 📄 instrument-rental.html       # Rental system
+├── 📄 prop-rental.html       # Rental system
 ├── 📄 reports.html                 # Analytics & reports
 ├── 📄 settings.html                # System configuration
 ├── 📄 users.html                   # User management
@@ -156,7 +156,7 @@ violet-marella-app/
 - **QR Code System**: Customer check-in/check-out via QR codes
 - **Billing Engine**: Configurable rates with overtime calculation
 
-### Instrument Rental
+### Prop Rental
 - **Equipment Inventory**: Guitars, keyboards, drums, brass, strings
 - **Booking Calendar**: Visual availability tracking
 - **Customer Profiles**: Rental history and contact information

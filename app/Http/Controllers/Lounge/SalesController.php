@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Lounge;
 
+use App\Http\Controllers\Controller;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;

@@ -18,8 +18,8 @@ class PagesController extends Controller
     public function lounge() {
         return view('pages.lounge');
     }
-    public function instrumentRental() {
-        return view('pages.instrument-rental');
+    public function propRental() {
+        return view('pages.prop-rental');
     }
     public function musicStudio() {
         return view('pages.music-studio');

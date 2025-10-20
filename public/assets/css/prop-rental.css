@@ -1,5 +1,5 @@
 /* =========================================
-   INSTRUMENT RENTAL PAGE SPECIFIC STYLES
+   PROP RENTAL PAGE SPECIFIC STYLES
    ========================================= */
 
 /* Category filter buttons */
@@ -23,15 +23,15 @@
     border-color: var(--primary-violet);
 }
 
-/* Instruments grid */
-.instruments-grid {
+/* Props grid */
+.props-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.instrument-card {
+.prop-card {
     background: white;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-sm);
@@ -40,36 +40,36 @@
     overflow: hidden;
 }
 
-.instrument-card:hover {
+.prop-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
     border-color: var(--primary-violet);
 }
 
-.instrument-image {
+.prop-image {
     background: var(--light-violet);
     padding: 2rem;
     text-align: center;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.instrument-image i {
+.prop-image i {
     color: var(--primary-violet);
     font-size: 3rem;
 }
 
-.instrument-info {
+.prop-info {
     padding: 1.5rem;
 }
 
-.instrument-name {
+.prop-name {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
 }
 
-.instrument-details {
+.prop-details {
     color: var(--text-secondary);
     font-size: 0.9rem;
     margin-bottom: 1rem;
@@ -278,7 +278,7 @@
 
 /* Responsive design */
 @media (max-width: 1200px) {
-    .instruments-grid {
+    .props-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 }
@@ -293,7 +293,7 @@
         padding: 0.4rem 1rem;
     }
     
-    .instruments-grid {
+    .props-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 1rem;
     }
@@ -323,7 +323,7 @@
 }
 
 @media (max-width: 576px) {
-    .instruments-grid {
+    .props-grid {
         grid-template-columns: 1fr;
     }
     

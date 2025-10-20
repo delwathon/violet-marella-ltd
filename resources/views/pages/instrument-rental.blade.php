@@ -1,7 +1,7 @@
 @extends('layouts.app')
-@section('title', 'Instrument Rental')
+@section('title', 'Prop Rental')
 @push('styles')
-<link href="{{ asset('assets/css/instrument-rental.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/prop-rental.css') }}" rel="stylesheet">
 @endpush
 @section('content')
 <div class="content-area">
@@ -9,8 +9,8 @@
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h1 class="page-title">Instrument Rental</h1>
-                <p class="page-subtitle">Manage musical instrument bookings and availability</p>
+                <h1 class="page-title">Prop Rental</h1>
+                <p class="page-subtitle">Manage musical prop bookings and availability</p>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
@@ -18,7 +18,7 @@
                         <i class="fas fa-plus me-2"></i>New Rental
                     </button>
                     <button class="btn btn-outline-success">
-                        <i class="fas fa-guitar me-2"></i>Add Instrument
+                        <i class="fas fa-guitar me-2"></i>Add Prop
                     </button>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-value">47</div>
-                    <div class="stat-label">Total Instruments</div>
+                    <div class="stat-label">Total Props</div>
                 </div>
             </div>
         </div>
@@ -74,8 +74,8 @@
     <!-- Main Content Tabs -->
     <ul class="nav nav-tabs mb-4" id="rentalTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="instruments-tab" data-bs-toggle="tab" data-bs-target="#instruments" type="button">
-                <i class="fas fa-guitar me-2"></i>Instruments
+            <button class="nav-link active" id="props-tab" data-bs-toggle="tab" data-bs-target="#props" type="button">
+                <i class="fas fa-guitar me-2"></i>Props
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -96,11 +96,11 @@
     </ul>
     <!-- Tab Content -->
     <div class="tab-content" id="rentalTabContent">
-        <!-- Instruments Tab -->
-        <div class="tab-pane fade show active" id="instruments">
+        <!-- Props Tab -->
+        <div class="tab-pane fade show active" id="props">
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Instrument Categories -->
+                    <!-- Prop Categories -->
                     <div class="category-filter mb-4">
                         <button class="btn btn-outline-primary active" data-category="all">All</button>
                         <button class="btn btn-outline-primary" data-category="guitars">Guitars</button>
@@ -109,9 +109,9 @@
                         <button class="btn btn-outline-primary" data-category="brass">Brass</button>
                         <button class="btn btn-outline-primary" data-category="strings">Strings</button>
                     </div>
-                    <!-- Instruments Grid -->
-                    <div class="instruments-grid" id="instrumentsGrid">
-                        <!-- Instruments will be loaded here -->
+                    <!-- Props Grid -->
+                    <div class="props-grid" id="propsGrid">
+                        <!-- Props will be loaded here -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -170,7 +170,7 @@
                                 <tr>
                                     <th>Rental ID</th>
                                     <th>Customer</th>
-                                    <th>Instrument</th>
+                                    <th>Prop</th>
                                     <th>Start Date</th>
                                     <th>Due Date</th>
                                     <th>Status</th>
@@ -279,9 +279,9 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Instrument</label>
+                                <label class="form-label">Prop</label>
                                 <select class="form-select" required>
-                                    <option value="">Select Instrument</option>
+                                    <option value="">Select Prop</option>
                                 </select>
                             </div>
                         </div>
@@ -381,6 +381,6 @@
     </div>
 </div>
 @push('scripts')
-<script src="{{ asset('assets/js/instrument-rental.js') }}"></script>
+<script src="{{ asset('assets/js/prop-rental.js') }}"></script>
 @endpush
 @endsection

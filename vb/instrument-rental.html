@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instrument Rental - Violet Marella Limited</title>
+    <title>Prop Rental - Violet Marella Limited</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
     
     <!-- Custom CSS -->
     <link href="assets/css/styles.css" rel="stylesheet">
-    <link href="assets/css/instrument-rental.css" rel="stylesheet">
+    <link href="assets/css/prop-rental.css" rel="stylesheet">
 </head>
 <body>
     <div class="main-app">
@@ -38,16 +38,16 @@
                 <div class="page-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h1 class="page-title">Instrument Rental</h1>
-                            <p class="page-subtitle">Manage musical instrument bookings and availability</p>
+                            <h1 class="page-title">Prop Rental</h1>
+                            <p class="page-subtitle">Manage musical prop bookings and availability</p>
                         </div>
                         <div class="col-auto">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRentalModal">
                                     <i class="fas fa-plus me-2"></i>New Rental
                                 </button>
-                                <button class="btn btn-outline-success" onclick="addInstrument()">
-                                    <i class="fas fa-guitar me-2"></i>Add Instrument
+                                <button class="btn btn-outline-success" onclick="addProp()">
+                                    <i class="fas fa-guitar me-2"></i>Add Prop
                                 </button>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                             </div>
                             <div class="stat-info">
                                 <div class="stat-value">47</div>
-                                <div class="stat-label">Total Instruments</div>
+                                <div class="stat-label">Total Props</div>
                             </div>
                         </div>
                     </div>
@@ -105,8 +105,8 @@
                 <!-- Main Content Tabs -->
                 <ul class="nav nav-tabs mb-4" id="rentalTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="instruments-tab" data-bs-toggle="tab" data-bs-target="#instruments" type="button">
-                            <i class="fas fa-guitar me-2"></i>Instruments
+                        <button class="nav-link active" id="props-tab" data-bs-toggle="tab" data-bs-target="#props" type="button">
+                            <i class="fas fa-guitar me-2"></i>Props
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -128,11 +128,11 @@
 
                 <!-- Tab Content -->
                 <div class="tab-content" id="rentalTabContent">
-                    <!-- Instruments Tab -->
-                    <div class="tab-pane fade show active" id="instruments">
+                    <!-- Props Tab -->
+                    <div class="tab-pane fade show active" id="props">
                         <div class="row">
                             <div class="col-lg-8">
-                                <!-- Instrument Categories -->
+                                <!-- Prop Categories -->
                                 <div class="category-filter mb-4">
                                     <button class="btn btn-outline-primary active" data-category="all">All</button>
                                     <button class="btn btn-outline-primary" data-category="guitars">Guitars</button>
@@ -142,9 +142,9 @@
                                     <button class="btn btn-outline-primary" data-category="strings">Strings</button>
                                 </div>
 
-                                <!-- Instruments Grid -->
-                                <div class="instruments-grid" id="instrumentsGrid">
-                                    <!-- Instruments will be loaded here -->
+                                <!-- Props Grid -->
+                                <div class="props-grid" id="propsGrid">
+                                    <!-- Props will be loaded here -->
                                 </div>
                             </div>
 
@@ -159,7 +159,7 @@
                                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRentalModal">
                                                 <i class="fas fa-plus me-2"></i>New Rental
                                             </button>
-                                            <button class="btn btn-outline-success" onclick="checkInstrument()">
+                                            <button class="btn btn-outline-success" onclick="checkProp()">
                                                 <i class="fas fa-check me-2"></i>Check In Return
                                             </button>
                                             <button class="btn btn-outline-warning" onclick="markMaintenance()">
@@ -206,7 +206,7 @@
                                             <tr>
                                                 <th>Rental ID</th>
                                                 <th>Customer</th>
-                                                <th>Instrument</th>
+                                                <th>Prop</th>
                                                 <th>Start Date</th>
                                                 <th>Due Date</th>
                                                 <th>Status</th>
@@ -321,10 +321,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Instrument</label>
-                                    <select class="form-select" required id="rentalInstrument">
-                                        <option value="">Select Instrument</option>
-                                        <!-- Available instruments will be loaded here -->
+                                    <label class="form-label">Prop</label>
+                                    <select class="form-select" required id="rentalProp">
+                                        <option value="">Select Prop</option>
+                                        <!-- Available props will be loaded here -->
                                     </select>
                                 </div>
                             </div>
@@ -430,6 +430,6 @@
     
     <!-- Custom JavaScript -->
     <script src="assets/js/common.js"></script>
-    <script src="assets/js/instrument-rental.js"></script>
+    <script src="assets/js/prop-rental.js"></script>
 </body>
 </html>

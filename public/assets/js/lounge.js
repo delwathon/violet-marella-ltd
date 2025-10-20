@@ -4,7 +4,7 @@
  */
 
 // Lounge state and data
-const SupermarketState = {
+const LoungeState = {
     products: [],
     cart: [],
     currentCustomer: null,
@@ -102,18 +102,18 @@ const sampleTransactions = [
 /**
  * Initialize Lounge POS
  */
-function initializeSupermarket() {
+function initializeLounge() {
     console.log('Initializing lounge POS...');
     
     // Load data
-    loadSupermarketData();
+    loadLoungeData();
     
     // Initialize components
     initializeProductSearch();
     initializeCart();
     
     // Bind events
-    bindSupermarketEvents();
+    bindLoungeEvents();
     
     // Update displays
     updateProductGrid();
@@ -126,12 +126,12 @@ function initializeSupermarket() {
 /**
  * Load Lounge Data
  */
-function loadSupermarketData() {
-    SupermarketState.products = [...sampleProducts];
-    SupermarketState.transactions = [...sampleTransactions];
-    SupermarketState.pagination.totalItems = SupermarketState.products.length;
+function loadLoungeData() {
+    LoungeState.products = [...sampleProducts];
+    LoungeState.transactions = [...sampleTransactions];
+    LoungeState.pagination.totalItems = LoungeState.products.length;
     
-    console.log('Loaded', SupermarketState.products.length, 'products');
+    console.log('Loaded', LoungeState.products.length, 'products');
 }
 
 /**
@@ -169,7 +169,7 @@ function initializeCart() {
 /**
  * Bind Lounge Events
  */
-function bindSupermarketEvents() {
+function bindLoungeEvents() {
     // Payment method buttons
     const paymentMethods = document.querySelectorAll('.payment-method');
     paymentMethods.forEach(btn => {
@@ -234,7 +234,7 @@ function updateProductGrid() {
  * Get Filtered Products
  */
 function getFilteredProducts() {
-    let filtered = [...SupermarketState.products];
+    let filtered = [...LoungeState.products];
     
     // Apply search filter
     const searchTerm = document.getElementById('productSearch')?.value.toLowerCase();
@@ -259,8 +259,8 @@ function getFilteredProducts() {
  * Get Paginated Products
  */
 function getPaginatedProducts(products) {
-    const startIndex = (SupermarketState.pagination.currentPage - 1) * SupermarketState.pagination.itemsPerPage;
-    const endIndex = startIndex + SupermarketState.pagination.itemsPerPage;
+    const startIndex = (LoungeState.pagination.currentPage - 1) * LoungeState.pagination.itemsPerPage;
+    const endIndex = startIndex + LoungeState.pagination.itemsPerPage;
     return products.slice(startIndex, endIndex);
 }
 
@@ -268,8 +268,8 @@ function getPaginatedProducts(products) {
  * Update Pagination
  */
 function updatePagination(totalItems) {
-    SupermarketState.pagination.totalItems = totalItems;
-    const totalPages = Math.ceil(totalItems / SupermarketState.pagination.itemsPerPage);
+    LoungeState.pagination.totalItems = totalItems;
+    const totalPages = Math.ceil(totalItems / LoungeState.pagination.itemsPerPage);
     
     const paginationContainer = document.getElementById('productPagination');
     if (!paginationContainer) return;
@@ -278,14 +278,14 @@ function updatePagination(totalItems) {
     
     // Previous button
     paginationHTML += `
-        <li class="page-item ${SupermarketState.pagination.currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${SupermarketState.pagination.currentPage - 1})">Previous</a>
+        <li class="page-item ${LoungeState.pagination.currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${LoungeState.pagination.currentPage - 1})">Previous</a>
         </li>
     `;
     
     // Page numbers
     for (let i = 1; i <= totalPages; i++) {
-        if (i === SupermarketState.pagination.currentPage) {
+        if (i === LoungeState.pagination.currentPage) {
             paginationHTML += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
         } else {
             paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
@@ -294,8 +294,8 @@ function updatePagination(totalItems) {
     
     // Next button
     paginationHTML += `
-        <li class="page-item ${SupermarketState.pagination.currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${SupermarketState.pagination.currentPage + 1})">Next</a>
+        <li class="page-item ${LoungeState.pagination.currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${LoungeState.pagination.currentPage + 1})">Next</a>
         </li>
     `;
     
@@ -306,11 +306,11 @@ function updatePagination(totalItems) {
  * Change Page
  */
 function changePage(page) {
-    const totalPages = Math.ceil(SupermarketState.pagination.totalItems / SupermarketState.pagination.itemsPerPage);
+    const totalPages = Math.ceil(LoungeState.pagination.totalItems / LoungeState.pagination.itemsPerPage);
     
     if (page < 1 || page > totalPages) return;
     
-    SupermarketState.pagination.currentPage = page;
+    LoungeState.pagination.currentPage = page;
     updateProductGrid();
 }
 
@@ -318,7 +318,7 @@ function changePage(page) {
  * Search Products
  */
 function searchProducts(searchTerm) {
-    SupermarketState.pagination.currentPage = 1;
+    LoungeState.pagination.currentPage = 1;
     updateProductGrid();
 }
 
@@ -326,7 +326,7 @@ function searchProducts(searchTerm) {
  * Filter Products by Category
  */
 function filterProductsByCategory(category) {
-    SupermarketState.pagination.currentPage = 1;
+    LoungeState.pagination.currentPage = 1;
     updateProductGrid();
 }
 
@@ -334,10 +334,10 @@ function filterProductsByCategory(category) {
  * Add Product to Cart
  */
 function addToCart(productId) {
-    const product = SupermarketState.products.find(p => p.id === productId);
+    const product = LoungeState.products.find(p => p.id === productId);
     if (!product || product.stock === 0) return;
     
-    const existingItem = SupermarketState.cart.find(item => item.productId === productId);
+    const existingItem = LoungeState.cart.find(item => item.productId === productId);
     
     if (existingItem) {
         if (existingItem.quantity < product.stock) {
@@ -348,7 +348,7 @@ function addToCart(productId) {
             return;
         }
     } else {
-        SupermarketState.cart.push({
+        LoungeState.cart.push({
             productId: productId,
             name: product.name,
             price: product.price,
@@ -369,7 +369,7 @@ function updateCartDisplay() {
     const cartItems = document.getElementById('cartItems');
     if (!cartItems) return;
     
-    if (SupermarketState.cart.length === 0) {
+    if (LoungeState.cart.length === 0) {
         cartItems.innerHTML = `
             <div class="empty-cart">
                 <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
@@ -380,7 +380,7 @@ function updateCartDisplay() {
         return;
     }
     
-    cartItems.innerHTML = SupermarketState.cart.map(item => `
+    cartItems.innerHTML = LoungeState.cart.map(item => `
         <div class="cart-item" data-product-id="${item.productId}">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="item-info">
@@ -407,7 +407,7 @@ function updateCartDisplay() {
  * Update Cart Summary
  */
 function updateCartSummary() {
-    const subtotal = SupermarketState.cart.reduce((sum, item) => sum + item.total, 0);
+    const subtotal = LoungeState.cart.reduce((sum, item) => sum + item.total, 0);
     const tax = subtotal * 0.075; // 7.5% VAT
     const total = subtotal + tax;
     
@@ -418,7 +418,7 @@ function updateCartSummary() {
     // Enable/disable checkout button
     const checkoutBtn = document.getElementById('checkoutBtn');
     if (checkoutBtn) {
-        checkoutBtn.disabled = SupermarketState.cart.length === 0;
+        checkoutBtn.disabled = LoungeState.cart.length === 0;
     }
 }
 
@@ -426,7 +426,7 @@ function updateCartSummary() {
  * Remove Item from Cart
  */
 function removeFromCart(productId) {
-    SupermarketState.cart = SupermarketState.cart.filter(item => item.productId !== productId);
+    LoungeState.cart = LoungeState.cart.filter(item => item.productId !== productId);
     updateCartDisplay();
     updateCartSummary();
 }
@@ -435,8 +435,8 @@ function removeFromCart(productId) {
  * Update Item Quantity
  */
 function updateQuantity(productId, change) {
-    const item = SupermarketState.cart.find(item => item.productId === productId);
-    const product = SupermarketState.products.find(p => p.id === productId);
+    const item = LoungeState.cart.find(item => item.productId === productId);
+    const product = LoungeState.products.find(p => p.id === productId);
     
     if (!item || !product) return;
     
@@ -463,10 +463,10 @@ function updateQuantity(productId, change) {
  * Clear Cart
  */
 function clearCart() {
-    if (SupermarketState.cart.length === 0) return;
+    if (LoungeState.cart.length === 0) return;
     
     if (confirm('Are you sure you want to clear the cart?')) {
-        SupermarketState.cart = [];
+        LoungeState.cart = [];
         updateCartDisplay();
         updateCartSummary();
         VioletMarellaCommon.showNotification('Cart cleared', 'info');
@@ -487,7 +487,7 @@ function applyDiscount() {
         return;
     }
     
-    const subtotal = SupermarketState.cart.reduce((sum, item) => sum + item.total, 0);
+    const subtotal = LoungeState.cart.reduce((sum, item) => sum + item.total, 0);
     const discountAmount = subtotal * (discount / 100);
     
     document.getElementById('cartDiscount').textContent = `-${VioletMarellaCommon.formatCurrency(discountAmount)}`;
@@ -505,7 +505,7 @@ function applyDiscount() {
  * Process Checkout
  */
 function processCheckout() {
-    if (SupermarketState.cart.length === 0) return;
+    if (LoungeState.cart.length === 0) return;
     
     const total = calculateTotal();
     document.getElementById('paymentTotal').textContent = VioletMarellaCommon.formatCurrency(total);
@@ -518,7 +518,7 @@ function processCheckout() {
  * Calculate Total
  */
 function calculateTotal() {
-    const subtotal = SupermarketState.cart.reduce((sum, item) => sum + item.total, 0);
+    const subtotal = LoungeState.cart.reduce((sum, item) => sum + item.total, 0);
     const tax = subtotal * 0.075;
     const discountElement = document.getElementById('cartDiscount');
     const discount = discountElement ? parseFloat(discountElement.textContent.replace(/[₦,]/g, '')) || 0 : 0;
@@ -531,7 +531,7 @@ function calculateTotal() {
  */
 function handlePaymentMethodSelect(event) {
     const method = event.currentTarget.getAttribute('data-method');
-    SupermarketState.payment.method = method;
+    LoungeState.payment.method = method;
     
     // Remove active class from all buttons
     document.querySelectorAll('.payment-method').forEach(btn => {
@@ -573,7 +573,7 @@ function calculateChange() {
  */
 function completePayment() {
     const total = calculateTotal();
-    const method = SupermarketState.payment.method;
+    const method = LoungeState.payment.method;
     
     if (!method) {
         VioletMarellaCommon.showNotification('Please select a payment method', 'warning');
@@ -585,27 +585,27 @@ function completePayment() {
         id: `TXN-${Date.now()}`,
         receiptNumber: generateReceiptNumber(),
         timestamp: new Date(),
-        items: SupermarketState.cart.length,
+        items: LoungeState.cart.length,
         amount: total,
         paymentMethod: method,
         cashier: 'Current User', // In real app, get from current user
-        products: [...SupermarketState.cart]
+        products: [...LoungeState.cart]
     };
     
     // Add to transactions
-    SupermarketState.transactions.unshift(transaction);
+    LoungeState.transactions.unshift(transaction);
     
     // Update product stock
-    SupermarketState.cart.forEach(item => {
-        const product = SupermarketState.products.find(p => p.id === item.productId);
+    LoungeState.cart.forEach(item => {
+        const product = LoungeState.products.find(p => p.id === item.productId);
         if (product) {
             product.stock -= item.quantity;
         }
     });
     
     // Clear cart
-    SupermarketState.cart = [];
-    SupermarketState.payment = { method: null, amount: 0, change: 0 };
+    LoungeState.cart = [];
+    LoungeState.payment = { method: null, amount: 0, change: 0 };
     
     // Update displays
     updateCartDisplay();
@@ -677,7 +677,7 @@ function updateTransactionsTable() {
     const transactionsTable = document.getElementById('transactionsTable');
     if (!transactionsTable) return;
     
-    const recentTransactions = SupermarketState.transactions.slice(0, 10);
+    const recentTransactions = LoungeState.transactions.slice(0, 10);
     
     transactionsTable.innerHTML = recentTransactions.map(transaction => `
         <tr>
@@ -720,13 +720,13 @@ function getPaymentMethodColor(method) {
  */
 function updateStats() {
     const today = new Date().toDateString();
-    const todayTransactions = SupermarketState.transactions.filter(t => 
+    const todayTransactions = LoungeState.transactions.filter(t => 
         t.timestamp.toDateString() === today
     );
     
     const todaySales = todayTransactions.reduce((sum, t) => sum + t.amount, 0);
     const totalCustomers = todayTransactions.length;
-    const totalProducts = SupermarketState.products.reduce((sum, p) => sum + p.stock, 0);
+    const totalProducts = LoungeState.products.reduce((sum, p) => sum + p.stock, 0);
     
     // Update stat cards
     const statCards = [
@@ -751,7 +751,7 @@ function handleBarcodeInput(event) {
     // Simulate barcode scanner input (when Enter is pressed in search field)
     if (event.key === 'Enter' && event.target.id === 'productSearch') {
         const barcode = event.target.value;
-        const product = SupermarketState.products.find(p => p.barcode === barcode);
+        const product = LoungeState.products.find(p => p.barcode === barcode);
         
         if (product) {
             addToCart(product.id);
@@ -787,7 +787,7 @@ function startSale() {
     const customerPhone = document.getElementById('customerPhone')?.value;
     const isRegular = document.getElementById('isRegularCustomer')?.checked;
     
-    SupermarketState.currentCustomer = {
+    LoungeState.currentCustomer = {
         name: customerName || 'Walk-in Customer',
         phone: customerPhone,
         isRegular: isRegular
@@ -796,14 +796,14 @@ function startSale() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('newSaleModal'));
     modal.hide();
     
-    VioletMarellaCommon.showNotification(`Sale started for ${SupermarketState.currentCustomer.name}`, 'success');
+    VioletMarellaCommon.showNotification(`Sale started for ${LoungeState.currentCustomer.name}`, 'success');
 }
 
 /**
  * View Transaction Details
  */
 function viewTransaction(transactionId) {
-    const transaction = SupermarketState.transactions.find(t => t.id === transactionId);
+    const transaction = LoungeState.transactions.find(t => t.id === transactionId);
     if (!transaction) return;
     
     const details = `
@@ -825,7 +825,7 @@ function viewTransaction(transactionId) {
  * Reprint Receipt
  */
 function reprintReceipt(transactionId) {
-    const transaction = SupermarketState.transactions.find(t => t.id === transactionId);
+    const transaction = LoungeState.transactions.find(t => t.id === transactionId);
     if (transaction) {
         printReceipt(transaction);
     }
@@ -842,11 +842,11 @@ function viewAllTransactions() {
  * Initialize on DOM Content Loaded
  */
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initializeSupermarket, 100);
+    setTimeout(initializeLounge, 100);
 });
 
 // Export lounge functions for global access
-window.VioletMarellaSupermarket = {
+window.VioletMarellaLounge = {
     addToCart,
     removeFromCart,
     updateQuantity,

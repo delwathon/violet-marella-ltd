@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Lounge;
 
+use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Sale;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
-class LoungeController extends Controller
+class LoungeRootController extends Controller
 {
     /**
      * Display the POS interface
@@ -148,7 +149,7 @@ class LoungeController extends Controller
         }
         
         // Get cart from session
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         
         // Check if product already exists in cart
         $existingIndex = array_search($request->product_id, array_column($cart, 'product_id'));
@@ -169,7 +170,7 @@ class LoungeController extends Controller
             ];
         }
         
-        Session::put('supermarket_cart', $cart);
+        Session::put('lounge_cart', $cart);
         
         return response()->json([
             'success' => true,
@@ -183,7 +184,7 @@ class LoungeController extends Controller
      */
     public function getCart()
     {
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         
         return response()->json([
             'success' => true,
@@ -196,7 +197,7 @@ class LoungeController extends Controller
      */
     public function getCartSummary()
     {
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         
         $count = count($cart);
         $subtotal = 0;
@@ -232,7 +233,7 @@ class LoungeController extends Controller
             'quantity' => 'required|integer',
         ]);
         
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         $index = array_search($request->product_id, array_column($cart, 'product_id'));
         
         if ($index !== false) {
@@ -255,7 +256,7 @@ class LoungeController extends Controller
                 $cart[$index]['total_price'] = $cart[$index]['price'] * $newQuantity;
             }
             
-            Session::put('supermarket_cart', $cart);
+            Session::put('lounge_cart', $cart);
             
             return response()->json([
                 'success' => true,
@@ -274,12 +275,12 @@ class LoungeController extends Controller
      */
     public function removeFromCart($productId)
     {
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         $index = array_search($productId, array_column($cart, 'product_id'));
         
         if ($index !== false) {
             array_splice($cart, $index, 1);
-            Session::put('supermarket_cart', $cart);
+            Session::put('lounge_cart', $cart);
             
             return response()->json([
                 'success' => true,
@@ -298,7 +299,7 @@ class LoungeController extends Controller
      */
     public function clearCart()
     {
-        Session::forget('supermarket_cart');
+        Session::forget('lounge_cart');
         
         return response()->json([
             'success' => true,
@@ -318,7 +319,7 @@ class LoungeController extends Controller
         ]);
         
         // Get cart from session
-        $cart = Session::get('supermarket_cart', []);
+        $cart = Session::get('lounge_cart', []);
         
         if (empty($cart)) {
             return response()->json([
@@ -414,7 +415,7 @@ class LoungeController extends Controller
             }
             
             // Clear cart
-            Session::forget('supermarket_cart');
+            Session::forget('lounge_cart');
             
             DB::commit();
             

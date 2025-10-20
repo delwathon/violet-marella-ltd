@@ -2,13 +2,14 @@
 <aside class="d-flex flex-column bg-dark text-white vh-100 position-fixed start-0 top-0 overflow-auto" style="width: 300px; z-index: 1000;">
     <!-- Sidebar Header -->
     <div class="p-4 border-bottom border-secondary border-opacity-25">
-        <h3 class="h5 mb-0 fw-semibold">Violet Marella</h3>
+        <h3 class="h5 mb-0 fw-semibold">Violet Marella Ltd</h3>
     </div>
     
     <!-- Sidebar Navigation -->
     <nav class="flex-grow-1 py-3">
         <ul class="nav flex-column">
-            <!-- Dashboard -->
+            
+            <!-- Overall Dashboard -->
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('dashboard') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-home me-3" style="width: 20px;"></i>
@@ -118,6 +119,56 @@
                     <span>Inventory</span>
                 </a>
             </li>
+
+            <!-- Prop Rental Section Header -->
+            <li class="nav-item mt-4">
+                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                    <i class="fas fa-guitar me-2 small"></i>
+                    <span>Prop Rental</span>
+                </div>
+            </li>
+                       
+            <!-- Prop Rental Dashboard -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('prop-rental.dashboard') ? 'text-white' : '' }}">
+                    <i class="fas fa-chart-line me-2"></i> Dashboard
+                </a>
+            </li>
+
+            <!-- All Props -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('prop-rental.index') && !request()->has('tab') ? 'text-white' : '' }}">
+                    <i class="fas fa-th-large me-2"></i> All Props
+                </a>
+            </li>
+
+            <!-- Active Rentals -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.index', ['tab' => 'active-rentals']) }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'active-rentals' || request()->routeIs('prop-rental.rentals.*') ? 'text-white' : '' }}">
+                    <i class="fas fa-calendar-check me-2"></i> Active Rentals
+                </a>
+            </li>
+
+            <!-- Prop Rental Customers -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.index', ['tab' => 'customers']) }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.customers.*') ? 'text-white' : '' }}">
+                    <i class="fas fa-users me-2"></i> Customers
+                </a>
+            </li>
+
+            <!-- Prop Rental Calendar -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.index', ['tab' => 'calendar']) }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'calendar' ? 'text-white' : '' }}">
+                    <i class="fas fa-calendar me-2"></i> Calendar
+                </a>
+            </li>
+
+            <!-- Prop Rental Customers -->
+            <li class="nav-item">
+                <a href="{{ route('prop-rental.reports') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.customers.*') ? 'text-white' : '' }}">
+                    <i class="fas fa-chart-bar me-2"></i> Reports
+                </a>
+            </li>
             
             <!-- Other Services Section Header -->
             <li class="nav-item mt-4">
@@ -131,15 +182,7 @@
             <li class="nav-item">
                 <a href="{{ route('gift-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('gift-store.*') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-gift me-3" style="width: 20px;"></i>
-                    <span>Gift Store</span>
-                </a>
-            </li>
-            
-            <!-- Instrument Rental -->
-            <li class="nav-item">
-                <a href="{{ route('instrument-rental.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('instrument-rental.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-guitar me-3" style="width: 20px;"></i>
-                    <span>Instrument Rental</span>
+                    <span>Anire Craft Store</span>
                 </a>
             </li>
             
@@ -147,7 +190,7 @@
             <li class="nav-item">
                 <a href="{{ route('music-studio.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('music-studio.*') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-music me-3" style="width: 20px;"></i>
-                    <span>Music Studio</span>
+                    <span>Photo Studio</span>
                 </a>
             </li>
             
@@ -155,7 +198,7 @@
             <li class="nav-item">
                 <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
-                    <span>Reports</span>
+                    <span>All Business Reports</span>
                 </a>
             </li>
             

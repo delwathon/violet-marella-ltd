@@ -219,7 +219,7 @@ body {
 }
 
 .nav-link {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.8);
     padding: 1rem 1.5rem;
     border-radius: var(--border-radius);
     text-decoration: none;
@@ -232,7 +232,7 @@ body {
 
 .nav-link:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
+    color: rgba(54, 171, 238, 0.8);
     transform: translateX(5px);
 }
 

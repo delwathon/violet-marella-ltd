@@ -134,9 +134,9 @@ function loadSidebar() {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="instrument-rental" data-page="instrument-rental">
+                        <a class="nav-link" href="prop-rental" data-page="prop-rental">
                             <i class="fas fa-guitar"></i>
-                            Instrument Rental
+                            Prop Rental
                         </a>
                     </li>
                 </ul>
@@ -288,7 +288,7 @@ function getPageTitle() {
         'gift-store': 'Gift Store',
         'lounge': 'Mini Lounge',
         'music-studio': 'Music Studio',
-        'instrument-rental': 'Instrument Rental',
+        'prop-rental': 'Prop Rental',
         'reports': 'Reports',
         'settings': 'Settings',
         'users': 'User Management'
@@ -306,7 +306,7 @@ function getPageSubtitle() {
         'gift-store': 'Manage inventory, sales, and customer orders',
         'lounge': 'POS system and inventory management',
         'music-studio': 'Studio sessions and time-based billing',
-        'instrument-rental': 'Manage instrument bookings and availability',
+        'prop-rental': 'Manage prop bookings and availability',
         'reports': 'Business analytics and insights',
         'settings': 'System configuration and preferences',
         'users': 'Manage user accounts and permissions'

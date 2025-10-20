@@ -45,9 +45,9 @@ const pageConfig = {
         title: 'Music Studio',
         subtitle: 'Studio sessions and time-based billing'
     },
-    'instrument-rental': {
-        title: 'Instrument Rental',
-        subtitle: 'Manage instrument bookings and availability'
+    'prop-rental': {
+        title: 'Prop Rental',
+        subtitle: 'Manage prop bookings and availability'
     },
     'reports': {
         title: 'Reports',
@@ -321,13 +321,13 @@ function loadSectionData(sectionName) {
             loadGiftStoreData();
             break;
         case 'lounge':
-            loadSupermarketData();
+            loadLoungeData();
             break;
         case 'music-studio':
             loadMusicStudioData();
             break;
-        case 'instrument-rental':
-            loadInstrumentRentalData();
+        case 'prop-rental':
+            loadPropRentalData();
             break;
         default:
             console.log('Loading data for section:', sectionName);
@@ -368,7 +368,7 @@ function loadGiftStoreData() {
 /**
  * Load Lounge Data
  */
-function loadSupermarketData() {
+function loadLoungeData() {
     console.log('Loading lounge data...');
     // Here you would typically fetch POS and inventory data from an API
 }
@@ -385,10 +385,10 @@ function loadMusicStudioData() {
 }
 
 /**
- * Load Instrument Rental Data
+ * Load Prop Rental Data
  */
-function loadInstrumentRentalData() {
-    console.log('Loading instrument rental data...');
+function loadPropRentalData() {
+    console.log('Loading prop rental data...');
     // Here you would typically fetch rental data from an API
 }
 

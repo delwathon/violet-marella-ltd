@@ -5,13 +5,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GiftStoreController;
-use App\Http\Controllers\LoungeController;
-use App\Http\Controllers\ProductsController;
-use App\Http\Controllers\CustomersController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SalesController;
-use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\InstrumentRentalController;
+use App\Http\Controllers\Lounge\LoungeRootController;
+use App\Http\Controllers\Lounge\ProductsController;
+use App\Http\Controllers\Lounge\CustomersController;
+use App\Http\Controllers\Lounge\CategoryController;
+use App\Http\Controllers\Lounge\SalesController;
+use App\Http\Controllers\Lounge\InventoryController;
+use App\Http\Controllers\PropRental\PropRentalController;
+use App\Http\Controllers\PropRental\PropsController;
+use App\Http\Controllers\PropRental\RentalCustomersController;
 use App\Http\Controllers\MusicStudioController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
@@ -126,34 +128,83 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     // ==================== LOUNGE/POS ====================
     Route::prefix('lounge')->name('lounge.')->group(function () {
         // Main POS Interface
-        Route::get('/', [LoungeController::class, 'index'])->name('index');
+        Route::get('/', [LoungeRootController::class, 'index'])->name('index');
         
         // Product Search & Management (used by POS)
-        Route::get('/products/search', [LoungeController::class, 'searchProducts'])->name('products.search');
-        Route::get('/product/{id}', [LoungeController::class, 'getProduct'])->name('product');
+        Route::get('/products/search', [LoungeRootController::class, 'searchProducts'])->name('products.search');
+        Route::get('/product/{id}', [LoungeRootController::class, 'getProduct'])->name('product');
         
         // Cart Management
-        Route::post('/cart/add', [LoungeController::class, 'addToCart'])->name('cart.add');
-        Route::get('/cart', [LoungeController::class, 'getCart'])->name('cart.get');
-        Route::get('/cart/summary', [LoungeController::class, 'getCartSummary'])->name('cart.summary');
-        Route::post('/cart/update', [LoungeController::class, 'updateCart'])->name('cart.update');
-        Route::delete('/cart/remove/{productId}', [LoungeController::class, 'removeFromCart'])->name('cart.remove');
-        Route::post('/cart/clear', [LoungeController::class, 'clearCart'])->name('cart.clear');
+        Route::post('/cart/add', [LoungeRootController::class, 'addToCart'])->name('cart.add');
+        Route::get('/cart', [LoungeRootController::class, 'getCart'])->name('cart.get');
+        Route::get('/cart/summary', [LoungeRootController::class, 'getCartSummary'])->name('cart.summary');
+        Route::post('/cart/update', [LoungeRootController::class, 'updateCart'])->name('cart.update');
+        Route::delete('/cart/remove/{productId}', [LoungeRootController::class, 'removeFromCart'])->name('cart.remove');
+        Route::post('/cart/clear', [LoungeRootController::class, 'clearCart'])->name('cart.clear');
         
         // Sales/Checkout
-        Route::post('/checkout', [LoungeController::class, 'processSale'])->name('checkout');
-        Route::get('/sale/{id}', [LoungeController::class, 'getSale'])->name('sale');
+        Route::post('/checkout', [LoungeRootController::class, 'processSale'])->name('checkout');
+        Route::get('/sale/{id}', [LoungeRootController::class, 'getSale'])->name('sale');
         
         // Customer Management (Quick access from POS)
-        Route::get('/search-customer', [LoungeController::class, 'searchCustomer'])->name('search-customer');
-        Route::post('/create-customer', [LoungeController::class, 'createCustomer'])->name('create-customer');
+        Route::get('/search-customer', [LoungeRootController::class, 'searchCustomer'])->name('search-customer');
+        Route::post('/create-customer', [LoungeRootController::class, 'createCustomer'])->name('create-customer');
         
         // Reports
-        Route::get('/daily-report', [LoungeController::class, 'getDailyReport'])->name('daily-report');
+        Route::get('/daily-report', [LoungeRootController::class, 'getDailyReport'])->name('daily-report');
     });
-    
-    // Instrument Rental
-    Route::get('instrument-rental', [InstrumentRentalController::class, 'index'])->name('instrument-rental.index');
+
+    // ==================== PROP RENTAL ====================
+    Route::prefix('prop-rental')->name('prop-rental.')->group(function () {
+        // Dashboard & Reports
+        Route::get('/dashboard', [PropRentalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/reports', [PropRentalController::class, 'reports'])->name('reports');
+        
+        // Main page (All Props view)
+        Route::get('/', [PropRentalController::class, 'index'])->name('index');
+        
+        // Props Management
+        Route::prefix('props')->name('props.')->group(function () {
+            Route::get('/create', [PropsController::class, 'create'])->name('create');
+            Route::post('/', [PropsController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [PropsController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PropsController::class, 'update'])->name('update');
+            Route::get('/{id}/delete', [PropsController::class, 'showDelete'])->name('delete');
+            Route::delete('/{id}', [PropsController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/maintenance', [PropsController::class, 'showMaintenance'])->name('maintenance');
+            Route::post('/{id}/maintenance', [PropsController::class, 'markMaintenance'])->name('mark-maintenance');
+            Route::post('/{id}/complete-maintenance', [PropsController::class, 'completeMaintenance'])->name('complete-maintenance');
+        });
+        
+        // Rentals Management
+        Route::prefix('rentals')->name('rentals.')->group(function () {
+            Route::get('/create', [PropRentalController::class, 'create'])->name('create');
+            Route::post('/', [PropRentalController::class, 'store'])->name('store');
+            Route::get('/{id}', [PropRentalController::class, 'show'])->name('show');
+            Route::get('/{id}/extend', [PropRentalController::class, 'editExtend'])->name('extend-form');
+            Route::post('/{id}/extend', [PropRentalController::class, 'extend'])->name('extend');
+            Route::get('/{id}/return', [PropRentalController::class, 'showReturn'])->name('return-form');
+            Route::post('/{id}/return', [PropRentalController::class, 'returnProp'])->name('return');
+            Route::get('/{id}/cancel', [PropRentalController::class, 'showCancel'])->name('cancel-form');
+            Route::post('/{id}/cancel', [PropRentalController::class, 'cancel'])->name('cancel');
+            Route::get('/export/csv', [PropRentalController::class, 'export'])->name('export');
+        });
+        
+        // Customers Management
+        Route::prefix('customers')->name('customers.')->group(function () {
+            Route::get('/create', [RentalCustomersController::class, 'create'])->name('create');
+            Route::post('/', [RentalCustomersController::class, 'store'])->name('store');
+            Route::get('/{id}', [RentalCustomersController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [RentalCustomersController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [RentalCustomersController::class, 'update'])->name('update');
+            Route::get('/{id}/deactivate', [RentalCustomersController::class, 'showDeactivate'])->name('deactivate-form');
+            Route::post('/{id}/deactivate', [RentalCustomersController::class, 'deactivate'])->name('deactivate');
+            Route::post('/{id}/activate', [RentalCustomersController::class, 'activate'])->name('activate');
+        });
+        
+        // Calendar AJAX helper
+        Route::get('/calendar/data', [PropRentalController::class, 'calendarData'])->name('calendar-data');
+    });
     
     // Music Studio
     Route::get('music-studio', [MusicStudioController::class, 'index'])->name('music-studio.index');

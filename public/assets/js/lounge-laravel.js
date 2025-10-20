@@ -4,7 +4,7 @@
  */
 
 // Lounge state and data
-const SupermarketState = {
+const LoungeState = {
     products: [],
     cart: [],
     currentCustomer: null,
@@ -26,7 +26,7 @@ const SupermarketState = {
 /**
  * Initialize Lounge POS
  */
-function initializeSupermarket() {
+function initializeLounge() {
     console.log('Initializing lounge POS with Laravel backend...');
 
     // Initialize components
@@ -34,7 +34,7 @@ function initializeSupermarket() {
     initializeCart();
 
     // Bind events
-    bindSupermarketEvents();
+    bindLoungeEvents();
 
     // Update displays
     updateCartDisplay();
@@ -78,7 +78,7 @@ function initializeCart() {
 /**
  * Bind Lounge Events
  */
-function bindSupermarketEvents() {
+function bindLoungeEvents() {
     // Add to cart buttons
     document.addEventListener('click', function(e) {
         if (e.target.closest('.add-to-cart')) {
@@ -128,8 +128,8 @@ async function searchProducts(searchTerm) {
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
-                SupermarketState.products = data.data || [];
-                SupermarketState.pagination.totalItems = data.total || 0;
+                LoungeState.products = data.data || [];
+                LoungeState.pagination.totalItems = data.total || 0;
                 updateProductGrid(data.data);
             }
         }
@@ -153,7 +153,7 @@ async function filterProductsByCategory(categoryId) {
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
-                SupermarketState.products = data.data || [];
+                LoungeState.products = data.data || [];
                 updateProductGrid(data.data);
             }
         }
@@ -434,7 +434,7 @@ function processCheckout() {
 
                 // Reset payment modal state
                 clearSelectedCustomer();
-                SupermarketState.payment.method = null;
+                LoungeState.payment.method = null;
                 document.querySelectorAll('.payment-method').forEach(btn => {
                     btn.classList.remove('active', 'btn-success', 'btn-primary', 'btn-info', 'btn-warning');
                     const method = btn.dataset.method;
@@ -465,7 +465,7 @@ function processCheckout() {
  */
 function handlePaymentMethodSelect(event) {
     const method = event.currentTarget.getAttribute('data-method');
-    SupermarketState.payment.method = method;
+    LoungeState.payment.method = method;
 
     // Remove active class from all buttons
     document.querySelectorAll('.payment-method').forEach(btn => {
@@ -573,7 +573,7 @@ async function searchCustomers() {
  * Select Customer
  */
 function selectCustomer(id, name, phone, email) {
-    SupermarketState.currentCustomer = { id, name, phone, email };
+    LoungeState.currentCustomer = { id, name, phone, email };
     
     document.getElementById('selectedCustomerId').value = id;
     document.getElementById('selectedCustomerName').textContent = name;
@@ -587,7 +587,7 @@ function selectCustomer(id, name, phone, email) {
  * Clear Selected Customer
  */
 function clearSelectedCustomer() {
-    SupermarketState.currentCustomer = null;
+    LoungeState.currentCustomer = null;
     document.getElementById('selectedCustomerId').value = '';
     document.getElementById('selectedCustomerDisplay').style.display = 'none';
     document.getElementById('customerSearchInput').value = '';
@@ -811,7 +811,7 @@ async function viewDailySales() {
  * Complete Payment
  */
 async function completePayment() {
-    const method = SupermarketState.payment.method;
+    const method = LoungeState.payment.method;
 
     if (!method) {
         showNotification('Please select a payment method', 'warning');
@@ -845,8 +845,8 @@ async function completePayment() {
         
         if (response.ok && data.success) {
             // Clear payment state
-            SupermarketState.payment = { method: null, amount: 0, change: 0 };
-            SupermarketState.currentCustomer = null;
+            LoungeState.payment = { method: null, amount: 0, change: 0 };
+            LoungeState.currentCustomer = null;
             
             // Reset payment form
             document.querySelectorAll('.payment-method').forEach(btn => {
@@ -977,11 +977,11 @@ function showNotification(message, type = 'info') {
  * Initialize on DOM Content Loaded
  */
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initializeSupermarket, 100);
+    setTimeout(initializeLounge, 100);
 });
 
 // Export lounge functions for global access
-window.VioletMarellaSupermarket = {
+window.VioletMarellaLounge = {
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -1004,7 +1004,7 @@ window.VioletMarellaSupermarket = {
         const customerPhone = document.getElementById('customerPhone')?.value;
         const isRegular = document.getElementById('isRegularCustomer')?.checked;
 
-        SupermarketState.currentCustomer = {
+        LoungeState.currentCustomer = {
             name: customerName || 'Walk-in Customer',
             phone: customerPhone,
             isRegular: isRegular
@@ -1015,6 +1015,6 @@ window.VioletMarellaSupermarket = {
             modal.hide();
         }
 
-        showNotification(`Sale started for ${SupermarketState.currentCustomer.name}`, 'success');
+        showNotification(`Sale started for ${LoungeState.currentCustomer.name}`, 'success');
     }
 };

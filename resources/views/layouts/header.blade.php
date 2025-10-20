@@ -3,7 +3,7 @@
         <button class="btn btn-link d-md-none p-0 me-3" onclick="VioletMarellaCommon.toggleSidebar()">
             <i class="fas fa-bars fa-lg"></i>
         </button>
-        <h5 class="mb-0" id="currentPageTitle">Dashboard</h5>
+        <h5 class="mb-0" id="currentPageTitle">Business Suite</h5>
         <small class="text-muted" id="currentPageSubtitle">Welcome to Violet Marella Management Suite</small>
     </div>
     

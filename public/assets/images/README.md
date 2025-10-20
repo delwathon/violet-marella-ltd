@@ -25,7 +25,7 @@ assets/images/
 │   │   ├── detergent.jpg
 │   │   ├── toothpaste.jpg
 │   │   └── bread.jpg
-│   └── instruments/
+│   └── props/
 │       ├── acoustic-guitar.jpg
 │       ├── electric-guitar.jpg
 │       ├── keyboard.jpg

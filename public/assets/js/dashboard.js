@@ -220,7 +220,7 @@ function getRecentActivities() {
             type: 'rental',
             icon: 'fas fa-guitar',
             iconColor: 'primary',
-            title: 'Instrument rental',
+            title: 'Prop Rental',
             description: 'Guitar rented to Sarah Johnson for 3 days',
             timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
         },
@@ -410,7 +410,7 @@ function handleStatCardClick(event) {
     const cardIndex = Array.from(card.parentNode.children).indexOf(card);
     
     // Navigate to relevant page based on card
-    const pages = ['reports.html', 'gift-store.html', 'music-studio.html', 'instrument-rental.html'];
+    const pages = ['reports.html', 'gift-store.html', 'music-studio.html', 'prop-rental.html'];
     if (pages[cardIndex]) {
         window.location.href = pages[cardIndex];
     }

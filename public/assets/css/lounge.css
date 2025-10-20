@@ -37,7 +37,11 @@ html {
 
 .product-grid * {
     overflow: visible !important;
-    text-overflow: clip !important;
+    text-overflow: clip !important;    
+}
+
+.product-grid .row {
+    width: -webkit-fill-available !important;
 }
 
 .product-name,
