@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/modals/new-prop.blade.php --}}
 <div class="modal fade" id="newPropModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

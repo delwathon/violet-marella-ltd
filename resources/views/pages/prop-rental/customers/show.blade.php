@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/customers/show.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Customer Details')

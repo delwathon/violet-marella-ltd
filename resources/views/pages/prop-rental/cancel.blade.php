@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/cancel.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Cancel Rental')

@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/dashboard.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Prop Rental Dashboard')

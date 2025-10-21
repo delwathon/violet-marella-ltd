@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/props/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Edit Prop')

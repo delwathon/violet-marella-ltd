@@ -28,21 +28,6 @@
         </div>
     </div>
 
-    <!-- Success/Error Messages -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <!-- Rental Overview -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -273,35 +258,94 @@
                                     <th>Start Date</th>
                                     <th>Due Date</th>
                                     <th>Status</th>
-                                    <th>Amount</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($activeRentals as $rental)
-                                    <tr>
-                                        <td><strong>{{ strtoupper($rental->rental_id) }}</strong></td>
+                                    <tr class="{{ $rental->isOverdue() ? 'table-danger' : '' }}">
+                                        <td>
+                                            <strong>{{ strtoupper($rental->rental_id) }}</strong>
+                                            @if($rental->isOverdue())
+                                                <span class="badge bg-danger badge-sm ms-1">OVERDUE</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             <div class="fw-semibold">{{ $rental->customer->name }}</div>
                                             <small class="text-muted">{{ $rental->customer->phone }}</small>
                                         </td>
-                                        <td>{{ $rental->prop->name }}</td>
-                                        <td>{{ $rental->start_date->format('d M Y') }}</td>
-                                        <td>{{ $rental->end_date->format('d M Y') }}</td>
-                                        <td><span class="badge {{ $rental->status_badge_class }}">{{ $rental->status_display }}</span></td>
-                                        <td>{{ $rental->formatted_total_amount }}</td>
+                                        <td>
+                                            <div>{{ $rental->prop->name }}</div>
+                                            <small class="text-muted">{{ $rental->prop->brand }}</small>
+                                        </td>
+                                        <td>
+                                            <div>{{ $rental->start_date->format('d M Y') }}</div>
+                                            <small class="text-muted">{{ $rental->start_date->format('h:i A') }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="{{ $rental->days_remaining < 2 ? 'text-danger fw-bold' : '' }}">
+                                                {{ $rental->end_date->format('d M Y') }}
+                                            </div>
+                                            <small class="text-muted">
+                                                @if($rental->days_remaining > 0)
+                                                    <i class="fas fa-clock me-1"></i>{{ $rental->days_remaining }} day(s) left
+                                                @else
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>Due today
+                                                @endif
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ $rental->status_badge_class }}">
+                                                {{ $rental->status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">{{ $rental->formatted_total_amount }}</div>
+                                            <small class="text-muted">
+                                                {{ $rental->duration }} day(s) @ {{ $rental->prop->formatted_daily_rate }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column gap-1">
+                                                <div>
+                                                    <span class="badge {{ $rental->payment_status_badge_class }}">
+                                                        {{ $rental->payment_status }}
+                                                    </span>
+                                                </div>
+                                                <div class="m-0">
+                                                    <small class="text-muted">Paid:</small> 
+                                                    <small class="text-success">{{ $rental->formatted_amount_paid }}</small>
+                                                </div>
+                                                {{-- @if($rental->balance_due > 0)
+                                                    <div>
+                                                        <small class="text-muted">Balance:</small> 
+                                                        <small class="text-warning">{{ $rental->formatted_balance_due }}</small>
+                                                    </div>
+                                                @endif --}}
+                                            </div>
+                                        </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('prop-rental.rentals.show', $rental->id) }}" class="btn btn-outline-primary" title="View">
+                                                <a href="{{ route('prop-rental.rentals.show', $rental->id) }}" 
+                                                class="btn btn-outline-primary" 
+                                                title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="{{ route('prop-rental.rentals.extend-form', $rental->id) }}" class="btn btn-outline-success" title="Extend">
+                                                <a href="{{ route('prop-rental.rentals.extend-form', $rental->id) }}" 
+                                                class="btn btn-outline-success" 
+                                                title="Extend Rental">
                                                     <i class="fas fa-calendar-plus"></i>
                                                 </a>
-                                                <a href="{{ route('prop-rental.rentals.return-form', $rental->id) }}" class="btn btn-outline-warning" title="Return">
+                                                <a href="{{ route('prop-rental.rentals.return-form', $rental->id) }}" 
+                                                class="btn btn-outline-warning" 
+                                                title="Return Prop">
                                                     <i class="fas fa-undo"></i>
                                                 </a>
-                                                <a href="{{ route('prop-rental.rentals.cancel-form', $rental->id) }}" class="btn btn-outline-danger" title="Cancel">
+                                                <a href="{{ route('prop-rental.rentals.cancel-form', $rental->id) }}" 
+                                                class="btn btn-outline-danger" 
+                                                title="Cancel Rental">
                                                     <i class="fas fa-times"></i>
                                                 </a>
                                             </div>
@@ -309,7 +353,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center py-4">
+                                        <td colspan="9" class="text-center py-4">
                                             <i class="fas fa-calendar fa-3x text-muted mb-3 d-block"></i>
                                             <div>No active rentals</div>
                                         </td>
@@ -543,7 +587,7 @@ function renderCalendar(rentals) {
                             ${rental.customer.name.split(' ')[0]}
                         </div>
                     `).join('')}
-                    ${rentalsOnDay.length > 3 ? `<div class="day-event">+${rentals On Day.length - 3} more</div>` : ''}
+                    ${rentalsOnDay.length > 3 ? `<div class="day-event">+${rentalsOnDay.length - 3} more</div>` : ''}
                 </div>
             </div>
         `;

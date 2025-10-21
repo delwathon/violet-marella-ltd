@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/modals/new-customer.blade.php --}}
 <div class="modal fade" id="newCustomerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">

@@ -322,6 +322,7 @@ class PropRentalController extends Controller
     {
         $user = Auth::guard('user')->user();
         $range = $request->get('range', 'month');
+        $paymentStatus = $request->get('payment_status', 'all');
         
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
@@ -332,16 +333,43 @@ class PropRentalController extends Controller
             $endDate = $end->format('Y-m-d');
         }
         
-        // Summary data
+        // Base query
         $rentalsQuery = PropRental::with(['prop', 'customer'])
             ->whereBetween('created_at', [$startDate, $endDate]);
         
+        // Apply payment status filter
+        if ($paymentStatus === 'paid') {
+            $rentalsQuery->where('balance_due', '<=', 0);
+        } elseif ($paymentStatus === 'partial') {
+            $rentalsQuery->where('balance_due', '>', 0)
+                        ->where('amount_paid', '>', 0);
+        } elseif ($paymentStatus === 'unpaid') {
+            $rentalsQuery->where('amount_paid', '<=', 0);
+        }
+        
+        // Summary data
+        $allRentalsQuery = PropRental::with(['prop', 'customer'])
+            ->whereBetween('created_at', [$startDate, $endDate]);
+        
         $summary = [
-            'total_rentals' => $rentalsQuery->count(),
-            'total_revenue' => $rentalsQuery->sum('total_amount'),
-            'avg_rental_value' => $rentalsQuery->avg('total_amount'),
-            'avg_duration' => round($rentalsQuery->avg(DB::raw('DATEDIFF(end_date, start_date)')), 1),
+            'total_rentals' => $allRentalsQuery->count(),
+            'total_revenue' => $allRentalsQuery->sum('total_amount'),
+            'total_collected' => $allRentalsQuery->sum('amount_paid'),
+            'total_balance' => $allRentalsQuery->sum('balance_due'),
+            'avg_rental_value' => $allRentalsQuery->avg('total_amount'),
+            'avg_duration' => round($allRentalsQuery->avg(DB::raw('DATEDIFF(end_date, start_date)')), 1),
         ];
+        
+        // Payment statistics
+        $summary['fully_paid_count'] = $allRentalsQuery->clone()->where('balance_due', '<=', 0)->count();
+        $summary['partially_paid_count'] = $allRentalsQuery->clone()
+            ->where('balance_due', '>', 0)
+            ->where('amount_paid', '>', 0)
+            ->count();
+        $summary['unpaid_count'] = $allRentalsQuery->clone()->where('amount_paid', '<=', 0)->count();
+        $summary['collection_rate'] = $summary['total_revenue'] > 0 
+            ? round(($summary['total_collected'] / $summary['total_revenue']) * 100, 1) 
+            : 0;
         
         // Revenue by prop
         $revenueByProp = PropRental::with('prop')
@@ -414,17 +442,15 @@ class PropRentalController extends Controller
         })->toArray();
         $categoryData = $categoryDistribution->values()->toArray();
         
-        // Rental history (paginated)
-        $rentals = PropRental::with(['prop', 'customer'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->latest()
-            ->paginate(20);
+        // Rental history (paginated) - with payment status filter applied
+        $rentals = $rentalsQuery->latest()->paginate(20)->appends($request->all());
         
         return view('pages.prop-rental.reports', compact(
             'user',
             'range',
             'startDate',
             'endDate',
+            'paymentStatus',
             'summary',
             'revenueByProp',
             'revenueByCustomer',
@@ -454,14 +480,16 @@ class PropRentalController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Validate input
+        $validated = $request->validate([
             'customer_id' => 'required|exists:rental_customers,id',
             'prop_id' => 'required|exists:props,id',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'security_deposit' => 'required|numeric|min:0',
+            'amount_paid' => 'nullable|numeric|min:0',
             'agreement_signed' => 'required|accepted',
-            'notes' => 'nullable|string',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -470,17 +498,31 @@ class PropRentalController extends Controller
             $prop = Prop::findOrFail($request->prop_id);
             $customer = RentalCustomer::findOrFail($request->customer_id);
 
+            // Check prop availability
             if (!$prop->isAvailable()) {
                 return redirect()->back()
                     ->withInput()
                     ->with('error', 'This prop is not available for rent.');
             }
 
+            // Calculate rental details
             $startDate = Carbon::parse($request->start_date);
             $endDate = Carbon::parse($request->end_date);
             $days = $startDate->diffInDays($endDate);
             $totalAmount = $days * $prop->daily_rate;
+            
+            // Validate amount paid
+            $amountPaid = $request->amount_paid ?? 0;
+            if ($amountPaid > $totalAmount) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Amount paid (₦' . number_format($amountPaid, 2) . ') cannot exceed total amount (₦' . number_format($totalAmount, 2) . ').');
+            }
+            
+            // Calculate balance
+            $balanceDue = $totalAmount - $amountPaid;
 
+            // Create rental
             $rental = PropRental::create([
                 'prop_id' => $prop->id,
                 'rental_customer_id' => $customer->id,
@@ -489,23 +531,35 @@ class PropRentalController extends Controller
                 'daily_rate' => $prop->daily_rate,
                 'total_amount' => $totalAmount,
                 'security_deposit' => $request->security_deposit,
-                'amount_paid' => $request->amount_paid ?? 0,
+                'amount_paid' => $amountPaid,
+                'balance_due' => $balanceDue,
                 'notes' => $request->notes,
                 'agreement_signed' => true,
                 'status' => 'active',
                 'created_by' => Auth::guard('user')->id(),
             ]);
 
+            // Update prop status
             $prop->update(['status' => 'rented']);
-            $customer->incrementRentalStats($totalAmount);
+            
+            // Update customer stats (only for amount paid, not total)
+            $customer->incrementRentalStats($amountPaid);
 
             DB::commit();
 
+            // Success message with balance info
+            $message = 'Rental created successfully.';
+            if ($balanceDue > 0) {
+                $message .= ' Balance of ₦' . number_format($balanceDue, 2) . ' due on return.';
+            }
+
             return redirect()->route('prop-rental.index', ['tab' => 'active-rentals'])
-                ->with('success', 'Rental created successfully.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Rental creation failed: ' . $e->getMessage());
+            
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create rental: ' . $e->getMessage());
@@ -533,8 +587,14 @@ class PropRentalController extends Controller
         $rental = PropRental::with(['prop', 'customer'])->findOrFail($id);
         
         if ($rental->status !== 'active') {
-            return redirect()->route('prop-rental.index')
+            return redirect()->route('prop-rental.rentals.show', $rental->id)
                 ->with('error', 'Only active rentals can be extended.');
+        }
+        
+        // Check if rental is overdue
+        if ($rental->isOverdue()) {
+            return redirect()->route('prop-rental.rentals.show', $rental->id)
+                ->with('warning', 'This rental is overdue. Please process return or contact customer first.');
         }
         
         return view('pages.prop-rental.extend', compact('user', 'rental'));
@@ -545,14 +605,15 @@ class PropRentalController extends Controller
      */
     public function extend(Request $request, $id)
     {
-        $request->validate([
-            'additional_days' => 'required|integer|min:1',
+        $validated = $request->validate([
+            'additional_days' => 'required|integer|min:1|max:365',
+            'amount_paid' => 'required|numeric|min:0',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $rental = PropRental::findOrFail($id);
+            $rental = PropRental::with(['prop', 'customer'])->findOrFail($id);
 
             if ($rental->status !== 'active') {
                 return redirect()->back()
@@ -560,22 +621,98 @@ class PropRentalController extends Controller
             }
 
             $additionalDays = $request->additional_days;
-            $additionalAmount = $additionalDays * $rental->daily_rate;
-
-            $rental->end_date = $rental->end_date->addDays($additionalDays);
-            $rental->total_amount += $additionalAmount;
+            $dailyRate = $rental->daily_rate;
+            
+            // Calculate extension charge
+            $extensionCharge = $additionalDays * $dailyRate;
+            
+            // Get current balance due (from original rental)
+            $previousBalanceDue = $rental->balance_due;
+            
+            // Calculate new total amount due (previous balance + extension charge)
+            $newTotalDue = $previousBalanceDue + $extensionCharge;
+            
+            // Get amount paid for this extension
+            $amountPaid = $request->amount_paid;
+            
+            // Validate amount paid doesn't exceed new total
+            if ($amountPaid > $newTotalDue) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Amount paid (₦' . number_format($amountPaid, 2) . 
+                        ') cannot exceed total amount due (₦' . number_format($newTotalDue, 2) . ').');
+            }
+            
+            // Calculate new balance due
+            $newBalanceDue = $newTotalDue - $amountPaid;
+            
+            // Calculate new end date
+            $newEndDate = $rental->end_date->copy()->addDays($additionalDays);
+            
+            // Update rental record
+            $rental->end_date = $newEndDate;
+            $rental->total_amount += $extensionCharge; // Add extension charge to total
+            $rental->amount_paid += $amountPaid; // Add new payment to amount paid
+            $rental->balance_due = $newBalanceDue; // Update balance due
+            
+            // Add note about extension
+            $extensionNote = "\n[Extension: " . now()->format('Y-m-d H:i') . "] " .
+                            "Extended by {$additionalDays} day(s). " .
+                            "Extension charge: ₦" . number_format($extensionCharge, 2) . ". " .
+                            "Paid: ₦" . number_format($amountPaid, 2) . ". " .
+                            "New balance: ₦" . number_format($newBalanceDue, 2) . ".";
+            
+            $rental->notes = ($rental->notes ?? '') . $extensionNote;
             $rental->save();
 
-            $rental->customer->increment('total_spent', $additionalAmount);
+            // Update customer's total spent (only for amount actually paid)
+            if ($amountPaid > 0) {
+                $rental->customer->increment('total_spent', $amountPaid);
+            }
+
+            // Log the extension
+            \Log::info('Rental extended', [
+                'rental_id' => $rental->rental_id,
+                'customer_id' => $rental->rental_customer_id,
+                'additional_days' => $additionalDays,
+                'extension_charge' => $extensionCharge,
+                'previous_balance' => $previousBalanceDue,
+                'amount_paid' => $amountPaid,
+                'new_balance' => $newBalanceDue,
+                'new_end_date' => $newEndDate->format('Y-m-d'),
+                'extended_by' => Auth::guard('user')->id(),
+                'timestamp' => now()
+            ]);
 
             DB::commit();
 
-            return redirect()->route('prop-rental.index', ['tab' => 'active-rentals'])
-                ->with('success', "Rental extended by {$additionalDays} day(s). Additional charge: ₦" . number_format($additionalAmount, 2));
+            // Build success message
+            $message = "Rental extended by {$additionalDays} day(s) successfully. ";
+            $message .= "New end date: " . $newEndDate->format('d M Y') . ". ";
+            
+            if ($amountPaid > 0) {
+                $message .= "Payment of ₦" . number_format($amountPaid, 2) . " received. ";
+            }
+            
+            if ($newBalanceDue > 0) {
+                $message .= "Balance of ₦" . number_format($newBalanceDue, 2) . " due on return.";
+            } else {
+                $message .= "Fully paid.";
+            }
+
+            return redirect()->route('prop-rental.rentals.show', $rental->id)
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Rental extension failed: ' . $e->getMessage(), [
+                'rental_id' => $id,
+                'user_id' => Auth::guard('user')->id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return redirect()->back()
+                ->withInput()
                 ->with('error', 'Failed to extend rental: ' . $e->getMessage());
         }
     }
@@ -601,30 +738,107 @@ class PropRentalController extends Controller
      */
     public function returnProp(Request $request, $id)
     {
+        // If there's a balance due, validate payment
+        $rental = PropRental::findOrFail($id);
+        
+        $rules = [];
+        if ($rental->balance_due > 0) {
+            $rules['final_payment'] = 'required|numeric|min:0|max:' . $rental->balance_due;
+        }
+        
+        if (!empty($rules)) {
+            $request->validate($rules);
+        }
+
         try {
             DB::beginTransaction();
 
-            $rental = PropRental::findOrFail($id);
+            $rental = PropRental::with(['prop', 'customer'])->findOrFail($id);
 
             if ($rental->status !== 'active') {
                 return redirect()->back()
                     ->with('error', 'This rental is not active.');
             }
 
+            $balanceDue = $rental->balance_due;
+            $finalPayment = $request->input('final_payment', 0);
+            $message = 'Prop returned successfully. ';
+            
+            // Handle balance collection
+            if ($balanceDue > 0) {
+                if ($finalPayment > 0) {
+                    // Validate final payment
+                    if ($finalPayment > $balanceDue) {
+                        return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'Final payment (₦' . number_format($finalPayment, 2) . 
+                                ') cannot exceed balance due (₦' . number_format($balanceDue, 2) . ').');
+                    }
+                    
+                    // Record the payment
+                    $rental->amount_paid += $finalPayment;
+                    $rental->balance_due -= $finalPayment;
+                    
+                    // Update customer's total spent
+                    $rental->customer->increment('total_spent', $finalPayment);
+                    
+                    $message .= "Final payment of ₦" . number_format($finalPayment, 2) . " collected. ";
+                    
+                    if ($rental->balance_due > 0) {
+                        $message .= "Remaining balance of ₦" . number_format($rental->balance_due, 2) . " outstanding.";
+                    } else {
+                        $message .= "Fully paid.";
+                    }
+                } else {
+                    $message .= "Outstanding balance of ₦" . number_format($balanceDue, 2) . " remains unpaid.";
+                }
+            } else {
+                $message .= "All payments settled.";
+            }
+
+            // Complete the rental
             $rental->status = 'completed';
             $rental->returned_at = Carbon::now();
+            
+            // Add return note
+            $returnNote = "\n[Returned: " . now()->format('Y-m-d H:i') . "] ";
+            if ($finalPayment > 0) {
+                $returnNote .= "Final payment: ₦" . number_format($finalPayment, 2) . ". ";
+            }
+            $returnNote .= "Final balance: ₦" . number_format($rental->balance_due, 2) . ".";
+            
+            $rental->notes = ($rental->notes ?? '') . $returnNote;
             $rental->save();
 
+            // Make prop available again
             $rental->prop->update(['status' => 'available']);
+            
+            // Decrement current rentals
             $rental->customer->decrementCurrentRentals();
+
+            // Log the return
+            \Log::info('Prop returned', [
+                'rental_id' => $rental->rental_id,
+                'customer_id' => $rental->rental_customer_id,
+                'balance_collected' => $finalPayment,
+                'remaining_balance' => $rental->balance_due,
+                'returned_by' => Auth::guard('user')->id(),
+                'timestamp' => now()
+            ]);
 
             DB::commit();
 
             return redirect()->route('prop-rental.index', ['tab' => 'active-rentals'])
-                ->with('success', 'Prop returned successfully.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Prop return failed: ' . $e->getMessage(), [
+                'rental_id' => $id,
+                'user_id' => Auth::guard('user')->id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return redirect()->back()
                 ->with('error', 'Failed to return prop: ' . $e->getMessage());
         }
@@ -661,19 +875,48 @@ class PropRentalController extends Controller
                     ->with('error', 'Only active rentals can be cancelled.');
             }
 
+            // Calculate refund amount
+            $refundAmount = $rental->amount_paid;
+            
+            // Update rental status
             $rental->status = 'cancelled';
+            $rental->cancelled_at = Carbon::now();
+            $rental->cancelled_by = Auth::guard('user')->id();
+            $rental->refund_amount = $refundAmount;
             $rental->save();
 
+            // Make prop available
             $rental->prop->update(['status' => 'available']);
+            
+            // Update customer stats (subtract the amount paid)
+            if ($refundAmount > 0) {
+                $rental->customer->decrement('total_spent', $refundAmount);
+            }
             $rental->customer->decrementCurrentRentals();
+
+            // Log the refund for accounting
+            \Log::info('Rental cancelled with refund', [
+                'rental_id' => $rental->rental_id,
+                'customer_id' => $rental->rental_customer_id,
+                'refund_amount' => $refundAmount,
+                'cancelled_by' => Auth::guard('user')->id(),
+                'timestamp' => now()
+            ]);
 
             DB::commit();
 
+            $message = 'Rental cancelled successfully.';
+            if ($refundAmount > 0) {
+                $message .= ' Refund of ₦' . number_format($refundAmount, 2) . ' to be processed.';
+            }
+
             return redirect()->route('prop-rental.index', ['tab' => 'active-rentals'])
-                ->with('success', 'Rental cancelled successfully.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Rental cancellation failed: ' . $e->getMessage());
+            
             return redirect()->back()
                 ->with('error', 'Failed to cancel rental: ' . $e->getMessage());
         }

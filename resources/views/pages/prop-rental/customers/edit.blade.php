@@ -1,4 +1,3 @@
-{{-- resources/views/pages/prop-rental/customers/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Edit Customer')
