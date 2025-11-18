@@ -116,7 +116,7 @@ function loadSidebar() {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gift-store" data-page="gift-store">
+                        <a class="nav-link" href="anire-craft-store" data-page="anire-craft-store">
                             <i class="fas fa-gift"></i>
                             Gift Store
                         </a>
@@ -128,9 +128,9 @@ function loadSidebar() {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="music-studio" data-page="music-studio">
+                        <a class="nav-link" href="photo-studio" data-page="photo-studio">
                             <i class="fas fa-music"></i>
-                            Music Studio
+                            Photo Studio
                         </a>
                     </li>
                     <li class="nav-item">
@@ -285,9 +285,9 @@ function getCurrentPageName() {
 function getPageTitle() {
     const pageTitles = {
         'dashboard': 'Dashboard',
-        'gift-store': 'Gift Store',
+        'anire-craft-store': 'Gift Store',
         'lounge': 'Mini Lounge',
-        'music-studio': 'Music Studio',
+        'photo-studio': 'Photo Studio',
         'prop-rental': 'Prop Rental',
         'reports': 'Reports',
         'settings': 'Settings',
@@ -303,9 +303,9 @@ function getPageTitle() {
 function getPageSubtitle() {
     const pageSubtitles = {
         'dashboard': 'Welcome to Violet Marella Management Suite',
-        'gift-store': 'Manage inventory, sales, and customer orders',
+        'anire-craft-store': 'Manage inventory, sales, and customer orders',
         'lounge': 'POS system and inventory management',
-        'music-studio': 'Studio sessions and time-based billing',
+        'photo-studio': 'Studio sessions and time-based billing',
         'prop-rental': 'Manage prop bookings and availability',
         'reports': 'Business analytics and insights',
         'settings': 'System configuration and preferences',

@@ -1,7 +1,7 @@
 @extends('layouts.app')
-@section('title', 'Music Studio Management')
+@section('title', 'Photo Studio Management')
 @push('styles')
-<link href="{{ asset('assets/css/music-studio.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/photo-studio.css') }}" rel="stylesheet">
 @endpush
 @section('content')
 <div class="content-area">
@@ -9,7 +9,7 @@
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h1 class="page-title">Music Studio Management</h1>
+                <h1 class="page-title">Photo Studio Management</h1>
                 <p class="page-subtitle">Manage studio sessions, customer check-ins, and time-based billing</p>
             </div>
             <div class="col-auto">
@@ -446,6 +446,6 @@
     </div>
 </div>
 @push('scripts')
-<script src="{{ asset('assets/js/music-studio.js') }}"></script>
+<script src="{{ asset('assets/js/photo-studio.js') }}"></script>
 @endpush
 @endsection

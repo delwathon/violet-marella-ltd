@@ -75,7 +75,7 @@
         <!-- Business Modules -->
         <div class="row mb-4">
             <div class="col-lg-4 mb-4">
-                <div class="module-card gift-store">
+                <div class="module-card anire-craft-store">
                     <div class="module-header">
                         <div class="module-icon">
                             <i class="fas fa-gift"></i>
@@ -84,7 +84,7 @@
                         <p class="module-description">Manage inventory, track sales, and monitor stock levels for your gift store business.</p>
                     </div>
                     <div class="module-body">
-                        <a href="{{ route('gift-store.index') }}" class="quick-action">
+                        <a href="{{ route('anire-craft-store.index') }}" class="quick-action">
                             <i class="fas fa-boxes"></i>
                             View Inventory
                         </a>
@@ -92,7 +92,7 @@
                             <i class="fas fa-plus"></i>
                             Add New Product
                         </button>
-                        <a href="{{ route('reports.index', ['type' => 'gift-store']) }}" class="quick-action">
+                        <a href="{{ route('reports.index', ['type' => 'anire-craft-store']) }}" class="quick-action">
                             <i class="fas fa-chart-line"></i>
                             Sales Report
                         </a>
@@ -127,24 +127,24 @@
             </div>
 
             <div class="col-lg-4 mb-4">
-                <div class="module-card music-studio">
+                <div class="module-card photo-studio">
                     <div class="module-header">
                         <div class="module-icon">
                             <i class="fas fa-music"></i>
                         </div>
-                        <h3 class="module-title">Music Studio</h3>
+                        <h3 class="module-title">Photo Studio</h3>
                         <p class="module-description">Time-based billing system with QR code generation for studio session management.</p>
                     </div>
                     <div class="module-body">
-                        <a href="{{ route('music-studio.index') }}" class="quick-action">
+                        <a href="{{ route('photo-studio.index') }}" class="quick-action">
                             <i class="fas fa-user-plus"></i>
                             Check-in Customer
                         </a>
-                        <a href="{{ route('music-studio.index', ['tab' => 'qr']) }}" class="quick-action">
+                        <a href="{{ route('photo-studio.index', ['tab' => 'qr']) }}" class="quick-action">
                             <i class="fas fa-qrcode"></i>
                             Generate QR Code
                         </a>
-                        <a href="{{ route('music-studio.index', ['tab' => 'billing']) }}" class="quick-action">
+                        <a href="{{ route('photo-studio.index', ['tab' => 'billing']) }}" class="quick-action">
                             <i class="fas fa-calculator"></i>
                             Calculate Billing
                         </a>

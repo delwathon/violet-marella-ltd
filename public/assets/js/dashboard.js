@@ -299,7 +299,7 @@ function loadBusinessMetrics() {
             transactions: 1847,
             avgTransaction: 650
         },
-        musicStudio: {
+        photoStudio: {
             revenue: 750000,
             sessions: 156,
             avgSession: 4808
@@ -410,7 +410,7 @@ function handleStatCardClick(event) {
     const cardIndex = Array.from(card.parentNode.children).indexOf(card);
     
     // Navigate to relevant page based on card
-    const pages = ['reports.html', 'gift-store.html', 'music-studio.html', 'prop-rental.html'];
+    const pages = ['reports.html', 'anire-craft-store.html', 'photo-studio.html', 'prop-rental.html'];
     if (pages[cardIndex]) {
         window.location.href = pages[cardIndex];
     }

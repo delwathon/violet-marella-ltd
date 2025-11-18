@@ -120,6 +120,100 @@
                 </a>
             </li>
 
+
+            
+            <!-- Anire Craft Store Section Header -->
+            <li class="nav-item mt-4">
+                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                    <i class="fas fa-gift me-2 small"></i>
+                    <span>Anire Craft Store</span>
+                </div>
+            </li>
+            
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a href="{{ route('anire-craft-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-gift me-3" style="width: 20px;"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+
+
+            <!-- Photo Studio Section Header -->
+            <li class="nav-item mt-4">
+                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                    <i class="fas fa-camera me-2 small"></i>
+                    <span>Photo Studio</span>
+                </div>
+            </li>
+            
+            <!-- Photo Studio Dashboard -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.dashboard') || (request()->routeIs('photo-studio.index') && !request()->has('tab')) ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-tachometer-alt me-3" style="width: 20px;"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Active Sessions -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.sessions.active') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.sessions.active') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-play-circle me-3" style="width: 20px;"></i>
+                    <span>Active Sessions</span>
+                </a>
+            </li>
+
+            <!-- Session History -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.sessions.history') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.sessions.history') || request()->routeIs('photo-studio.sessions.index') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-history me-3" style="width: 20px;"></i>
+                    <span>Session History</span>
+                </a>
+            </li>
+
+            <!-- Studio Customers -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.customers.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-user-friends me-3" style="width: 20px;"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+
+            <!-- Studio Management -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.studios.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.studios.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-door-open me-3" style="width: 20px;"></i>
+                    <span>Studio Rooms</span>
+                </a>
+            </li>
+
+            <!-- Rates & Pricing -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.rates.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.rates.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-tags me-3" style="width: 20px;"></i>
+                    <span>Rates & Pricing</span>
+                </a>
+            </li>
+
+            <!-- QR Scanner -->
+            <li class="nav-item">
+                <a href="#" class="nav-link text-white-50 d-flex align-items-center py-2 px-4" onclick="openQRScanner(); return false;">
+                    <i class="fas fa-qrcode me-3" style="width: 20px;"></i>
+                    <span>QR Scanner</span>
+                </a>
+            </li>
+
+            <!-- Studio Reports -->
+            <li class="nav-item">
+                <a href="{{ route('photo-studio.reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.reports.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-chart-line me-3" style="width: 20px;"></i>
+                    <span>Studio Reports</span>
+                </a>
+            </li>
+
+
+            
             <!-- Prop Rental Section Header -->
             <li class="nav-item mt-4">
                 <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
@@ -170,30 +264,16 @@
                 </a>
             </li>
             
-            <!-- Other Services Section Header -->
+            
+
+            <!-- Other Section Header -->
             <li class="nav-item mt-4">
                 <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                     <i class="fas fa-ellipsis-h me-2 small"></i>
-                    <span>Other Services</span>
+                    <span>Others</span>
                 </div>
             </li>
-            
-            <!-- Gift Store -->
-            <li class="nav-item">
-                <a href="{{ route('gift-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('gift-store.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-gift me-3" style="width: 20px;"></i>
-                    <span>Anire Craft Store</span>
-                </a>
-            </li>
-            
-            <!-- Music Studio -->
-            <li class="nav-item">
-                <a href="{{ route('music-studio.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('music-studio.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-music me-3" style="width: 20px;"></i>
-                    <span>Photo Studio</span>
-                </a>
-            </li>
-            
+
             <!-- Reports -->
             <li class="nav-item">
                 <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">

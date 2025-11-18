@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\GiftStoreController;
+use App\Http\Controllers\AnireCraftStore\AnireStoreController;
 use App\Http\Controllers\Lounge\LoungeRootController;
 use App\Http\Controllers\Lounge\ProductsController;
 use App\Http\Controllers\Lounge\CustomersController;
@@ -14,7 +14,12 @@ use App\Http\Controllers\Lounge\InventoryController;
 use App\Http\Controllers\PropRental\PropRentalController;
 use App\Http\Controllers\PropRental\PropsController;
 use App\Http\Controllers\PropRental\RentalCustomersController;
-use App\Http\Controllers\MusicStudioController;
+use App\Http\Controllers\PhotoStudio\PhotoStudioController;
+use App\Http\Controllers\PhotoStudio\StudioCustomerController;
+use App\Http\Controllers\PhotoStudio\StudioRateController;
+use App\Http\Controllers\PhotoStudio\StudioSessionController;
+use App\Http\Controllers\PhotoStudio\StudioReportController;
+use App\Http\Controllers\PhotoStudio\StudioManagementController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
@@ -46,8 +51,11 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Gift Store
-    Route::get('gift-store', [GiftStoreController::class, 'index'])->name('gift-store.index');
+    // Anire Craft Store    
+    Route::prefix('anire-craft-store')->name('anire-craft-store.')->group(function () {
+        // Main page
+        Route::get('/', [AnireStoreController::class, 'index'])->name('index');
+    });
     
     // ==================== PRODUCT MANAGEMENT ====================
     Route::prefix('products')->name('products.')->group(function () {
@@ -206,8 +214,85 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         Route::get('/calendar/data', [PropRentalController::class, 'calendarData'])->name('calendar-data');
     });
     
-    // Music Studio
-    Route::get('music-studio', [MusicStudioController::class, 'index'])->name('music-studio.index');
+    // Photo Studio Routes
+    Route::prefix('photo-studio')->name('photo-studio.')->group(function () {
+        // Dashboard
+        Route::get('/', [PhotoStudioController::class, 'index'])->name('index');
+        Route::get('/dashboard', [PhotoStudioController::class, 'index'])->name('dashboard');
+        
+        // Session Management
+        Route::get('/sessions/active', [PhotoStudioController::class, 'activeSessions'])->name('sessions.active');
+        Route::get('/sessions/history', [StudioSessionController::class, 'index'])->name('sessions.history');
+        Route::post('/check-in', [PhotoStudioController::class, 'checkIn'])->name('check-in');
+        Route::post('/checkout/{id}', [PhotoStudioController::class, 'checkout'])->name('checkout');
+        Route::get('/session/{id}', [PhotoStudioController::class, 'getSession'])->name('session');
+        Route::post('/extend/{id}', [PhotoStudioController::class, 'extendSession'])->name('extend');
+        
+        // QR Code
+        Route::get('/session/{id}/qr-code', [PhotoStudioController::class, 'generateQRCode'])->name('generate-qr');
+        Route::post('/scan-qr', [PhotoStudioController::class, 'scanQRCode'])->name('scan-qr');
+        
+        // AJAX Endpoints
+        Route::get('/active-sessions', [PhotoStudioController::class, 'getActiveSessions'])->name('get-active-sessions');
+        Route::get('/studio/{id}/status', [PhotoStudioController::class, 'getStudioStatus'])->name('studio-status');
+        Route::get('/customers/search', [PhotoStudioController::class, 'searchCustomers'])->name('customers-search');
+        
+        // Customers Management
+        Route::prefix('customers')->name('customers.')->group(function () {
+            Route::get('/', [StudioCustomerController::class, 'index'])->name('index');
+            Route::get('/create', [StudioCustomerController::class, 'create'])->name('create');
+            Route::post('/', [StudioCustomerController::class, 'store'])->name('store');
+            Route::get('/{id}', [StudioCustomerController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [StudioCustomerController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [StudioCustomerController::class, 'update'])->name('update');
+            Route::delete('/{id}', [StudioCustomerController::class, 'destroy'])->name('destroy');
+            Route::get('/export/csv', [StudioCustomerController::class, 'export'])->name('export');
+        });
+        
+        // Sessions
+        Route::prefix('sessions')->name('sessions.')->group(function () {
+            Route::get('/', [StudioSessionController::class, 'index'])->name('index');
+            Route::get('/{id}', [StudioSessionController::class, 'show'])->name('show');
+            Route::get('/export/csv', [StudioSessionController::class, 'export'])->name('export');
+        });
+        
+        // Studio Management
+        Route::prefix('studios')->name('studios.')->group(function () {
+            Route::get('/', [StudioManagementController::class, 'index'])->name('index');
+            Route::get('/create', [StudioManagementController::class, 'create'])->name('create');
+            Route::post('/', [StudioManagementController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [StudioManagementController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [StudioManagementController::class, 'update'])->name('update');
+            Route::post('/{id}/status', [StudioManagementController::class, 'updateStatus'])->name('update-status');
+            Route::delete('/{id}', [StudioManagementController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Rates Management
+        Route::prefix('rates')->name('rates.')->group(function () {
+            Route::get('/', [StudioRateController::class, 'index'])->name('index');
+            Route::get('/list', [StudioRateController::class, 'getRatesList'])->name('list');
+            Route::get('/create', [StudioRateController::class, 'create'])->name('create');
+            Route::post('/', [StudioRateController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [StudioRateController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [StudioRateController::class, 'update'])->name('update');
+            Route::post('/{id}/set-default', [StudioRateController::class, 'setDefault'])->name('set-default');
+            Route::delete('/{id}', [StudioRateController::class, 'destroy'])->name('destroy');
+        });
+        
+        // AJAX endpoint for rates list
+        Route::get('/rates-list', [StudioRateController::class, 'getRatesList'])->name('rates-list');
+        
+        // Reports
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [StudioReportController::class, 'index'])->name('index');
+            Route::get('/daily', [StudioReportController::class, 'daily'])->name('daily');
+            Route::get('/revenue', [StudioReportController::class, 'revenue'])->name('revenue');
+            Route::get('/occupancy', [StudioReportController::class, 'occupancy'])->name('occupancy');
+            Route::get('/customers', [StudioReportController::class, 'customers'])->name('customers');
+            Route::get('/export', [StudioReportController::class, 'export'])->name('export');
+        });
+    });
+
     
     // Reports
     Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');

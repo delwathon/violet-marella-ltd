@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Gift Store Management')
 @push('styles')
-<link href="{{ asset('assets/css/gift-store.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/anire-craft-store.css') }}" rel="stylesheet">
 @endpush
 @section('content')
 <div class="content-area">
@@ -427,5 +427,5 @@
 </div>
 @endsection
 @push('scripts')
-<script src="{{ asset('assets/js/gift-store.js') }}"></script>
+<script src="{{ asset('assets/js/anire-craft-store.js') }}"></script>
 @endpush

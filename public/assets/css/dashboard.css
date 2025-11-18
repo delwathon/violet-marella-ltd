@@ -156,7 +156,7 @@
     z-index: -1;
 }
 
-.gift-store .module-icon {
+.anire-craft-store .module-icon {
     background: linear-gradient(135deg, #ec4899, #f97316);
     color: var(--white);
 }
@@ -166,7 +166,7 @@
     color: var(--white);
 }
 
-.music-studio .module-icon {
+.photo-studio .module-icon {
     background: linear-gradient(135deg, var(--primary-violet), var(--secondary-violet));
     color: var(--white);
 }
@@ -463,7 +463,7 @@
 }
 
 /* Dark theme for business modules to match gift store style */
-.module-card.gift-store {
+.module-card.anire-craft-store {
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 
@@ -471,7 +471,7 @@
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 
-.module-card.music-studio {
+.module-card.photo-studio {
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 

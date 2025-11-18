@@ -33,9 +33,9 @@
                         <label class="form-label">Business Unit</label>
                         <select class="form-select">
                             <option value="all">All Business Units</option>
-                            <option value="gift-store">Gift Store</option>
+                            <option value="anire-craft-store">Gift Store</option>
                             <option value="lounge">Mini Lounge</option>
-                            <option value="music-studio">Music Studio</option>
+                            <option value="photo-studio">Photo Studio</option>
                             <option value="prop-rental">Prop Rental</option>
                         </select>
                     </div>
@@ -455,7 +455,7 @@
                     <div class="mb-3">
                         <label class="form-label">Business Units</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="gift-store" checked>
+                            <input class="form-check-input" type="checkbox" value="anire-craft-store" checked>
                             <label class="form-check-label">Gift Store</label>
                         </div>
                         <div class="form-check">
@@ -463,8 +463,8 @@
                             <label class="form-check-label">Mini Lounge</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="music-studio" checked>
-                            <label class="form-check-label">Music Studio</label>
+                            <input class="form-check-input" type="checkbox" value="photo-studio" checked>
+                            <label class="form-check-label">Photo Studio</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="prop-rental" checked>

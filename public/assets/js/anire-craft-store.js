@@ -680,7 +680,7 @@ function exportInventory() {
         'Last Updated': VioletMarellaCommon.formatDate(product.lastUpdated, 'short')
     }));
     
-    const filename = `gift-store-inventory-${new Date().toISOString().split('T')[0]}.csv`;
+    const filename = `anire-craft-store-inventory-${new Date().toISOString().split('T')[0]}.csv`;
     VioletMarellaCommon.exportToCSV(data, filename);
     VioletMarellaCommon.showNotification('Inventory exported successfully', 'success');
 }

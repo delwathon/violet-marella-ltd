@@ -1,6 +1,6 @@
 # Violet Marella Limited - Business Management Suite
 
-A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Lounge, and Music Studio with Prop Rental services.
+A comprehensive multi-page business management application built with HTML, Bootstrap 5, and vanilla JavaScript. This application manages three distinct sub-businesses: Gift Store, Mini Lounge, and Photo Studio with Prop Rental services.
 
 ![Violet Marella Limited](assets/images/logos/logo-primary.svg)
 
@@ -20,7 +20,7 @@ A comprehensive multi-page business management application built with HTML, Boot
 - Receipt generation and printing
 - Real-time inventory updates
 
-### 🎵 **Music Studio Operations**
+### 🎵 **Photo Studio Operations**
 - Time-based billing system
 - Customer check-in/check-out with QR codes
 - Studio room availability tracking
@@ -63,9 +63,9 @@ A comprehensive multi-page business management application built with HTML, Boot
 violet-marella-app/
 ├── 📄 index.html                    # Authentication page
 ├── 📄 dashboard.html                # Main business dashboard
-├── 📄 gift-store.html              # Inventory management
+├── 📄 anire-craft-store.html              # Inventory management
 ├── 📄 lounge.html             # POS system
-├── 📄 music-studio.html            # Studio management
+├── 📄 photo-studio.html            # Studio management
 ├── 📄 prop-rental.html       # Rental system
 ├── 📄 reports.html                 # Analytics & reports
 ├── 📄 settings.html                # System configuration
@@ -75,15 +75,15 @@ violet-marella-app/
 │   │   ├── styles.css              # Main stylesheet
 │   │   ├── login.css               # Login specific styles
 │   │   ├── dashboard.css           # Dashboard styles
-│   │   ├── gift-store.css          # Gift store styles
-│   │   ├── music-studio.css        # Studio styles
+│   │   ├── anire-craft-store.css          # Gift store styles
+│   │   ├── photo-studio.css        # Studio styles
 │   │   └── [additional CSS files]
 │   ├── 📁 js/
 │   │   ├── common.js               # Shared functionality
 │   │   ├── auth.js                 # Authentication logic
 │   │   ├── dashboard.js            # Dashboard functionality
-│   │   ├── gift-store.js           # Inventory management
-│   │   ├── music-studio.js         # Studio operations
+│   │   ├── anire-craft-store.js           # Inventory management
+│   │   ├── photo-studio.js         # Studio operations
 │   │   ├── lounge.js          # POS system
 │   │   └── [additional JS files]
 │   └── 📁 images/
@@ -150,7 +150,7 @@ violet-marella-app/
 - **Payment Processing**: Multiple payment methods
 - **Receipt Generation**: Automatic receipt creation and printing
 
-### Music Studio
+### Photo Studio
 - **Room Management**: 4 studio rooms with real-time status
 - **Time Tracking**: Automatic session duration calculation
 - **QR Code System**: Customer check-in/check-out via QR codes

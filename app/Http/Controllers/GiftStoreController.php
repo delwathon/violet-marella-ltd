@@ -14,6 +14,6 @@ class GiftStoreController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        return view('pages.gift-store', compact('user'));
+        return view('pages.anire-craft-store', compact('user'));
     }
 }

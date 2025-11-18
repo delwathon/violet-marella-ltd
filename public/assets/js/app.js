@@ -33,7 +33,7 @@ const pageConfig = {
         title: 'Dashboard',
         subtitle: 'Welcome to Violet Marella Management Suite'
     },
-    'gift-store': {
+    'anire-craft-store': {
         title: 'Gift Store',
         subtitle: 'Manage inventory, sales, and customer orders'
     },
@@ -41,8 +41,8 @@ const pageConfig = {
         title: 'Mini Lounge',
         subtitle: 'POS system and inventory management'
     },
-    'music-studio': {
-        title: 'Music Studio',
+    'photo-studio': {
+        title: 'Photo Studio',
         subtitle: 'Studio sessions and time-based billing'
     },
     'prop-rental': {
@@ -317,14 +317,14 @@ function loadSectionData(sectionName) {
         case 'dashboard':
             loadDashboardData();
             break;
-        case 'gift-store':
+        case 'anire-craft-store':
             loadGiftStoreData();
             break;
         case 'lounge':
             loadLoungeData();
             break;
-        case 'music-studio':
-            loadMusicStudioData();
+        case 'photo-studio':
+            loadPhotoStudioData();
             break;
         case 'prop-rental':
             loadPropRentalData();
@@ -374,9 +374,9 @@ function loadLoungeData() {
 }
 
 /**
- * Load Music Studio Data
+ * Load Photo Studio Data
  */
-function loadMusicStudioData() {
+function loadPhotoStudioData() {
     console.log('Loading music studio data...');
     // Here you would typically fetch active sessions and billing data from an API
     

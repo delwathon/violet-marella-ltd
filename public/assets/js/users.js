@@ -39,7 +39,7 @@ const sampleUsers = [
         email: 'manager@violetmarella.com',
         phone: '+234 802 345 6789',
         role: 'manager',
-        department: 'gift-store',
+        department: 'anire-craft-store',
         employeeId: 'EMP-002',
         status: 'active',
         lastLogin: new Date(Date.now() - 5 * 60 * 60 * 1000),
@@ -75,14 +75,14 @@ const sampleRoles = [
         id: 'role-002',
         name: 'Manager',
         description: 'Business operations and reporting access',
-        permissions: ['dashboard.view', 'gift-store.manage', 'lounge.manage', 'music-studio.manage', 'reports.view'],
+        permissions: ['dashboard.view', 'anire-craft-store.manage', 'lounge.manage', 'photo-studio.manage', 'reports.view'],
         userCount: 2
     },
     {
         id: 'role-003',
         name: 'Staff',
         description: 'Basic operational access',
-        permissions: ['dashboard.view', 'gift-store.view', 'lounge.operate'],
+        permissions: ['dashboard.view', 'anire-craft-store.view', 'lounge.operate'],
         userCount: 3
     }
 ];
@@ -378,9 +378,9 @@ function formatRole(role) {
 function formatDepartment(department) {
     const departments = {
         'all': 'All Departments',
-        'gift-store': 'Gift Store',
+        'anire-craft-store': 'Gift Store',
         'lounge': 'Lounge',
-        'music-studio': 'Music Studio'
+        'photo-studio': 'Photo Studio'
     };
     return departments[department] || department;
 }
@@ -406,11 +406,11 @@ function formatPermission(permission) {
     
     const permissions = {
         'dashboard.view': 'View Dashboard',
-        'gift-store.manage': 'Manage Gift Store',
-        'gift-store.view': 'View Gift Store',
+        'anire-craft-store.manage': 'Manage Gift Store',
+        'anire-craft-store.view': 'View Gift Store',
         'lounge.manage': 'Manage Lounge',
         'lounge.operate': 'Operate POS',
-        'music-studio.manage': 'Manage Studio',
+        'photo-studio.manage': 'Manage Studio',
         'reports.view': 'View Reports',
         'users.manage': 'Manage Users',
         'settings.manage': 'Manage Settings'

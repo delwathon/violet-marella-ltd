@@ -355,7 +355,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.gift-store .module-icon {
+.anire-craft-store .module-icon {
     background: linear-gradient(135deg, #ec4899, #f97316);
     color: var(--white);
 }
@@ -365,7 +365,7 @@ body {
     color: var(--white);
 }
 
-.music-studio .module-icon {
+.photo-studio .module-icon {
     background: linear-gradient(135deg, var(--primary-violet), var(--secondary-violet));
     color: var(--white);
 }

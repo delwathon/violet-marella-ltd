@@ -13,7 +13,7 @@ class PagesController extends Controller
         return view('pages.dashboard');
     }
     public function giftStore() {
-        return view('pages.gift-store');
+        return view('pages.anire-craft-store');
     }
     public function lounge() {
         return view('pages.lounge');
@@ -21,8 +21,8 @@ class PagesController extends Controller
     public function propRental() {
         return view('pages.prop-rental');
     }
-    public function musicStudio() {
-        return view('pages.music-studio');
+    public function photoStudio() {
+        return view('pages.photo-studio');
     }
     public function reports() {
         return view('pages.reports');

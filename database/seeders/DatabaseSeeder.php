@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             ProductSeeder::class,
             PropRentalSeeder::class,
+            StudioSeeder::class,
         ]);
     }
 }

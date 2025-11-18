@@ -11,7 +11,7 @@ assets/images/
 │   ├── favicon.ico              # Browser favicon
 │   └── favicon-32x32.png        # High-res favicon
 ├── products/
-│   ├── gift-store/
+│   ├── anire-craft-store/
 │   │   ├── valentine-gift-box.jpg
 │   │   ├── birthday-cards.jpg
 │   │   ├── anniversary-flowers.jpg
@@ -42,9 +42,9 @@ assets/images/
 │   └── hero-gradient.svg        # Gradient backgrounds
 ├── icons/
 │   ├── business-units/
-│   │   ├── gift-store-icon.svg
+│   │   ├── anire-craft-store-icon.svg
 │   │   ├── lounge-icon.svg
-│   │   ├── music-studio-icon.svg
+│   │   ├── photo-studio-icon.svg
 │   │   └── rental-icon.svg
 │   └── features/
 │       ├── pos-icon.svg
@@ -111,7 +111,7 @@ For development and demo purposes, the application currently uses:
 <img src="assets/images/logos/logo-primary.svg" alt="Violet Marella Limited" class="logo">
 
 <!-- Product Images with Fallback -->
-<img src="assets/images/products/gift-store/valentine-gift-box.jpg" 
+<img src="assets/images/products/anire-craft-store/valentine-gift-box.jpg" 
      alt="Valentine's Gift Box" 
      onerror="this.src='assets/images/placeholders/product-placeholder.svg'"
      class="product-image">
@@ -146,8 +146,8 @@ For development and demo purposes, the application currently uses:
 }
 
 /* Module Cards */
-.gift-store-card {
-    background-image: url('../images/icons/business-units/gift-store-icon.svg');
+.anire-craft-store-card {
+    background-image: url('../images/icons/business-units/anire-craft-store-icon.svg');
 }
 ```
 
