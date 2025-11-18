@@ -20,13 +20,13 @@
                     <a href="{{ route('lounge.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-cash-register"></i> Back to POS
                     </a>
-                    <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-tags"></i> Categories
                     </a>
-                    <a href="{{ route('products.export') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.products.export') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-download"></i> Export
                     </a>
-                    <a href="{{ route('products.create') }}" class="btn btn-success">
+                    <a href="{{ route('lounge.products.create') }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Add Product
                     </a>
                 </div>
@@ -85,7 +85,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('products.index') }}">
+            <form method="GET" action="{{ route('lounge.products.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <input type="text" name="search" class="form-control" 
@@ -122,7 +122,7 @@
                             <button type="submit" class="btn btn-primary flex-fill">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-redo"></i>
                             </a>
                         </div>
@@ -213,12 +213,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('products.show', $product->id) }}" 
+                                        <a href="{{ route('lounge.products.show', $product->id) }}" 
                                            class="btn btn-outline-info" 
                                            title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('products.edit', $product->id) }}" 
+                                        <a href="{{ route('lounge.products.edit', $product->id) }}" 
                                            class="btn btn-outline-primary" 
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
@@ -241,7 +241,7 @@
                                 <td colspan="8" class="text-center text-muted py-5">
                                     <i class="fas fa-boxes fa-3x mb-3"></i>
                                     <br><h5>No products found</h5>
-                                    <p>Try adjusting your filters or <a href="{{ route('products.create') }}">add a new product</a></p>
+                                    <p>Try adjusting your filters or <a href="{{ route('lounge.products.create') }}">add a new product</a></p>
                                 </td>
                             </tr>
                         @endforelse

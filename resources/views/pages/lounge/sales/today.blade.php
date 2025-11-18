@@ -90,7 +90,7 @@
     <!-- Search -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('sales.today') }}">
+            <form method="GET" action="{{ route('lounge.sales.today') }}">
                 <div class="input-group">
                     <input type="text" name="search" class="form-control" placeholder="Search by receipt # or customer name..." value="{{ request('search') }}">
                     <button type="submit" class="btn btn-primary">
@@ -130,7 +130,7 @@
                                 </td>
                                 <td>
                                     @if($sale->customer)
-                                        <a href="{{ route('customers.show', $sale->customer->id) }}">
+                                        <a href="{{ route('lounge.customers.show', $sale->customer->id) }}">
                                             {{ $sale->customer->full_name }}
                                         </a>
                                     @else
@@ -157,7 +157,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View">
+                                        <a href="{{ route('lounge.sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button class="btn btn-outline-secondary" onclick="printReceipt({{ $sale->id }})" title="Print">

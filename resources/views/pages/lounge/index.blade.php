@@ -92,10 +92,10 @@
                                     <i class="fas fa-boxes"></i> Products
                                 </h6>
                                 <div class="d-grid gap-2">
-                                    <a href="{{ route('products.create') }}" class="btn btn-sm btn-primary">
+                                    <a href="{{ route('lounge.products.create') }}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-plus"></i> Add New Product
                                     </a>
-                                    <a href="{{ route('products.index') }}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ route('lounge.products.index') }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-list"></i> Manage Products
                                     </a>
                                     <button class="btn btn-sm btn-outline-warning" onclick="viewLowStock()">
@@ -117,10 +117,10 @@
                                     <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#quickCustomerModal">
                                         <i class="fas fa-user-plus"></i> Quick Add Customer
                                     </button>
-                                    <a href="{{ route('customers.create') }}" class="btn btn-sm btn-outline-success">
+                                    <a href="{{ route('lounge.customers.create') }}" class="btn btn-sm btn-outline-success">
                                         <i class="fas fa-user-plus"></i> Add Customer (Full)
                                     </a>
-                                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-success">
+                                    <a href="{{ route('lounge.customers.index') }}" class="btn btn-sm btn-outline-success">
                                         <i class="fas fa-list"></i> Manage Customers
                                     </a>
                                 </div>
@@ -136,10 +136,10 @@
                                     <i class="fas fa-tags"></i> Categories
                                 </h6>
                                 <div class="d-grid gap-2">
-                                    <a href="{{ route('categories.create') }}" class="btn btn-sm btn-info">
+                                    <a href="{{ route('lounge.categories.create') }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-plus"></i> Add Category
                                     </a>
-                                    <a href="{{ route('categories.index') }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('lounge.categories.index') }}" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-list"></i> Manage Categories
                                     </a>
                                 </div>
@@ -346,7 +346,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Recent Transactions</h5>
                     <div class="d-flex gap-2">
-                        <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('lounge.sales.index') }}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-eye me-1"></i>View All
                         </a>
                     </div>
@@ -399,7 +399,7 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
+                                                    <a href="{{ route('lounge.sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <button class="btn btn-outline-secondary" onclick="printReceipt({{ $sale->id }})" title="Print Receipt">
@@ -704,7 +704,7 @@
                         </select>
                     </div>
                     <div class="alert alert-info">
-                        <small><i class="fas fa-info-circle"></i> For more details, use the <a href="{{ route('customers.create') }}" target="_blank">full customer form</a></small>
+                        <small><i class="fas fa-info-circle"></i> For more details, use the <a href="{{ route('lounge.customers.create') }}" target="_blank">full customer form</a></small>
                     </div>
                 </form>
             </div>
@@ -754,7 +754,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a href="{{ route('products.index') }}?stock_status=low" class="btn btn-primary">
+                <a href="{{ route('lounge.products.index') }}?stock_status=low" class="btn btn-primary">
                     <i class="fas fa-list"></i> View All Low Stock
                 </a>
             </div>
@@ -783,7 +783,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a href="{{ route('sales.today') }}" class="btn btn-primary">
+                <a href="{{ route('lounge.sales.today') }}" class="btn btn-primary">
                     <i class="fas fa-chart-bar"></i> Full Reports
                 </a>
             </div>

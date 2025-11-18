@@ -27,7 +27,7 @@
             
             <!-- Point of Sale -->
             <li class="nav-item">
-                <a href="{{ route('lounge.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.*') ? 'bg-primary text-white' : '' }}">
+                <a href="{{ route('lounge.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.index') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-cash-register me-3" style="width: 20px;"></i>
                     <span>Point of Sale</span>
                 </a>
@@ -35,30 +35,25 @@
             
             <!-- Product Management -->
             <li class="nav-item">
-                <a href="#productsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'true' : 'false' }}">
+                <a href="#productsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.products.*') || request()->routeIs('lounge.categories.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('lounge.products.*') || request()->routeIs('lounge.categories.*') ? 'true' : 'false' }}">
                     <i class="fas fa-boxes me-3" style="width: 20px;"></i>
                     <span class="flex-grow-1">Products</span>
                     <i class="fas fa-chevron-down small"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'show' : '' }}" id="productsMenu">
+                <div class="collapse {{ request()->routeIs('lounge.products.*') || request()->routeIs('lounge.categories.*') ? 'show' : '' }}" id="productsMenu">
                     <ul class="nav flex-column bg-black bg-opacity-25 py-1">
                         <li class="nav-item">
-                            <a href="{{ route('products.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.index') ? 'text-white' : '' }}">
+                            <a href="{{ route('lounge.products.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.products.index') ? 'text-white' : '' }}">
                                 <i class="fas fa-list me-2"></i> All Products
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('products.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.create') ? 'text-white' : '' }}">
+                            <a href="{{ route('lounge.products.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.products.create') ? 'text-white' : '' }}">
                                 <i class="fas fa-plus me-2"></i> Add Product
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('products.low-stock') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('products.low-stock') ? 'text-white' : '' }}">
-                                <i class="fas fa-exclamation-triangle me-2"></i> Low Stock
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('categories.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('categories.*') ? 'text-white' : '' }}">
+                            <a href="{{ route('lounge.categories.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.categories.*') ? 'text-white' : '' }}">
                                 <i class="fas fa-tags me-2"></i> Categories
                             </a>
                         </li>
@@ -68,20 +63,20 @@
             
             <!-- Customer Management -->
             <li class="nav-item">
-                <a href="#customersMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('customers.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('customers.*') ? 'true' : 'false' }}">
+                <a href="#customersMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.customers.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('lounge.customers.*') ? 'true' : 'false' }}">
                     <i class="fas fa-users me-3" style="width: 20px;"></i>
                     <span class="flex-grow-1">Customers</span>
                     <i class="fas fa-chevron-down small"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('customers.*') ? 'show' : '' }}" id="customersMenu">
+                <div class="collapse {{ request()->routeIs('lounge.customers.*') ? 'show' : '' }}" id="customersMenu">
                     <ul class="nav flex-column bg-black bg-opacity-25 py-1">
                         <li class="nav-item">
-                            <a href="{{ route('customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('customers.index') ? 'text-white' : '' }}">
+                            <a href="{{ route('lounge.customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.customers.index') ? 'text-white' : '' }}">
                                 <i class="fas fa-list me-2"></i> All Customers
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('customers.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('customers.create') ? 'text-white' : '' }}">
+                            <a href="{{ route('lounge.customers.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.customers.create') ? 'text-white' : '' }}">
                                 <i class="fas fa-user-plus me-2"></i> Add Customer
                             </a>
                         </li>
@@ -91,20 +86,20 @@
             
             <!-- Sales & Transactions -->
             <li class="nav-item">
-                <a href="#salesMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('sales.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('sales.*') ? 'true' : 'false' }}">
+                <a href="#salesMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.sales.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('lounge.sales.*') ? 'true' : 'false' }}">
                     <i class="fas fa-receipt me-3" style="width: 20px;"></i>
                     <span class="flex-grow-1">Sales</span>
                     <i class="fas fa-chevron-down small"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('sales.*') ? 'show' : '' }}" id="salesMenu">
+                <div class="collapse {{ request()->routeIs('lounge.sales.*') ? 'show' : '' }}" id="salesMenu">
                     <ul class="nav flex-column bg-black bg-opacity-25 py-1">
                         <li class="nav-item">
-                            <a href="{{ route('sales.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
+                            <a href="{{ route('lounge.sales.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
                                 <i class="fas fa-list me-2"></i> All Sales
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('sales.today') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
+                            <a href="{{ route('lounge.sales.today') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small">
                                 <i class="fas fa-calendar-day me-2"></i> Today's Sales
                             </a>
                         </li>
@@ -113,13 +108,28 @@
             </li>
             
             <!-- Inventory -->
-            <li class="nav-item">
-                <a href="{{ route('inventory.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('inventory.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-warehouse me-3" style="width: 20px;"></i>
-                    <span>Inventory</span>
+             <li class="nav-item">
+                <a href="#inventoryMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.inventory.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('lounge.inventory.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-boxes me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Inventory</span>
+                    <i class="fas fa-chevron-down small"></i>
                 </a>
+                <div class="collapse {{ request()->routeIs('lounge.inventory.*') ? 'show' : '' }}" id="inventoryMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('lounge.inventory.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.inventory.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-warehouse me-3" style="width: 20px;"></i>
+                                <span>Inventory</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('lounge.inventory.low-stock') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('lounge.inventory.low-stock') ? 'text-white' : '' }}">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Low Stock
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
-
 
             
             <!-- Anire Craft Store Section Header -->
@@ -245,7 +255,7 @@
 
             <!-- Prop Rental Customers -->
             <li class="nav-item">
-                <a href="{{ route('prop-rental.index', ['tab' => 'customers']) }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.customers.*') ? 'text-white' : '' }}">
+                <a href="{{ route('prop-rental.index', ['tab' => 'customers']) }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.lounge.customers.*') ? 'text-white' : '' }}">
                     <i class="fas fa-users me-2"></i> Customers
                 </a>
             </li>
@@ -259,7 +269,7 @@
 
             <!-- Prop Rental Customers -->
             <li class="nav-item">
-                <a href="{{ route('prop-rental.reports') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.customers.*') ? 'text-white' : '' }}">
+                <a href="{{ route('prop-rental.reports') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->get('tab') === 'customers' || request()->routeIs('prop-rental.lounge.customers.*') ? 'text-white' : '' }}">
                     <i class="fas fa-chart-bar me-2"></i> Reports
                 </a>
             </li>

@@ -10,20 +10,20 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.customers.index') }}">Customers</a></li>
                         <li class="breadcrumb-item active">Add New</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
-                <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Customers
                 </a>
             </div>
         </div>
     </div>
 
-    <form action="{{ route('customers.store') }}" method="POST">
+    <form action="{{ route('lounge.customers.store') }}" method="POST">
         @csrf
         
         <div class="row">
@@ -179,7 +179,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Save Customer
                             </button>
-                            <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

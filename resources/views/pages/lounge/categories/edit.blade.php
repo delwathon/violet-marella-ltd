@@ -10,20 +10,20 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Categories</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.categories.index') }}">Categories</a></li>
                         <li class="breadcrumb-item active">Edit: {{ $category->name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
-                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Categories
                 </a>
             </div>
         </div>
     </div>
 
-    <form action="{{ route('categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('lounge.categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -138,7 +138,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Update Category
                             </button>
-                            <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

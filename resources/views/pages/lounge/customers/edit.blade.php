@@ -10,17 +10,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.customers.index') }}">Customers</a></li>
                         <li class="breadcrumb-item active">Edit: {{ $customer->full_name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-outline-info">
+                    <a href="{{ route('lounge.customers.show', $customer->id) }}" class="btn btn-outline-info">
                         <i class="fas fa-eye"></i> View Profile
                     </a>
-                    <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Customers
                     </a>
                 </div>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <form action="{{ route('customers.update', $customer->id) }}" method="POST">
+    <form action="{{ route('lounge.customers.update', $customer->id) }}" method="POST">
         @csrf
         @method('PUT')
         
@@ -209,10 +209,10 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Update Customer
                             </button>
-                            <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-outline-info">
+                            <a href="{{ route('lounge.customers.show', $customer->id) }}" class="btn btn-outline-info">
                                 <i class="fas fa-eye"></i> View Profile
                             </a>
-                            <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

@@ -10,20 +10,20 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Categories</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.categories.index') }}">Categories</a></li>
                         <li class="breadcrumb-item active">Add New</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
-                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Categories
                 </a>
             </div>
         </div>
     </div>
 
-    <form action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('lounge.categories.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <div class="row">
@@ -121,7 +121,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Save Category
                             </button>
-                            <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

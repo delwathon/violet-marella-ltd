@@ -14,10 +14,10 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('products.create') }}" class="btn btn-success">
+                    <a href="{{ route('lounge.products.create') }}" class="btn btn-success">
                         <i class="fas fa-plus me-2"></i>Add Product
                     </a>
-                    <a href="{{ route('inventory.logs') }}" class="btn btn-outline-primary">
+                    <a href="{{ route('lounge.inventory.logs') }}" class="btn btn-outline-primary">
                         <i class="fas fa-history me-2"></i>View Logs
                     </a>
                     <button class="btn btn-outline-secondary" onclick="exportInventory()">
@@ -82,10 +82,10 @@
             <!-- Filters -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('inventory.index') }}">
+                    <form method="GET" action="{{ route('lounge.inventory.index') }}">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control" placeholder="Search lounge.products..." value="{{ request('search') }}">
                             </div>
                             <div class="col-md-3">
                                 <select name="category_id" class="form-select">
@@ -166,10 +166,10 @@
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('inventory.adjust', $product->id) }}" class="btn btn-outline-primary" title="Adjust Stock">
+                                                <a href="{{ route('lounge.inventory.adjust', $product->id) }}" class="btn btn-outline-primary" title="Adjust Stock">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="{{ route('products.show', $product->id) }}" class="btn btn-outline-secondary" title="View Details">
+                                                <a href="{{ route('lounge.products.show', $product->id) }}" class="btn btn-outline-secondary" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </div>
@@ -224,7 +224,7 @@
                     @endforelse
                 </div>
                 <div class="card-footer">
-                    <a href="{{ route('inventory.logs') }}" class="btn btn-sm btn-outline-primary w-100">
+                    <a href="{{ route('lounge.inventory.logs') }}" class="btn btn-sm btn-outline-primary w-100">
                         View All Logs
                     </a>
                 </div>
@@ -237,7 +237,7 @@
 <script>
 function exportInventory() {
     const params = new URLSearchParams(window.location.search);
-    window.location.href = '{{ route("inventory.export") }}?' + params.toString();
+    window.location.href = '{{ route("lounge.inventory.export") }}?' + params.toString();
 }
 </script>
 @endpush

@@ -11,17 +11,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.products.index') }}">Products</a></li>
                         <li class="breadcrumb-item active">{{ $product->name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">
+                    <a href="{{ route('lounge.products.edit', $product->id) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>
                 </div>
@@ -238,7 +238,7 @@
                                     <tr>
                                         <td>{{ $saleItem->sale->sale_date->format('M d, Y') }}</td>
                                         <td>
-                                            <a href="{{ route('sales.show', $saleItem->sale_id) }}">
+                                            <a href="{{ route('lounge.sales.show', $saleItem->sale_id) }}">
                                                 {{ $saleItem->sale->receipt_number }}
                                             </a>
                                         </td>
@@ -351,7 +351,7 @@
                         <button class="btn btn-primary" onclick="showAdjustStockModal()">
                             <i class="fas fa-boxes"></i> Adjust Stock
                         </button>
-                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-outline-primary">
+                        <a href="{{ route('lounge.products.edit', $product->id) }}" class="btn btn-outline-primary">
                             <i class="fas fa-edit"></i> Edit Product
                         </a>
                         <button class="btn btn-outline-info" onclick="printBarcode()">

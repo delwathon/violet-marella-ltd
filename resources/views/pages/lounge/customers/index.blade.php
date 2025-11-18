@@ -20,10 +20,10 @@
                     <a href="{{ route('lounge.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-cash-register"></i> Back to POS
                     </a>
-                    <a href="{{ route('customers.export') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.customers.export') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-download"></i> Export
                     </a>
-                    <a href="{{ route('customers.create') }}" class="btn btn-success">
+                    <a href="{{ route('lounge.customers.create') }}" class="btn btn-success">
                         <i class="fas fa-user-plus"></i> Add Customer
                     </a>
                 </div>
@@ -82,7 +82,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('customers.index') }}">
+            <form method="GET" action="{{ route('lounge.customers.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <input type="text" name="search" class="form-control" 
@@ -110,7 +110,7 @@
                             <button type="submit" class="btn btn-primary flex-fill">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-redo"></i>
                             </a>
                         </div>
@@ -185,12 +185,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('customers.show', $customer->id) }}" 
+                                        <a href="{{ route('lounge.customers.show', $customer->id) }}" 
                                            class="btn btn-outline-info" 
                                            title="View Profile">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('customers.edit', $customer->id) }}" 
+                                        <a href="{{ route('lounge.customers.edit', $customer->id) }}" 
                                            class="btn btn-outline-primary" 
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
@@ -208,7 +208,7 @@
                                 <td colspan="9" class="text-center text-muted py-5">
                                     <i class="fas fa-users fa-3x mb-3"></i>
                                     <br><h5>No customers found</h5>
-                                    <p>Try adjusting your filters or <a href="{{ route('customers.create') }}">add a new customer</a></p>
+                                    <p>Try adjusting your filters or <a href="{{ route('lounge.customers.create') }}">add a new customer</a></p>
                                 </td>
                             </tr>
                         @endforelse

@@ -57,82 +57,6 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         Route::get('/', [AnireStoreController::class, 'index'])->name('index');
     });
     
-    // ==================== PRODUCT MANAGEMENT ====================
-    Route::prefix('products')->name('products.')->group(function () {
-        Route::get('/', [ProductsController::class, 'index'])->name('index');
-        Route::get('/create', [ProductsController::class, 'create'])->name('create');
-        Route::post('/', [ProductsController::class, 'store'])->name('store');
-        Route::get('/{id}', [ProductsController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [ProductsController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [ProductsController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ProductsController::class, 'destroy'])->name('destroy');
-        
-        // AJAX endpoints
-        Route::post('/{id}/adjust-stock', [ProductsController::class, 'adjustStock'])->name('adjust-stock');
-        Route::get('/barcode/scan', [ProductsController::class, 'getByBarcode'])->name('barcode');
-        Route::get('/low-stock/list', [ProductsController::class, 'getLowStock'])->name('low-stock');
-        Route::get('/export/csv', [ProductsController::class, 'export'])->name('export');
-    });
-    
-    // ==================== CUSTOMER MANAGEMENT ====================
-    Route::prefix('customers')->name('customers.')->group(function () {
-        Route::get('/', [CustomersController::class, 'index'])->name('index');
-        Route::get('/create', [CustomersController::class, 'create'])->name('create');
-        Route::post('/', [CustomersController::class, 'store'])->name('store');
-        Route::get('/{id}', [CustomersController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [CustomersController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [CustomersController::class, 'update'])->name('update');
-        Route::delete('/{id}', [CustomersController::class, 'destroy'])->name('destroy');
-        
-        // AJAX endpoints
-        Route::get('/search/query', [CustomersController::class, 'search'])->name('search');
-        Route::post('/quick/create', [CustomersController::class, 'quickStore'])->name('quick-store');
-        Route::get('/{id}/details', [CustomersController::class, 'getCustomer'])->name('details');
-        Route::post('/{id}/loyalty', [CustomersController::class, 'adjustLoyaltyPoints'])->name('adjust-loyalty');
-        Route::get('/{id}/statistics', [CustomersController::class, 'getStatistics'])->name('statistics');
-        Route::get('/export/csv', [CustomersController::class, 'export'])->name('export');
-    });
-    
-    // ==================== CATEGORY MANAGEMENT ====================
-    Route::prefix('categories')->name('categories.')->group(function () {
-        Route::get('/', [CategoryController::class, 'index'])->name('index');
-        Route::get('/create', [CategoryController::class, 'create'])->name('create');
-        Route::post('/', [CategoryController::class, 'store'])->name('store');
-        Route::get('/{id}', [CategoryController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [CategoryController::class, 'update'])->name('update');
-        Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('destroy');
-        
-        // AJAX endpoints
-        Route::get('/active/list', [CategoryController::class, 'getActive'])->name('active');
-    });
-    
-    // ==================== SALES MANAGEMENT ====================
-    Route::prefix('sales')->name('sales.')->group(function () {
-        Route::get('/', [SalesController::class, 'index'])->name('index');
-        Route::get('/today', [SalesController::class, 'today'])->name('today');
-        Route::get('/create', [SalesController::class, 'create'])->name('create');
-        Route::get('/{id}', [SalesController::class, 'show'])->name('show');
-        Route::get('/{id}/receipt', [SalesController::class, 'receipt'])->name('receipt'); // ADD THIS LINE
-        
-        // AJAX endpoints
-        Route::get('/export/csv', [SalesController::class, 'export'])->name('export');
-        Route::get('/statistics/data', [SalesController::class, 'statistics'])->name('statistics');
-    });
-    
-    // ==================== INVENTORY MANAGEMENT ====================
-    Route::prefix('inventory')->name('inventory.')->group(function () {
-        Route::get('/', [InventoryController::class, 'index'])->name('index');
-        Route::get('/logs', [InventoryController::class, 'logs'])->name('logs');
-        Route::get('/{id}/adjust', [InventoryController::class, 'adjust'])->name('adjust');
-        Route::post('/{id}/adjust', [InventoryController::class, 'processAdjustment'])->name('process-adjustment');
-        Route::get('/low-stock', [InventoryController::class, 'lowStock'])->name('low-stock');
-        
-        // AJAX endpoints
-        Route::get('/export/csv', [InventoryController::class, 'export'])->name('export');
-        Route::get('/statistics/data', [InventoryController::class, 'statistics'])->name('statistics');
-    });
-    
     // ==================== LOUNGE/POS ====================
     Route::prefix('lounge')->name('lounge.')->group(function () {
         // Main POS Interface
@@ -160,6 +84,83 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         
         // Reports
         Route::get('/daily-report', [LoungeRootController::class, 'getDailyReport'])->name('daily-report');
+        
+        
+        // ==================== PRODUCT MANAGEMENT ====================
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', [ProductsController::class, 'index'])->name('index');
+            Route::get('/create', [ProductsController::class, 'create'])->name('create');
+            Route::post('/', [ProductsController::class, 'store'])->name('store');
+            Route::get('/{id}', [ProductsController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [ProductsController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ProductsController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ProductsController::class, 'destroy'])->name('destroy');
+            
+            // AJAX endpoints
+            Route::post('/{id}/adjust-stock', [ProductsController::class, 'adjustStock'])->name('adjust-stock');
+            Route::get('/barcode/scan', [ProductsController::class, 'getByBarcode'])->name('barcode');
+            Route::get('/low-stock/list', [ProductsController::class, 'getLowStock'])->name('low-stock');
+            Route::get('/export/csv', [ProductsController::class, 'export'])->name('export');
+        });
+        
+        // ==================== CUSTOMER MANAGEMENT ====================
+        Route::prefix('customers')->name('customers.')->group(function () {
+            Route::get('/', [CustomersController::class, 'index'])->name('index');
+            Route::get('/create', [CustomersController::class, 'create'])->name('create');
+            Route::post('/', [CustomersController::class, 'store'])->name('store');
+            Route::get('/{id}', [CustomersController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [CustomersController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [CustomersController::class, 'update'])->name('update');
+            Route::delete('/{id}', [CustomersController::class, 'destroy'])->name('destroy');
+            
+            // AJAX endpoints
+            Route::get('/search/query', [CustomersController::class, 'search'])->name('search');
+            Route::post('/quick/create', [CustomersController::class, 'quickStore'])->name('quick-store');
+            Route::get('/{id}/details', [CustomersController::class, 'getCustomer'])->name('details');
+            Route::post('/{id}/loyalty', [CustomersController::class, 'adjustLoyaltyPoints'])->name('adjust-loyalty');
+            Route::get('/{id}/statistics', [CustomersController::class, 'getStatistics'])->name('statistics');
+            Route::get('/export/csv', [CustomersController::class, 'export'])->name('export');
+        });
+        
+        // ==================== CATEGORY MANAGEMENT ====================
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/', [CategoryController::class, 'index'])->name('index');
+            Route::get('/create', [CategoryController::class, 'create'])->name('create');
+            Route::post('/', [CategoryController::class, 'store'])->name('store');
+            Route::get('/{id}', [CategoryController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [CategoryController::class, 'update'])->name('update');
+            Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('destroy');
+            
+            // AJAX endpoints
+            Route::get('/active/list', [CategoryController::class, 'getActive'])->name('active');
+        });
+        
+        // ==================== SALES MANAGEMENT ====================
+        Route::prefix('sales')->name('sales.')->group(function () {
+            Route::get('/', [SalesController::class, 'index'])->name('index');
+            Route::get('/today', [SalesController::class, 'today'])->name('today');
+            Route::get('/create', [SalesController::class, 'create'])->name('create');
+            Route::get('/{id}', [SalesController::class, 'show'])->name('show');
+            Route::get('/{id}/receipt', [SalesController::class, 'receipt'])->name('receipt');
+            
+            // AJAX endpoints
+            Route::get('/export/csv', [SalesController::class, 'export'])->name('export');
+            Route::get('/statistics/data', [SalesController::class, 'statistics'])->name('statistics');
+        });
+        
+        // ==================== INVENTORY MANAGEMENT ====================
+        Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::get('/', [InventoryController::class, 'index'])->name('index');
+            Route::get('/logs', [InventoryController::class, 'logs'])->name('logs');
+            Route::get('/{id}/adjust', [InventoryController::class, 'adjust'])->name('adjust');
+            Route::post('/{id}/adjust', [InventoryController::class, 'processAdjustment'])->name('process-adjustment');
+            Route::get('/low-stock', [InventoryController::class, 'lowStock'])->name('low-stock');
+            
+            // AJAX endpoints
+            Route::get('/export/csv', [InventoryController::class, 'export'])->name('export');
+            Route::get('/statistics/data', [InventoryController::class, 'statistics'])->name('statistics');
+        });
     });
 
     // ==================== PROP RENTAL ====================

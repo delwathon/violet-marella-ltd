@@ -78,7 +78,7 @@
                             <i class="fas fa-download me-1"></i>Export
                         </button>
                         <div class="input-group input-group-sm" style="width: 200px;">
-                            <input type="text" class="form-control" placeholder="Search products...">
+                            <input type="text" class="form-control" placeholder="Search lounge.products...">
                             <button class="btn btn-outline-secondary" type="button">
                                 <i class="fas fa-search"></i>
                             </button>

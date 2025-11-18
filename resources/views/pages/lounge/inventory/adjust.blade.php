@@ -13,7 +13,7 @@
                 <p class="page-subtitle">Update inventory levels for {{ $product->name }}</p>
             </div>
             <div class="col-auto">
-                <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.inventory.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Inventory
                 </a>
             </div>
@@ -28,7 +28,7 @@
                     <h5 class="mb-0">Stock Adjustment Form</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('inventory.process-adjustment', $product->id) }}">
+                    <form method="POST" action="{{ route('lounge.inventory.process-adjustment', $product->id) }}">
                         @csrf
                         
                         <div class="row mb-4">
@@ -115,7 +115,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Save Adjustment
                             </button>
-                            <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('lounge.inventory.index') }}" class="btn btn-secondary">
                                 Cancel
                             </a>
                         </div>
@@ -176,7 +176,7 @@
                         <button type="button" class="btn btn-outline-danger" onclick="setQuickAdjustment('damage', -5)">
                             <i class="fas fa-minus me-2"></i>Remove 5 Units
                         </button>
-                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('lounge.products.edit', $product->id) }}" class="btn btn-outline-secondary">
                             <i class="fas fa-edit me-2"></i>Edit Product
                         </a>
                     </div>

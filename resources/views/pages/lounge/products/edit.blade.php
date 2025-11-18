@@ -11,17 +11,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.products.index') }}">Products</a></li>
                         <li class="breadcrumb-item active">Edit: {{ $product->name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-outline-info">
+                    <a href="{{ route('lounge.products.show', $product->id) }}" class="btn btn-outline-info">
                         <i class="fas fa-eye"></i> View Details
                     </a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Products
                     </a>
                 </div>
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('lounge.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -250,7 +250,7 @@
                                 <div class="alert alert-info">
                                     <i class="fas fa-info-circle"></i> 
                                     To adjust stock with proper logging, use the 
-                                    <a href="{{ route('products.show', $product->id) }}">product details page</a>.
+                                    <a href="{{ route('lounge.products.show', $product->id) }}">product details page</a>.
                                 </div>
                             </div>
                         </div>
@@ -346,10 +346,10 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Update Product
                             </button>
-                            <a href="{{ route('products.show', $product->id) }}" class="btn btn-outline-info">
+                            <a href="{{ route('lounge.products.show', $product->id) }}" class="btn btn-outline-info">
                                 <i class="fas fa-eye"></i> View Details
                             </a>
-                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

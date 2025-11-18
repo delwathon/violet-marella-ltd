@@ -14,7 +14,7 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.sales.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Sales
                     </a>
                     <button class="btn btn-primary" onclick="printReceipt({{ $sale->id }})">
@@ -47,7 +47,7 @@
                         <div class="col-md-6">
                             <strong>Customer:</strong><br>
                             @if($sale->customer)
-                                <a href="{{ route('customers.show', $sale->customer->id) }}">
+                                <a href="{{ route('lounge.customers.show', $sale->customer->id) }}">
                                     {{ $sale->customer->full_name }}
                                 </a><br>
                                 <small class="text-muted">{{ $sale->customer->phone }}</small>
@@ -112,7 +112,7 @@
                                     <tr>
                                         <td>
                                             @if($item->product)
-                                                <a href="{{ route('products.show', $item->product->id) }}">
+                                                <a href="{{ route('lounge.products.show', $item->product->id) }}">
                                                     {{ $item->product_name }}
                                                 </a>
                                             @else

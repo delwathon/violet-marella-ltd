@@ -430,13 +430,13 @@
                                         <td>{{ $customer->formatted_total_spent }}</td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('prop-rental.customers.show', $customer->id) }}" class="btn btn-outline-primary" title="View">
+                                                <a href="{{ route('prop-rental.lounge.customers.show', $customer->id) }}" class="btn btn-outline-primary" title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#newRentalModal" onclick="setCustomerInModal({{ $customer->id }})" title="New Rental">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
-                                                <a href="{{ route('prop-rental.customers.edit', $customer->id) }}" class="btn btn-outline-info" title="Edit">
+                                                <a href="{{ route('prop-rental.lounge.customers.edit', $customer->id) }}" class="btn btn-outline-info" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </div>

@@ -447,7 +447,7 @@
                     </div>
 
                     <div class="mt-3">
-                        <a href="{{ route('prop-rental.customers.show', $rental->customer->id) }}" class="btn btn-sm btn-outline-primary w-100">
+                        <a href="{{ route('prop-rental.lounge.customers.show', $rental->customer->id) }}" class="btn btn-sm btn-outline-primary w-100">
                             <i class="fas fa-user me-2"></i>View Customer Profile
                         </a>
                     </div>

@@ -13,7 +13,7 @@
                 <p class="page-subtitle">Track all stock movements and changes</p>
             </div>
             <div class="col-auto">
-                <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.inventory.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Inventory
                 </a>
             </div>
@@ -23,7 +23,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('inventory.logs') }}">
+            <form method="GET" action="{{ route('lounge.inventory.logs') }}">
                 <div class="row g-3">
                     <div class="col-md-2">
                         <label class="form-label">Start Date</label>
@@ -94,7 +94,7 @@
                                 <td>{{ $log->action_date->format('M d, Y H:i') }}</td>
                                 <td>
                                     @if($log->product)
-                                        <a href="{{ route('products.show', $log->product->id) }}">
+                                        <a href="{{ route('lounge.products.show', $log->product->id) }}">
                                             {{ $log->product->name }}
                                         </a>
                                         <br><small class="text-muted">{{ $log->product->sku }}</small>

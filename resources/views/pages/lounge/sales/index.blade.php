@@ -76,7 +76,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('sales.index') }}">
+            <form method="GET" action="{{ route('lounge.sales.index') }}">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Search</label>
@@ -151,7 +151,7 @@
                                 <td>{{ $sale->sale_date->format('M d, Y H:i') }}</td>
                                 <td>
                                     @if($sale->customer)
-                                        <a href="{{ route('customers.show', $sale->customer->id) }}">
+                                        <a href="{{ route('lounge.customers.show', $sale->customer->id) }}">
                                             {{ $sale->customer->full_name }}
                                         </a>
                                     @else
@@ -178,7 +178,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
+                                        <a href="{{ route('lounge.sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button class="btn btn-outline-secondary" onclick="printReceipt({{ $sale->id }})" title="Print Receipt">
@@ -209,7 +209,7 @@
 <script>
 function exportSales() {
     const params = new URLSearchParams(window.location.search);
-    window.location.href = '{{ route("sales.export") }}?' + params.toString();
+    window.location.href = '{{ route("lounge.sales.export") }}?' + params.toString();
 }
 
 function printReceipt(saleId) {

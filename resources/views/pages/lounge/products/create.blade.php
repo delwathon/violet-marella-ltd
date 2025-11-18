@@ -11,20 +11,20 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.products.index') }}">Products</a></li>
                         <li class="breadcrumb-item active">Add New</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
-                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </a>
             </div>
         </div>
     </div>
 
-    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('lounge.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <div class="row">
@@ -87,7 +87,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                                 <small class="text-muted">
-                                    <a href="{{ route('categories.create') }}" target="_blank">Add new category</a>
+                                    <a href="{{ route('lounge.categories.create') }}" target="_blank">Add new category</a>
                                 </small>
                             </div>
                             
@@ -305,7 +305,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save"></i> Save Product
                             </button>
-                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                         </div>

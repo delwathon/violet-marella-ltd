@@ -10,17 +10,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Categories</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('lounge.categories.index') }}">Categories</a></li>
                         <li class="breadcrumb-item active">{{ $category->name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary">
+                    <a href="{{ route('lounge.categories.edit', $category->id) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
-                    <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>
                 </div>
@@ -104,7 +104,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Products in this Category</h5>
-                    <a href="{{ route('products.create') }}" class="btn btn-sm btn-success">
+                    <a href="{{ route('lounge.products.create') }}" class="btn btn-sm btn-success">
                         <i class="fas fa-plus"></i> Add Product
                     </a>
                 </div>
@@ -160,11 +160,11 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="{{ route('products.show', $product->id) }}" 
+                                                    <a href="{{ route('lounge.products.show', $product->id) }}" 
                                                        class="btn btn-outline-info" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('products.edit', $product->id) }}" 
+                                                    <a href="{{ route('lounge.products.edit', $product->id) }}" 
                                                        class="btn btn-outline-primary" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -180,7 +180,7 @@
                             <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No products in this category</h5>
                             <p class="text-muted">
-                                <a href="{{ route('products.create') }}">Add a new product</a> to this category
+                                <a href="{{ route('lounge.products.create') }}">Add a new product</a> to this category
                             </p>
                         </div>
                     @endif
@@ -224,13 +224,13 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('products.create') }}" class="btn btn-success">
+                        <a href="{{ route('lounge.products.create') }}" class="btn btn-success">
                             <i class="fas fa-plus"></i> Add Product to Category
                         </a>
-                        <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-outline-primary">
+                        <a href="{{ route('lounge.categories.edit', $category->id) }}" class="btn btn-outline-primary">
                             <i class="fas fa-edit"></i> Edit Category
                         </a>
-                        <a href="{{ route('products.index') }}?category_id={{ $category->id }}" class="btn btn-outline-info">
+                        <a href="{{ route('lounge.products.index') }}?category_id={{ $category->id }}" class="btn btn-outline-info">
                             <i class="fas fa-filter"></i> View All Products
                         </a>
                         <hr>

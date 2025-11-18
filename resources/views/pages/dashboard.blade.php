@@ -211,7 +211,7 @@
                                             </td>
                                             <td>{{ $product->minimum_stock_level }}</td>
                                             <td>
-                                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-outline-primary">
+                                                <a href="{{ route('lounge.products.edit', $product->id) }}" class="btn btn-sm btn-outline-primary">
                                                     Restock
                                                 </a>
                                             </td>
@@ -233,13 +233,13 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="{{ route('sales.create') }}" class="btn btn-outline-primary">
+                            <a href="{{ route('lounge.sales.create') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-plus me-2"></i>New Sale
                             </a>
-                            <a href="{{ route('products.create') }}" class="btn btn-outline-success">
+                            <a href="{{ route('lounge.products.create') }}" class="btn btn-outline-success">
                                 <i class="fas fa-box me-2"></i>Add Product
                             </a>
-                            <a href="{{ route('customers.create') }}" class="btn btn-outline-info">
+                            <a href="{{ route('lounge.customers.create') }}" class="btn btn-outline-info">
                                 <i class="fas fa-user-plus me-2"></i>New Customer
                             </a>
                             <a href="{{ route('reports.index') }}" class="btn btn-outline-warning">
