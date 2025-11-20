@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductsController extends Controller
 {
@@ -430,5 +431,330 @@ class ProductsController extends Controller
             'success' => true,
             'products' => $products
         ]);
+    }
+    
+    /**
+     * Show bulk upload page
+     */
+    public function bulkUploadPage()
+    {
+        $user = Auth::guard('user')->user();
+        $categories = Category::active()->ordered()->get();
+        
+        return view('pages.lounge.products.bulk-upload', compact('user', 'categories'));
+    }
+    
+    /**
+     * Download CSV template
+     */
+    public function downloadTemplate()
+    {
+        $filename = 'product_import_template.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+        
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            
+            // Headers with instructions in first row
+            fputcsv($file, [
+                'name (required)',
+                'sku (optional - auto-generated)',
+                'barcode (optional)',
+                'category_name (required)',
+                'price (required)',
+                'cost_price (optional)',
+                'wholesale_price (optional)',
+                'stock_quantity (default: 0)',
+                'minimum_stock_level (default: 0)',
+                'maximum_stock_level (optional)',
+                'unit (e.g., piece, kg, liter)',
+                'description (optional)',
+                'brand (optional)',
+                'supplier (optional)',
+                'tax_rate (e.g., 7.5 for 7.5%)',
+                'track_stock (yes/no - default: yes)',
+                'is_active (yes/no - default: yes)',
+                'is_featured (yes/no - default: no)'
+            ]);
+            
+            // Sample data rows
+            fputcsv($file, [
+                'Rice 50kg Premium',
+                'PRD-RICE50',
+                '1234567890123',
+                'Groceries',
+                '35000',
+                '30000',
+                '33000',
+                '50',
+                '10',
+                '100',
+                'bag',
+                'Premium quality rice, 50kg bag',
+                'Golden Harvest',
+                'ABC Supplies Ltd',
+                '7.5',
+                'yes',
+                'yes',
+                'no'
+            ]);
+            
+            fputcsv($file, [
+                'Coca Cola 35cl',
+                '',
+                '2345678901234',
+                'Beverages',
+                '200',
+                '150',
+                '180',
+                '200',
+                '50',
+                '500',
+                'bottle',
+                'Refreshing soft drink',
+                'Coca Cola',
+                'Coca Cola Distributor',
+                '7.5',
+                'yes',
+                'yes',
+                'yes'
+            ]);
+            
+            fputcsv($file, [
+                'Hand Sanitizer 500ml',
+                'PRD-SANITIZER',
+                '',
+                'Personal Care',
+                '1500',
+                '1000',
+                '',
+                '30',
+                '5',
+                '50',
+                'bottle',
+                'Antibacterial hand sanitizer with Aloe Vera',
+                'SafeHands',
+                'Health Products Inc',
+                '0',
+                'yes',
+                'yes',
+                'no'
+            ]);
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+    
+    /**
+     * Import products from CSV
+     */
+    public function importCSV(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:5120', // 5MB max
+            'skip_duplicates' => 'in:on,NULL',
+            'update_existing' => 'in:on,NULL',
+        ]);
+        
+        DB::beginTransaction();
+        
+        try {
+            $file = $request->file('csv_file');
+            $skipDuplicates = $request->has('skip_duplicates');
+            $updateExisting = $request->has('update_existing');
+            
+            // Read CSV file
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+            
+            // Remove header row
+            $headers = array_shift($csvData);
+            
+            $imported = 0;
+            $updated = 0;
+            $skipped = 0;
+            $errors = [];
+            
+            foreach ($csvData as $index => $row) {
+                $rowNumber = $index + 2; // +2 because we removed header and index starts at 0
+                
+                try {
+                    // Skip empty rows
+                    if (empty(array_filter($row))) {
+                        continue;
+                    }
+                    
+                    // Map CSV columns to array
+                    $data = [
+                        'name' => trim($row[0] ?? ''),
+                        'sku' => trim($row[1] ?? ''),
+                        'barcode' => trim($row[2] ?? ''),
+                        'category_name' => trim($row[3] ?? ''),
+                        'price' => trim($row[4] ?? '0'),
+                        'cost_price' => trim($row[5] ?? null),
+                        'wholesale_price' => trim($row[6] ?? null),
+                        'stock_quantity' => trim($row[7] ?? '0'),
+                        'minimum_stock_level' => trim($row[8] ?? '0'),
+                        'maximum_stock_level' => trim($row[9] ?? null),
+                        'unit' => trim($row[10] ?? 'piece'),
+                        'description' => trim($row[11] ?? ''),
+                        'brand' => trim($row[12] ?? ''),
+                        'supplier' => trim($row[13] ?? ''),
+                        'tax_rate' => trim($row[14] ?? '0'),
+                        'track_stock' => strtolower(trim($row[15] ?? 'yes')) === 'yes',
+                        'is_active' => strtolower(trim($row[16] ?? 'yes')) === 'yes',
+                        'is_featured' => strtolower(trim($row[17] ?? 'no')) === 'yes',
+                    ];
+                    
+                    // Validate required fields
+                    if (empty($data['name'])) {
+                        $errors[] = "Row {$rowNumber}: Product name is required";
+                        $skipped++;
+                        continue;
+                    }
+                    
+                    if (empty($data['category_name'])) {
+                        $errors[] = "Row {$rowNumber}: Category is required";
+                        $skipped++;
+                        continue;
+                    }
+                    
+                    // Find or create category
+                    $category = Category::where('name', $data['category_name'])->first();
+                    
+                    if (!$category) {
+                        $category = Category::create([
+                            'name' => $data['category_name'],
+                            'is_active' => true
+                        ]);
+                    }
+                    
+                    $data['category_id'] = $category->id;
+                    unset($data['category_name']);
+                    
+                    // Handle empty string values
+                    if ($data['sku'] === '') {
+                        $data['sku'] = 'PRD-' . strtoupper(Str::random(8));
+                    }
+                    if ($data['barcode'] === '') {
+                        $data['barcode'] = null;
+                    }
+                    if ($data['description'] === '') {
+                        $data['description'] = null;
+                    }
+                    if ($data['brand'] === '') {
+                        $data['brand'] = null;
+                    }
+                    if ($data['supplier'] === '') {
+                        $data['supplier'] = null;
+                    }
+                    if ($data['cost_price'] === '') {
+                        $data['cost_price'] = null;
+                    }
+                    if ($data['wholesale_price'] === '') {
+                        $data['wholesale_price'] = null;
+                    }
+                    if ($data['maximum_stock_level'] === '') {
+                        $data['maximum_stock_level'] = null;
+                    }
+                    
+                    // Check for existing product by SKU or name
+                    $existingProduct = null;
+                    if (!empty($data['sku'])) {
+                        $existingProduct = Product::where('sku', $data['sku'])->first();
+                    }
+                    
+                    if (!$existingProduct) {
+                        $existingProduct = Product::where('name', $data['name'])
+                            ->where('category_id', $data['category_id'])
+                            ->first();
+                    }
+                    
+                    if ($existingProduct) {
+                        if ($updateExisting) {
+                            // Update existing product
+                            $previousStock = $existingProduct->stock_quantity;
+                            $existingProduct->update($data);
+                            
+                            // Log stock change if quantity changed
+                            if ($previousStock != $data['stock_quantity']) {
+                                InventoryLog::create([
+                                    'product_id' => $existingProduct->id,
+                                    'user_id' => Auth::guard('user')->id(),
+                                    'action_type' => 'adjustment',
+                                    'quantity_change' => $data['stock_quantity'] - $previousStock,
+                                    'previous_stock' => $previousStock,
+                                    'new_stock' => $data['stock_quantity'],
+                                    'reason' => 'CSV bulk import update',
+                                    'action_date' => now(),
+                                ]);
+                            }
+                            
+                            $updated++;
+                        } else if ($skipDuplicates) {
+                            $skipped++;
+                            continue;
+                        } else {
+                            $errors[] = "Row {$rowNumber}: Product '{$data['name']}' already exists (SKU: {$existingProduct->sku})";
+                            $skipped++;
+                            continue;
+                        }
+                    } else {
+                        // Create new product
+                        $product = Product::create($data);
+                        
+                        // Log initial inventory
+                        if ($product->stock_quantity > 0) {
+                            InventoryLog::create([
+                                'product_id' => $product->id,
+                                'user_id' => Auth::guard('user')->id(),
+                                'action_type' => 'purchase',
+                                'quantity_change' => $product->stock_quantity,
+                                'previous_stock' => 0,
+                                'new_stock' => $product->stock_quantity,
+                                'reason' => 'CSV bulk import - initial stock',
+                                'action_date' => now(),
+                            ]);
+                        }
+                        
+                        $imported++;
+                    }
+                    
+                } catch (\Exception $e) {
+                    $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+                    $skipped++;
+                }
+            }
+            
+            DB::commit();
+            
+            $message = "Import completed: {$imported} products imported, {$updated} updated, {$skipped} skipped.";
+            
+            if (!empty($errors)) {
+                $message .= " Errors: " . implode('; ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= " and " . (count($errors) - 5) . " more errors.";
+                }
+            }
+            
+            return redirect()->route('lounge.products.bulk-upload')
+                ->with('success', $message)
+                ->with('import_stats', [
+                    'imported' => $imported,
+                    'updated' => $updated,
+                    'skipped' => $skipped,
+                    'errors' => $errors
+                ]);
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return back()->withInput()
+                ->with('error', 'Import failed: ' . $e->getMessage());
+        }
     }
 }

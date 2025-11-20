@@ -29,6 +29,9 @@
                     <a href="{{ route('lounge.products.create') }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Add Product
                     </a>
+                    <a href="{{ route('lounge.products.bulk-upload') }}" class="btn btn-primary">
+                        <i class="fas fa-file-upload"></i> Bulk Upload
+                    </a>
                 </div>
             </div>
         </div>

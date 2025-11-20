@@ -42,7 +42,7 @@ Route::prefix('auth')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
 
-Auth::routes(['register' => false]);
+// Auth::routes(['register' => false]);
 
 // -------------------------------
 // Application Routes (Protected)
@@ -91,6 +91,13 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
             Route::get('/', [ProductsController::class, 'index'])->name('index');
             Route::get('/create', [ProductsController::class, 'create'])->name('create');
             Route::post('/', [ProductsController::class, 'store'])->name('store');
+
+            
+            // Bulk Import
+            Route::get('/bulk-upload', [ProductsController::class, 'bulkUploadPage'])->name('bulk-upload');
+            Route::get('/download-template', [ProductsController::class, 'downloadTemplate'])->name('download-template');
+            Route::post('/import-csv', [ProductsController::class, 'importCSV'])->name('import-csv');
+            
             Route::get('/{id}', [ProductsController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [ProductsController::class, 'edit'])->name('edit');
             Route::put('/{id}', [ProductsController::class, 'update'])->name('update');

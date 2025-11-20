@@ -126,7 +126,7 @@ html {
     overflow: hidden;
 }
 
-.page-header::before {
+/* .page-header::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -135,7 +135,7 @@ html {
     height: 500px;
     background: radial-gradient(circle, rgba(111, 66, 193, 0.03) 0%, transparent 70%);
     animation: float 20s ease-in-out infinite;
-}
+} */
 
 @keyframes float {
     0%, 100% { transform: translateY(0) rotate(0deg); }
