@@ -5,7 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Customer;
-use App\Models\InventoryLog;
+use App\Models\StoreProduct;
+use App\Models\StoreSale;
+use App\Models\StoreCustomer;
+use App\Models\StudioSession;
+use App\Models\StudioCustomer;
+use App\Models\PropRental;
+use App\Models\RentalCustomer;
+use App\Models\Prop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +21,7 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
-     * Index Page.
+     * All Business Overview Dashboard
      */
     public function index()
     {
@@ -23,190 +30,372 @@ class DashboardController extends Controller
         // Get date ranges
         $today = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
         $lastMonth = Carbon::now()->subMonth();
         $lastMonthStart = $lastMonth->copy()->startOfMonth();
         $lastMonthEnd = $lastMonth->copy()->endOfMonth();
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $lastWeekStart = Carbon::now()->subWeek()->startOfWeek();
+        $lastWeekEnd = Carbon::now()->subWeek()->endOfWeek();
 
-        // Calculate statistics
+        // ==================== AGGREGATED STATISTICS ====================
+        
+        // Total Revenue (All Businesses This Month)
+        $loungeRevenue = Sale::completed()
+            ->whereBetween('sale_date', [$startOfMonth, now()])
+            ->sum('total_amount');
+            
+        $storeRevenue = StoreSale::completed()
+            ->whereBetween('sale_date', [$startOfMonth, now()])
+            ->sum('total_amount');
+            
+        $studioRevenue = StudioSession::completed()
+            ->whereBetween('check_out_time', [$startOfMonth, now()])
+            ->where('payment_status', 'paid')
+            ->sum('total_amount');
+            
+        $propRevenue = PropRental::completed()
+            ->whereBetween('created_at', [$startOfMonth, now()])
+            ->sum('total_amount');
+        
+        $totalRevenue = $loungeRevenue + $storeRevenue + $studioRevenue + $propRevenue;
+        
+        // Last Month Revenue for comparison
+        $lastMonthLoungeRevenue = Sale::completed()
+            ->whereBetween('sale_date', [$lastMonthStart, $lastMonthEnd])
+            ->sum('total_amount');
+            
+        $lastMonthStoreRevenue = StoreSale::completed()
+            ->whereBetween('sale_date', [$lastMonthStart, $lastMonthEnd])
+            ->sum('total_amount');
+            
+        $lastMonthStudioRevenue = StudioSession::completed()
+            ->whereBetween('check_out_time', [$lastMonthStart, $lastMonthEnd])
+            ->where('payment_status', 'paid')
+            ->sum('total_amount');
+            
+        $lastMonthPropRevenue = PropRental::completed()
+            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
+            ->sum('total_amount');
+            
+        $lastMonthTotalRevenue = $lastMonthLoungeRevenue + $lastMonthStoreRevenue + 
+                                 $lastMonthStudioRevenue + $lastMonthPropRevenue;
+        
+        // Revenue Change Percentage
+        if ($lastMonthTotalRevenue > 0) {
+            $revenueChange = (($totalRevenue - $lastMonthTotalRevenue) / $lastMonthTotalRevenue) * 100;
+        } else {
+            $revenueChange = $totalRevenue > 0 ? 100 : 0;
+        }
+        
+        // Total Sales/Transactions This Week
+        $loungeSales = Sale::completed()
+            ->where('sale_date', '>=', $startOfWeek)
+            ->count();
+            
+        $storeSales = StoreSale::completed()
+            ->where('sale_date', '>=', $startOfWeek)
+            ->count();
+            
+        $studioSessions = StudioSession::completed()
+            ->where('check_out_time', '>=', $startOfWeek)
+            ->count();
+            
+        $propRentals = PropRental::where('created_at', '>=', $startOfWeek)
+            ->count();
+        
+        $totalTransactions = $loungeSales + $storeSales + $studioSessions + $propRentals;
+        
+        // Last Week Transactions for comparison
+        $lastWeekLoungeSales = Sale::completed()
+            ->whereBetween('sale_date', [$lastWeekStart, $lastWeekEnd])
+            ->count();
+            
+        $lastWeekStoreSales = StoreSale::completed()
+            ->whereBetween('sale_date', [$lastWeekStart, $lastWeekEnd])
+            ->count();
+            
+        $lastWeekStudioSessions = StudioSession::completed()
+            ->whereBetween('check_out_time', [$lastWeekStart, $lastWeekEnd])
+            ->count();
+            
+        $lastWeekPropRentals = PropRental::whereBetween('created_at', [$lastWeekStart, $lastWeekEnd])
+            ->count();
+            
+        $lastWeekTotalTransactions = $lastWeekLoungeSales + $lastWeekStoreSales + 
+                                     $lastWeekStudioSessions + $lastWeekPropRentals;
+        
+        // Transaction Change Percentage
+        if ($lastWeekTotalTransactions > 0) {
+            $transactionChange = (($totalTransactions - $lastWeekTotalTransactions) / $lastWeekTotalTransactions) * 100;
+        } else {
+            $transactionChange = $totalTransactions > 0 ? 100 : 0;
+        }
+        
+        // Total Products Across All Businesses
+        $loungeProducts = Product::active()->count();
+        $storeProducts = StoreProduct::active()->count();
+        $totalProps = Prop::count();
+        $totalProducts = $loungeProducts + $storeProducts + $totalProps;
+        
+        // Low Stock Count
+        $loungeLowStock = Product::active()->lowStock()->count();
+        $storeLowStock = StoreProduct::lowStock()->count();
+        $propsMaintenance = Prop::where('status', 'maintenance')->count();
+        $totalLowStock = $loungeLowStock + $storeLowStock + $propsMaintenance;
+        
+        // Total Customers Across All Businesses
+        $loungeCustomers = Customer::count();
+        $storeCustomers = StoreCustomer::count();
+        $studioCustomers = StudioCustomer::count();
+        $rentalCustomers = RentalCustomer::count();
+        $totalCustomers = $loungeCustomers + $storeCustomers + $studioCustomers + $rentalCustomers;
+        
+        // Active Customers (who made purchases this month)
+        $loungeActiveCustomers = Customer::whereHas('sales', function($query) use ($startOfMonth) {
+            $query->where('sale_date', '>=', $startOfMonth);
+        })->count();
+        
+        $storeActiveCustomers = StoreCustomer::whereHas('sales', function($query) use ($startOfMonth) {
+            $query->where('sale_date', '>=', $startOfMonth);
+        })->count();
+        
+        $studioActiveCustomers = StudioCustomer::whereHas('sessions', function($query) use ($startOfMonth) {
+            $query->where('check_in_time', '>=', $startOfMonth);
+        })->count();
+        
+        $rentalActiveCustomers = RentalCustomer::whereHas('rentals', function($query) use ($startOfMonth) {
+            $query->where('created_at', '>=', $startOfMonth);
+        })->count();
+        
+        $activeCustomers = $loungeActiveCustomers + $storeActiveCustomers + 
+                          $studioActiveCustomers + $rentalActiveCustomers;
+        
+        // Pending Payments
+        $loungePending = Sale::where('payment_status', 'pending')->count();
+        $storePending = StoreSale::where('payment_status', 'pending')->count();
+        $studioPending = StudioSession::where('payment_status', 'pending')->count();
+        $propOverdue = PropRental::overdue()->count();
+        $totalPending = $loungePending + $storePending + $studioPending + $propOverdue;
+        
+        // Compile Statistics
         $stats = [
-            // Total Revenue (current month)
-            'total_revenue' => Sale::completed()
-                ->whereBetween('sale_date', [$startOfMonth, now()])
-                ->sum('total_amount'),
-            
-            // Last month revenue for comparison
-            'last_month_revenue' => Sale::completed()
-                ->whereBetween('sale_date', [$lastMonthStart, $lastMonthEnd])
-                ->sum('total_amount'),
-            
-            // Total Products
-            'total_products' => Product::active()->count(),
-            
-            // Low Stock Products
-            'low_stock_count' => Product::active()->lowStock()->count(),
-            
-            // Studio Sessions (current week)
-            'studio_sessions' => Sale::completed()
-                ->where('sale_date', '>=', Carbon::now()->startOfWeek())
-                ->count(),
-            
-            // Last week sessions for comparison
-            'last_week_sessions' => Sale::completed()
-                ->whereBetween('sale_date', [
-                    Carbon::now()->subWeek()->startOfWeek(),
-                    Carbon::now()->subWeek()->endOfWeek()
-                ])
-                ->count(),
-            
-            // Active customers who made purchases this month
-            'active_customers' => Customer::whereHas('sales', function($query) use ($startOfMonth) {
-                $query->where('sale_date', '>=', $startOfMonth);
-            })->count(),
-            
-            // Sales due today or overdue (you can adjust this based on your business logic)
-            'due_today' => Sale::where('payment_status', 'pending')
-                ->whereDate('sale_date', '<=', $today)
-                ->count(),
+            'total_revenue' => $totalRevenue,
+            'revenue_change' => $revenueChange,
+            'total_transactions' => $totalTransactions,
+            'transaction_change' => $transactionChange,
+            'total_products' => $totalProducts,
+            'total_low_stock' => $totalLowStock,
+            'total_customers' => $totalCustomers,
+            'active_customers' => $activeCustomers,
+            'total_pending' => $totalPending,
         ];
-
-        // Calculate percentage changes
-        if ($stats['last_month_revenue'] > 0) {
-            $stats['revenue_change'] = (($stats['total_revenue'] - $stats['last_month_revenue']) / $stats['last_month_revenue']) * 100;
-        } else {
-            $stats['revenue_change'] = $stats['total_revenue'] > 0 ? 100 : 0;
+        
+        // ==================== BUSINESS MODULE DETAILS ====================
+        
+        $businessModules = [
+            'lounge' => [
+                'name' => 'Mini Lounge',
+                'icon' => 'shopping-cart',
+                'color' => 'success',
+                'revenue' => $loungeRevenue,
+                'transactions' => $loungeSales,
+                'products' => $loungeProducts,
+                'low_stock' => $loungeLowStock,
+                'customers' => $loungeActiveCustomers,
+                'pending' => $loungePending,
+            ],
+            'gift_store' => [
+                'name' => 'Gift Store',
+                'icon' => 'gift',
+                'color' => 'danger',
+                'revenue' => $storeRevenue,
+                'transactions' => $storeSales,
+                'products' => $storeProducts,
+                'low_stock' => $storeLowStock,
+                'customers' => $storeActiveCustomers,
+                'pending' => $storePending,
+            ],
+            'photo_studio' => [
+                'name' => 'Photo Studio',
+                'icon' => 'camera',
+                'color' => 'primary',
+                'revenue' => $studioRevenue,
+                'transactions' => $studioSessions,
+                'active_sessions' => StudioSession::active()->count(),
+                'customers' => $studioActiveCustomers,
+                'pending' => $studioPending,
+            ],
+            'prop_rental' => [
+                'name' => 'Prop Rental',
+                'icon' => 'guitar',
+                'color' => 'warning',
+                'revenue' => $propRevenue,
+                'transactions' => $propRentals,
+                'active_rentals' => PropRental::active()->count(),
+                'props' => $totalProps,
+                'maintenance' => $propsMaintenance,
+                'overdue' => $propOverdue,
+            ],
+        ];
+        
+        // ==================== REVENUE TREND (LAST 7 DAYS) ====================
+        
+        $revenueTrend = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $dateString = $date->toDateString();
+            
+            $dayLoungeRevenue = Sale::completed()
+                ->whereDate('sale_date', $dateString)
+                ->sum('total_amount');
+                
+            $dayStoreRevenue = StoreSale::completed()
+                ->whereDate('sale_date', $dateString)
+                ->sum('total_amount');
+                
+            $dayStudioRevenue = StudioSession::completed()
+                ->whereDate('check_out_time', $dateString)
+                ->where('payment_status', 'paid')
+                ->sum('total_amount');
+                
+            $dayPropRevenue = PropRental::completed()
+                ->whereDate('created_at', $dateString)
+                ->sum('total_amount');
+            
+            $revenueTrend[] = [
+                'date' => $date->format('M d'),
+                'lounge' => $dayLoungeRevenue,
+                'store' => $dayStoreRevenue,
+                'studio' => $dayStudioRevenue,
+                'props' => $dayPropRevenue,
+                'total' => $dayLoungeRevenue + $dayStoreRevenue + $dayStudioRevenue + $dayPropRevenue,
+            ];
         }
-
-        if ($stats['last_week_sessions'] > 0) {
-            $stats['sessions_change'] = (($stats['studio_sessions'] - $stats['last_week_sessions']) / $stats['last_week_sessions']) * 100;
-        } else {
-            $stats['sessions_change'] = $stats['studio_sessions'] > 0 ? 100 : 0;
-        }
-
-        // Recent Activities (last 10)
+        
+        // ==================== TODAY'S SUMMARY ====================
+        
+        $todaySummary = [
+            'lounge' => [
+                'revenue' => Sale::completed()->whereDate('sale_date', $today)->sum('total_amount'),
+                'transactions' => Sale::completed()->whereDate('sale_date', $today)->count(),
+            ],
+            'store' => [
+                'revenue' => StoreSale::completed()->whereDate('sale_date', $today)->sum('total_amount'),
+                'transactions' => StoreSale::completed()->whereDate('sale_date', $today)->count(),
+            ],
+            'studio' => [
+                'revenue' => StudioSession::completed()
+                    ->whereDate('check_out_time', $today)
+                    ->where('payment_status', 'paid')
+                    ->sum('total_amount'),
+                'sessions' => StudioSession::whereDate('check_in_time', $today)->count(),
+            ],
+            'props' => [
+                'revenue' => PropRental::whereDate('created_at', $today)->sum('total_amount'),
+                'rentals' => PropRental::whereDate('created_at', $today)->count(),
+            ],
+        ];
+        
+        // ==================== RECENT ACTIVITIES ====================
+        
         $recentActivities = $this->getRecentActivities();
-
-        // Low Stock Products for alerts
-        $lowStockProducts = Product::active()
-            ->lowStock()
-            ->orderBy('stock_quantity', 'asc')
-            ->limit(5)
-            ->get();
-
-        // Top Selling Products (this month)
-        $topProducts = Product::select(
-                'products.id',
-                'products.name',
-                'products.price',
-                'products.sku',
-                'products.image',
-                DB::raw('SUM(sale_items.quantity) as total_sold')
-            )
-            ->join('sale_items', 'products.id', '=', 'sale_items.product_id')
-            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
-            ->where('sales.status', 'completed')
-            ->where('sales.sale_date', '>=', $startOfMonth)
-            ->groupBy('products.id', 'products.name', 'products.price', 'products.sku', 'products.image')
-            ->orderBy('total_sold', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Today's Sales Summary
-        $todaySales = [
-            'count' => Sale::completed()->whereDate('sale_date', $today)->count(),
-            'amount' => Sale::completed()->whereDate('sale_date', $today)->sum('total_amount'),
-        ];
-
+        
         return view('pages.dashboard', compact(
             'user',
             'stats',
-            'recentActivities',
-            'lowStockProducts',
-            'topProducts',
-            'todaySales'
+            'businessModules',
+            'revenueTrend',
+            'todaySummary',
+            'recentActivities'
         ));
     }
-
+    
     /**
-     * Get recent activities from various sources
+     * Get recent activities across all business units
      */
     private function getRecentActivities()
     {
         $activities = [];
-
-        // Recent Sales (last 5)
-        $recentSales = Sale::completed()
-            ->with(['customer', 'saleItems.product'])
-            ->latest('sale_date')
-            ->limit(5)
-            ->get();
-
-        foreach ($recentSales as $sale) {
-            $customerName = $sale->customer ? $sale->customer->full_name : 'Walk-in Customer';
-            $activities[] = [
-                'type' => 'sale',
-                'icon' => 'fa-shopping-cart',
-                'color' => 'success',
-                'title' => 'New sale recorded',
-                'description' => "{$customerName} - " . count($sale->saleItems) . " items for ₦" . number_format($sale->total_amount, 2),
-                'time' => $sale->sale_date->diffForHumans(),
-                'timestamp' => $sale->sale_date,
-            ];
-        }
-
-        // Recent Inventory Logs (last 5)
-        $recentInventoryLogs = InventoryLog::with(['product', 'staff'])
-            ->latest('action_date')
-            ->limit(5)
-            ->get();
-
-        foreach ($recentInventoryLogs as $log) {
-            $icon = 'fa-warehouse';
-            $color = 'info';
-            $title = $log->action_description;
-
-            if ($log->action_type == 'damage' || $log->action_type == 'expiry') {
-                $color = 'danger';
-                $icon = 'fa-exclamation-triangle';
-            } elseif ($log->action_type == 'purchase') {
-                $color = 'primary';
-                $icon = 'fa-box';
-            }
-
-            $activities[] = [
-                'type' => 'inventory',
-                'icon' => $icon,
-                'color' => $color,
-                'title' => $title,
-                'description' => "{$log->product->name} - " . abs($log->quantity_change) . " units",
-                'time' => $log->action_date->diffForHumans(),
-                'timestamp' => $log->action_date,
-            ];
-        }
-
-        // Low Stock Alerts (current)
-        $lowStockProducts = Product::active()
-            ->lowStock()
+        
+        // Recent Lounge Sales
+        $recentLoungeSales = Sale::with('customer')
+            ->latest()
             ->limit(3)
-            ->get();
-
-        foreach ($lowStockProducts as $product) {
-            $activities[] = [
-                'type' => 'alert',
-                'icon' => 'fa-exclamation-triangle',
-                'color' => 'warning',
-                'title' => 'Low stock alert',
-                'description' => "{$product->name} - Only {$product->stock_quantity} items remaining",
-                'time' => 'Now',
-                'timestamp' => now(),
-            ];
-        }
-
-        // Sort all activities by timestamp (most recent first)
-        usort($activities, function($a, $b) {
-            return $b['timestamp'] <=> $a['timestamp'];
-        });
-
-        // Return only the 10 most recent
-        return array_slice($activities, 0, 10);
+            ->get()
+            ->map(function($sale) {
+                return [
+                    'type' => 'lounge_sale',
+                    'icon' => 'shopping-cart',
+                    'color' => 'success',
+                    'title' => 'Lounge Sale',
+                    'description' => 'Sale to ' . ($sale->customer->full_name ?? 'Walk-in Customer'),
+                    'amount' => $sale->total_amount,
+                    'time' => $sale->sale_date,
+                ];
+            });
+        
+        // Recent Store Sales
+        $recentStoreSales = StoreSale::with('customer')
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->map(function($sale) {
+                return [
+                    'type' => 'store_sale',
+                    'icon' => 'gift',
+                    'color' => 'danger',
+                    'title' => 'Gift Store Sale',
+                    'description' => 'Sale to ' . ($sale->customer->name ?? 'Walk-in Customer'),
+                    'amount' => $sale->total_amount,
+                    'time' => $sale->sale_date,
+                ];
+            });
+        
+        // Recent Studio Sessions  
+        $recentSessions = StudioSession::with(['customer', 'studio'])
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->map(function($session) {
+                return [
+                    'type' => 'studio_session',
+                    'icon' => 'camera',
+                    'color' => 'primary',
+                    'title' => 'Studio Session',
+                    'description' => $session->customer->name . ' - ' . $session->studio->name,
+                    'amount' => $session->total_amount,
+                    'time' => $session->check_in_time,
+                ];
+            });
+        
+        // Recent Prop Rentals
+        $recentRentals = PropRental::with(['customer', 'prop'])
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->map(function($rental) {
+                return [
+                    'type' => 'prop_rental',
+                    'icon' => 'guitar',
+                    'color' => 'warning',
+                    'title' => 'Prop Rental',
+                    'description' => $rental->customer->name . ' - ' . $rental->prop->name,
+                    'amount' => $rental->total_amount,
+                    'time' => $rental->created_at,
+                ];
+            });
+        
+        // Merge all activities
+        $activities = collect()
+            ->merge($recentLoungeSales)
+            ->merge($recentStoreSales)
+            ->merge($recentSessions)
+            ->merge($recentRentals)
+            ->sortByDesc('time')
+            ->take(10)
+            ->values();
+        
+        return $activities;
     }
 }
