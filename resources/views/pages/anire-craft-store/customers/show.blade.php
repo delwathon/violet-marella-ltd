@@ -10,17 +10,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('lounge.customers.index') }}">Customers</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('anire-craft-store.customers.index') }}">Customers</a></li>
                         <li class="breadcrumb-item active">{{ $customer->full_name }}</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.customers.edit', $customer->id) }}" class="btn btn-primary">
+                    <a href="{{ route('anire-craft-store.customers.edit', $customer->id) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
-                    <a href="{{ route('lounge.customers.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.customers.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>
                 </div>
@@ -191,7 +191,7 @@
                                     <tr>
                                         <td>{{ $sale->sale_date->format('M d, Y') }}</td>
                                         <td>
-                                            <a href="{{ route('lounge.sale', $sale->id) }}">
+                                            <a href="{{ route('anire-craft-store.sale', $sale->id) }}">
                                                 {{ $sale->receipt_number }}
                                             </a>
                                         </td>
@@ -270,10 +270,10 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('lounge.index') }}" class="btn btn-success">
+                        <a href="{{ route('anire-craft-store.index') }}" class="btn btn-success">
                             <i class="fas fa-shopping-cart"></i> New Sale
                         </a>
-                        <a href="{{ route('lounge.customers.edit', $customer->id) }}" class="btn btn-outline-primary">
+                        <a href="{{ route('anire-craft-store.customers.edit', $customer->id) }}" class="btn btn-outline-primary">
                             <i class="fas fa-edit"></i> Edit Customer
                         </a>
                         <button class="btn btn-outline-info" onclick="sendMessage()">
@@ -360,7 +360,7 @@ async function submitPointsAdjustment() {
     }
     
     try {
-        const response = await fetch('/app/lounge/customers/{{ $customer->id }}/loyalty', {
+        const response = await fetch('/app/anire-craft-store/customers/{{ $customer->id }}/loyalty', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -400,7 +400,7 @@ function deleteCustomer() {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/app/lounge/customers/{{ $customer->id }}';
+    form.action = '/app/anire-craft-store/customers/{{ $customer->id }}';
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
@@ -419,7 +419,7 @@ function deleteCustomer() {
 }
 
 function printReceipt(saleId) {
-    window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+    window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

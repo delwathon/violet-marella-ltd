@@ -17,19 +17,19 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.index') }}" class="btn btn-outline-primary">
+                    <a href="{{ route('anire-craft-store.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-cash-register"></i> Back to POS
                     </a>
-                    <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.categories.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-tags"></i> Categories
                     </a>
-                    <a href="{{ route('lounge.products.export') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.products.export') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-download"></i> Export
                     </a>
-                    <a href="{{ route('lounge.products.create') }}" class="btn btn-success">
+                    <a href="{{ route('anire-craft-store.products.create') }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Add Product
                     </a>
-                    <a href="{{ route('lounge.products.bulk-upload') }}" class="btn btn-primary">
+                    <a href="{{ route('anire-craft-store.products.bulk-upload') }}" class="btn btn-primary">
                         <i class="fas fa-file-upload"></i> Bulk Upload
                     </a>
                 </div>
@@ -88,7 +88,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('lounge.products.index') }}">
+            <form method="GET" action="{{ route('anire-craft-store.products.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <input type="text" name="search" class="form-control" 
@@ -125,7 +125,7 @@
                             <button type="submit" class="btn btn-primary flex-fill">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('anire-craft-store.products.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-redo"></i>
                             </a>
                         </div>
@@ -216,12 +216,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('lounge.products.show', $product->id) }}" 
+                                        <a href="{{ route('anire-craft-store.products.show', $product->id) }}" 
                                            class="btn btn-outline-info" 
                                            title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('lounge.products.edit', $product->id) }}" 
+                                        <a href="{{ route('anire-craft-store.products.edit', $product->id) }}" 
                                            class="btn btn-outline-primary" 
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
@@ -244,7 +244,7 @@
                                 <td colspan="8" class="text-center text-muted py-5">
                                     <i class="fas fa-boxes fa-3x mb-3"></i>
                                     <br><h5>No products found</h5>
-                                    <p>Try adjusting your filters or <a href="{{ route('lounge.products.create') }}">add a new product</a></p>
+                                    <p>Try adjusting your filters or <a href="{{ route('anire-craft-store.products.create') }}">add a new product</a></p>
                                 </td>
                             </tr>
                         @endforelse
@@ -351,7 +351,7 @@ async function submitStockAdjustment() {
     }
     
     try {
-        const response = await fetch(`/app/lounge/products/${productId}/adjust-stock`, {
+        const response = await fetch(`/app/anire-craft-store/products/${productId}/adjust-stock`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -384,7 +384,7 @@ function deleteProduct(productId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/lounge/products/${productId}`;
+    form.action = `/app/anire-craft-store/products/${productId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

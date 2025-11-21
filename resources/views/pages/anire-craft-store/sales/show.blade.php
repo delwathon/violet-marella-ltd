@@ -14,7 +14,7 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.sales.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.sales.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Sales
                     </a>
                     <button class="btn btn-primary" onclick="printReceipt({{ $sale->id }})">
@@ -47,7 +47,7 @@
                         <div class="col-md-6">
                             <strong>Customer:</strong><br>
                             @if($sale->customer)
-                                <a href="{{ route('lounge.customers.show', $sale->customer->id) }}">
+                                <a href="{{ route('anire-craft-store.customers.show', $sale->customer->id) }}">
                                     {{ $sale->customer->full_name }}
                                 </a><br>
                                 <small class="text-muted">{{ $sale->customer->phone }}</small>
@@ -112,7 +112,7 @@
                                     <tr>
                                         <td>
                                             @if($item->product)
-                                                <a href="{{ route('lounge.products.show', $item->product->id) }}">
+                                                <a href="{{ route('anire-craft-store.products.show', $item->product->id) }}">
                                                     {{ $item->product_name }}
                                                 </a>
                                             @else
@@ -226,7 +226,7 @@
 @push('scripts')
 <script>
     function printReceipt(saleId) {
-        window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+        window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
     }
 </script>
 @endpush

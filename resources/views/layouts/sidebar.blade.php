@@ -13,7 +13,7 @@
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('dashboard') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-home me-3" style="width: 20px;"></i>
-                    <span>Dashboard</span>
+                    <span>All Business Overview</span>
                 </a>
             </li>
             
@@ -119,7 +119,7 @@
                         <li class="nav-item">
                             <a href="{{ route('lounge.inventory.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('lounge.inventory.index') ? 'text-white' : '' }}">
                                 <i class="fas fa-warehouse me-3" style="width: 20px;"></i>
-                                <span>Inventory</span>
+                                <span>Overview</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -139,14 +139,119 @@
                     <span>Anire Craft Store</span>
                 </div>
             </li>
+
+            <!-- Point of Sale -->
+            <li class="nav-item">
+                <a href="{{ route('anire-craft-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.index') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-cash-register me-3" style="width: 20px;"></i>
+                    <span>Point of Sale</span>
+                </a>
+            </li>
+
+            <!-- Product Management -->
+            <li class="nav-item">
+                <a href="#storeProductsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.products.*') || request()->routeIs('anire-craft-store.categories.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('anire-craft-store.products.*') || request()->routeIs('anire-craft-store.categories.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-boxes me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Products</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('anire-craft-store.products.*') || request()->routeIs('anire-craft-store.categories.*') ? 'show' : '' }}" id="storeProductsMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.products.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.products.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.products.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.products.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-plus me-2"></i> Add Product
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.categories.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.categories.*') ? 'text-white' : '' }}">
+                                <i class="fas fa-tags me-2"></i> Categories
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            <!-- Customer Management -->
+            <li class="nav-item">
+                <a href="#storeCustomersMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.customers.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('anire-craft-store.customers.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-users me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Customers</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('anire-craft-store.customers.*') ? 'show' : '' }}" id="storeCustomersMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.customers.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.customers.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.customers.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-plus me-2"></i> Add Customer
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Sales Management -->
+            <li class="nav-item">
+                <a href="#storeSalesMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.sales.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('anire-craft-store.sales.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-shopping-cart me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Sales</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('anire-craft-store.sales.*') ? 'show' : '' }}" id="storeSalesMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.sales.today') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.sales.today') ? 'text-white' : '' }}">
+                                <i class="fas fa-calendar-day me-2"></i> Today's Sales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.sales.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.sales.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-history me-2"></i> Sales History
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Inventory Management -->
+            <li class="nav-item">
+                <a href="#storeInventoryMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.inventory.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('anire-craft-store.inventory.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-boxes me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Inventory</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('anire-craft-store.inventory.*') ? 'show' : '' }}" id="storeInventoryMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.inventory.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.inventory.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-warehouse me-2"></i> Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('anire-craft-store.inventory.low-stock') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('anire-craft-store.inventory.low-stock') ? 'text-white' : '' }}">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Low Stock
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
             
             <!-- Dashboard -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="{{ route('anire-craft-store.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('anire-craft-store.*') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-gift me-3" style="width: 20px;"></i>
                     <span>Dashboard</span>
                 </a>
-            </li>
+            </li> -->
 
 
 

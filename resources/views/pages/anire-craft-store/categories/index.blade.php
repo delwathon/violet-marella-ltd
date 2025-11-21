@@ -10,17 +10,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('lounge.products.index') }}">Products</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('anire-craft-store.products.index') }}">Products</a></li>
                         <li class="breadcrumb-item active">Categories</li>
                     </ol>
                 </nav>
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.products.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.products.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-boxes"></i> Products
                     </a>
-                    <a href="{{ route('lounge.categories.create') }}" class="btn btn-success">
+                    <a href="{{ route('anire-craft-store.categories.create') }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Add Category
                     </a>
                 </div>
@@ -31,7 +31,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('lounge.categories.index') }}">
+            <form method="GET" action="{{ route('anire-craft-store.categories.index') }}">
                 <div class="row g-3">
                     <div class="col-md-8">
                         <input type="text" name="search" class="form-control" 
@@ -50,7 +50,7 @@
                             <button type="submit" class="btn btn-primary flex-fill">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="{{ route('lounge.categories.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('anire-craft-store.categories.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-redo"></i>
                             </a>
                         </div>
@@ -93,11 +93,11 @@
                                 {{ $category->is_active ? 'Active' : 'Inactive' }}
                             </span>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('lounge.categories.show', $category->id) }}" 
+                                <a href="{{ route('anire-craft-store.categories.show', $category->id) }}" 
                                    class="btn btn-outline-info" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('lounge.categories.edit', $category->id) }}" 
+                                <a href="{{ route('anire-craft-store.categories.edit', $category->id) }}" 
                                    class="btn btn-outline-primary" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -117,7 +117,7 @@
                     <div class="card-body text-center py-5">
                         <i class="fas fa-tags fa-3x text-muted mb-3"></i>
                         <h5>No categories found</h5>
-                        <p class="text-muted">Start by <a href="{{ route('lounge.categories.create') }}">adding a new category</a></p>
+                        <p class="text-muted">Start by <a href="{{ route('anire-craft-store.categories.create') }}">adding a new category</a></p>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,7 @@ function deleteCategory(categoryId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/lounge/categories/${categoryId}`;
+    form.action = `/app/anire-craft-store/categories/${categoryId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

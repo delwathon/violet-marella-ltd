@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Lounge;
+namespace App\Http\Controllers\AnireCraftStore;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\InventoryLog;
+use App\Models\StoreProduct;
+use App\Models\StoreCategory;
+use App\Models\StoreInventoryLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductsController extends Controller
+class StoreProductsController extends Controller
 {
     /**
      * Display a listing of products
@@ -21,7 +21,7 @@ class ProductsController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        $query = Product::with('category');
+        $query = StoreProduct::with('category');
         
         // Search
         if ($request->has('search') && $request->search) {
@@ -30,7 +30,7 @@ class ProductsController extends Controller
         
         // Category filter
         if ($request->has('category_id') && $request->category_id) {
-            $query->where('category_id', $request->category_id);
+            $query->where('store_category_id', $request->category_id);
         }
         
         // Stock status filter
@@ -52,13 +52,13 @@ class ProductsController extends Controller
         }
         
         $products = $query->orderBy('name')->paginate(20);
-        $categories = Category::active()->ordered()->get();
+        $categories = StoreCategory::active()->ordered()->get();
         
         // Low stock count
-        $lowStockCount = Product::lowStock()->count();
-        $outOfStockCount = Product::where('stock_quantity', '<=', 0)->count();
+        $lowStockCount = StoreProduct::lowStock()->count();
+        $outOfStockCount = StoreProduct::where('stock_quantity', '<=', 0)->count();
         
-        return view('pages.lounge.products.index', compact(
+        return view('pages.anire-craft-store.products.index', compact(
             'user',
             'products',
             'categories',
@@ -73,9 +73,9 @@ class ProductsController extends Controller
     public function create()
     {
         $user = Auth::guard('user')->user();
-        $categories = Category::active()->ordered()->get();
+        $categories = StoreCategory::active()->ordered()->get();
         
-        return view('pages.lounge.products.create', compact('user', 'categories'));
+        return view('pages.anire-craft-store.products.create', compact('user', 'categories'));
     }
     
     /**
@@ -85,15 +85,15 @@ class ProductsController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'store_category_id' => 'required|exists:store_categories,id',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'wholesale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'minimum_stock_level' => 'nullable|integer|min:0',
             'maximum_stock_level' => 'nullable|integer|min:0',
-            'sku' => 'nullable|string|unique:products,sku',
-            'barcode' => 'nullable|string|unique:products,barcode',
+            'sku' => 'nullable|string|unique:store_products,sku',
+            'barcode' => 'nullable|string|unique:store_products,barcode',
             'description' => 'nullable|string',
             'unit' => 'nullable|string|max:50',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
@@ -120,12 +120,12 @@ class ProductsController extends Controller
                 $data['image'] = $imagePath;
             }
             
-            $product = Product::create($data);
+            $product = StoreProduct::create($data);
             
             // Log initial inventory
             if ($product->stock_quantity > 0) {
-                InventoryLog::create([
-                    'product_id' => $product->id,
+                StoreInventoryLog::create([
+                    'store_product_id' => $product->id,
                     'user_id' => Auth::guard('user')->id(),
                     'action_type' => 'purchase',
                     'quantity_change' => $product->stock_quantity,
@@ -138,7 +138,7 @@ class ProductsController extends Controller
             
             DB::commit();
             
-            return redirect()->route('lounge.products.index')
+            return redirect()->route('anire-craft-store.products.index')
                 ->with('success', 'Product created successfully.');
                 
         } catch (\Exception $e) {
@@ -155,7 +155,7 @@ class ProductsController extends Controller
     public function show($id)
     {
         $user = Auth::guard('user')->user();
-        $product = Product::with(['category', 'saleItems', 'inventoryLogs'])->findOrFail($id);
+        $product = StoreProduct::with(['category', 'saleItems', 'inventoryLogs'])->findOrFail($id);
         
         // Get recent sales
         $recentSales = $product->saleItems()
@@ -171,7 +171,7 @@ class ProductsController extends Controller
             ->limit(20)
             ->get();
         
-        return view('pages.lounge.products.show', compact('user', 'product', 'recentSales', 'inventoryHistory'));
+        return view('pages.anire-craft-store.products.show', compact('user', 'product', 'recentSales', 'inventoryHistory'));
     }
     
     /**
@@ -180,10 +180,10 @@ class ProductsController extends Controller
     public function edit($id)
     {
         $user = Auth::guard('user')->user();
-        $product = Product::findOrFail($id);
-        $categories = Category::active()->ordered()->get();
+        $product = StoreProduct::findOrFail($id);
+        $categories = StoreCategory::active()->ordered()->get();
         
-        return view('pages.lounge.products.edit', compact('user', 'product', 'categories'));
+        return view('pages.anire-craft-store.products.edit', compact('user', 'product', 'categories'));
     }
     
     /**
@@ -191,19 +191,19 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = StoreProduct::findOrFail($id);
         
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'store_category_id' => 'required|exists:store_categories,id',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'wholesale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'minimum_stock_level' => 'nullable|integer|min:0',
             'maximum_stock_level' => 'nullable|integer|min:0',
-            'sku' => 'nullable|string|unique:products,sku,' . $id,
-            'barcode' => 'nullable|string|unique:products,barcode,' . $id,
+            'sku' => 'nullable|string|unique:store_products,sku,' . $id,
+            'barcode' => 'nullable|string|unique:store_products,barcode,' . $id,
             'description' => 'nullable|string',
             'unit' => 'nullable|string|max:50',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
@@ -243,8 +243,8 @@ class ProductsController extends Controller
             
             // Log stock change if quantity changed
             if ($previousStock != $newStock) {
-                InventoryLog::create([
-                    'product_id' => $product->id,
+                StoreInventoryLog::create([
+                    'store_product_id' => $product->id,
                     'user_id' => Auth::guard('user')->id(),
                     'action_type' => 'adjustment',
                     'quantity_change' => $newStock - $previousStock,
@@ -257,7 +257,7 @@ class ProductsController extends Controller
             
             DB::commit();
             
-            return redirect()->route('lounge.products.index')
+            return redirect()->route('anire-craft-store.products.index')
                 ->with('success', 'Product updated successfully.');
                 
         } catch (\Exception $e) {
@@ -273,7 +273,7 @@ class ProductsController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = StoreProduct::findOrFail($id);
         
         DB::beginTransaction();
         
@@ -287,7 +287,7 @@ class ProductsController extends Controller
             
             DB::commit();
             
-            return redirect()->route('lounge.products.index')
+            return redirect()->route('anire-craft-store.products.index')
                 ->with('success', 'Product deleted successfully.');
                 
         } catch (\Exception $e) {
@@ -309,7 +309,7 @@ class ProductsController extends Controller
             'unit_cost' => 'nullable|numeric|min:0',
         ]);
         
-        $product = Product::findOrFail($id);
+        $product = StoreProduct::findOrFail($id);
         
         DB::beginTransaction();
         
@@ -321,8 +321,8 @@ class ProductsController extends Controller
             $product->update(['stock_quantity' => $newStock]);
             
             // Log inventory change
-            InventoryLog::create([
-                'product_id' => $product->id,
+            StoreInventoryLog::create([
+                'store_product_id' => $product->id,
                 'user_id' => Auth::guard('user')->id(),
                 'action_type' => $request->action_type,
                 'quantity_change' => $request->quantity_change,
@@ -358,7 +358,7 @@ class ProductsController extends Controller
     {
         $barcode = $request->get('barcode');
         
-        $product = Product::where('barcode', $barcode)
+        $product = StoreProduct::where('barcode', $barcode)
             ->with('category')
             ->first();
         
@@ -380,7 +380,7 @@ class ProductsController extends Controller
      */
     public function export()
     {
-        $products = Product::with('category')->get();
+        $products = StoreProduct::with('category')->get();
         
         $filename = 'products_' . date('Y-m-d_His') . '.csv';
         $headers = [
@@ -423,7 +423,7 @@ class ProductsController extends Controller
      */
     public function getLowStock()
     {
-        $products = Product::lowStock()
+        $products = StoreProduct::lowStock()
             ->with('category')
             ->get();
         
@@ -439,9 +439,9 @@ class ProductsController extends Controller
     public function bulkUploadPage()
     {
         $user = Auth::guard('user')->user();
-        $categories = Category::active()->ordered()->get();
+        $categories = StoreCategory::active()->ordered()->get();
         
-        return view('pages.lounge.products.bulk-upload', compact('user', 'categories'));
+        return view('pages.anire-craft-store.products.bulk-upload', compact('user', 'categories'));
     }
     
     /**
@@ -624,21 +624,21 @@ class ProductsController extends Controller
                     }
                     
                     // Find or create category
-                    $category = Category::where('name', $data['category_name'])->first();
+                    $category = StoreCategory::where('name', $data['category_name'])->first();
                     
                     if (!$category) {
-                        $category = Category::create([
+                        $category = StoreCategory::create([
                             'name' => $data['category_name'],
                             'is_active' => true
                         ]);
                     }
                     
-                    $data['category_id'] = $category->id;
+                    $data['store_category_id'] = $category->id;
                     unset($data['category_name']);
                     
                     // Handle empty string values
                     if ($data['sku'] === '') {
-                        $data['sku'] = 'PRD-' . strtoupper(Str::random(8));
+                        $data['sku'] = 'STORE-' . strtoupper(Str::random(8));
                     }
                     if ($data['barcode'] === '') {
                         $data['barcode'] = null;
@@ -665,12 +665,12 @@ class ProductsController extends Controller
                     // Check for existing product by SKU or name
                     $existingProduct = null;
                     if (!empty($data['sku'])) {
-                        $existingProduct = Product::where('sku', $data['sku'])->first();
+                        $existingProduct = StoreProduct::where('sku', $data['sku'])->first();
                     }
                     
                     if (!$existingProduct) {
-                        $existingProduct = Product::where('name', $data['name'])
-                            ->where('category_id', $data['category_id'])
+                        $existingProduct = StoreProduct::where('name', $data['name'])
+                            ->where('store_category_id', $data['store_category_id'])
                             ->first();
                     }
                     
@@ -682,8 +682,8 @@ class ProductsController extends Controller
                             
                             // Log stock change if quantity changed
                             if ($previousStock != $data['stock_quantity']) {
-                                InventoryLog::create([
-                                    'product_id' => $existingProduct->id,
+                                StoreInventoryLog::create([
+                                    'store_product_id' => $existingProduct->id,
                                     'user_id' => Auth::guard('user')->id(),
                                     'action_type' => 'adjustment',
                                     'quantity_change' => $data['stock_quantity'] - $previousStock,
@@ -705,12 +705,12 @@ class ProductsController extends Controller
                         }
                     } else {
                         // Create new product
-                        $product = Product::create($data);
+                        $product = StoreProduct::create($data);
                         
                         // Log initial inventory
                         if ($product->stock_quantity > 0) {
-                            InventoryLog::create([
-                                'product_id' => $product->id,
+                            StoreInventoryLog::create([
+                                'store_product_id' => $product->id,
                                 'user_id' => Auth::guard('user')->id(),
                                 'action_type' => 'purchase',
                                 'quantity_change' => $product->stock_quantity,
@@ -741,7 +741,7 @@ class ProductsController extends Controller
                 }
             }
             
-            return redirect()->route('lounge.products.bulk-upload')
+            return redirect()->route('anire-craft-store.products.bulk-upload')
                 ->with('success', $message)
                 ->with('import_stats', [
                     'imported' => $imported,

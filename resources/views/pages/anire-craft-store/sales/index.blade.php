@@ -14,7 +14,7 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.index') }}" class="btn btn-success">
+                    <a href="{{ route('anire-craft-store.index') }}" class="btn btn-success">
                         <i class="fas fa-plus me-2"></i>New Sale
                     </a>
                     <button class="btn btn-outline-primary" onclick="exportSales()">
@@ -76,7 +76,7 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('lounge.sales.index') }}">
+            <form method="GET" action="{{ route('anire-craft-store.sales.index') }}">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Search</label>
@@ -151,7 +151,7 @@
                                 <td>{{ $sale->sale_date->format('M d, Y H:i') }}</td>
                                 <td>
                                     @if($sale->customer)
-                                        <a href="{{ route('lounge.customers.show', $sale->customer->id) }}">
+                                        <a href="{{ route('anire-craft-store.customers.show', $sale->customer->id) }}">
                                             {{ $sale->customer->full_name }}
                                         </a>
                                     @else
@@ -178,7 +178,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('lounge.sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
+                                        <a href="{{ route('anire-craft-store.sales.show', $sale->id) }}" class="btn btn-outline-primary" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button class="btn btn-outline-secondary" onclick="printReceipt({{ $sale->id }})" title="Print Receipt">
@@ -213,7 +213,7 @@ function exportSales() {
 }
 
 function printReceipt(saleId) {
-    window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+    window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

@@ -14,7 +14,7 @@
             </div>
             <div class="col-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('lounge.inventory.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('anire-craft-store.inventory.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Inventory
                     </a>
                     <button class="btn btn-outline-primary" onclick="exportLowStock()">
@@ -215,17 +215,17 @@
                                                 title="Quick Restock">
                                             <i class="fas fa-plus"></i>
                                         </button>
-                                        <a href="{{ route('lounge.inventory.adjust', $product->id) }}" 
+                                        <a href="{{ route('anire-craft-store.inventory.adjust', $product->id) }}" 
                                            class="btn btn-primary" 
                                            title="Adjust Stock">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ route('lounge.products.show', $product->id) }}" 
+                                        <a href="{{ route('anire-craft-store.products.show', $product->id) }}" 
                                            class="btn btn-info" 
                                            title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('lounge.products.edit', $product->id) }}" 
+                                        <a href="{{ route('anire-craft-store.products.edit', $product->id) }}" 
                                            class="btn btn-warning" 
                                            title="Edit Product">
                                             <i class="fas fa-cog"></i>
@@ -388,7 +388,7 @@ async function submitQuickRestock() {
     }
     
     try {
-        const response = await fetch(`/app/lounge/products/${productId}/adjust-stock`, {
+        const response = await fetch(`/app/anire-craft-store/products/${productId}/adjust-stock`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
