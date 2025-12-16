@@ -29,6 +29,11 @@ use App\Http\Controllers\PhotoStudio\StudioManagementController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
+// New User Management Controllers
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\SecurityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -419,10 +424,72 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     // Settings
     Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
 
-    // Only accessible to users with 'admin' role
-    Route::middleware(['auth:user,admin'])->group(function () {
-        Route::get('users', [UsersController::class, 'index'])->name('users.index');
-    });
+    // =============================================
+    // USER MANAGEMENT ROUTES
+    // =============================================
+    
+    // Place specific routes BEFORE dynamic {id} routes to avoid conflicts
+    Route::get('/users/activity/log', [UserController::class, 'activity'])->name('users.activity');
+    Route::get('/users/security/settings', [UserController::class, 'security'])->name('users.security');
+    Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->name('users.download-template');
+    Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    
+    // Main user CRUD operations (general routes after specific routes)
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    
+    // User permissions management
+    Route::get('/users/{id}/permissions', [UserController::class, 'permissions'])->name('users.permissions');
+    Route::post('/users/{id}/permissions', [UserController::class, 'updatePermissions'])->name('users.permissions.update');
+    
+    // Import & Bulk operations
+    Route::post('/users/import', [UserController::class, 'import'])->name('users.import');
+    Route::post('/users/bulk-activate', [UserController::class, 'bulkActivate'])->name('users.bulk-activate');
+    Route::post('/users/bulk-suspend', [UserController::class, 'bulkSuspend'])->name('users.bulk-suspend');
+    Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
+    Route::post('/users/bulk-assign-role', [UserController::class, 'bulkAssignRole'])->name('users.bulk-assign-role');
+    
+    // =============================================
+    // ROLE MANAGEMENT ROUTES
+    // =============================================
+    
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{id}', [RoleController::class, 'show'])->name('roles.show');
+    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::post('/roles/{id}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+    Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->name('roles.duplicate');
+    
+    // =============================================
+    // DEPARTMENT MANAGEMENT ROUTES
+    // =============================================
+    
+    Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
+    Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
+    Route::get('/departments/{id}', [DepartmentController::class, 'show'])->name('departments.show');
+    Route::put('/departments/{id}', [DepartmentController::class, 'update'])->name('departments.update');
+    Route::delete('/departments/{id}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
+    Route::get('/departments/{id}/members', [DepartmentController::class, 'members'])->name('departments.members');
+    Route::post('/departments/{id}/members', [DepartmentController::class, 'addMember'])->name('departments.add-member');
+    Route::delete('/departments/{id}/members/{userId}', [DepartmentController::class, 'removeMember'])->name('departments.remove-member');
+    
+    // =============================================
+    // SECURITY SETTINGS ROUTES
+    // =============================================
+    
+    Route::post('/security/password-policy', [SecurityController::class, 'updatePasswordPolicy'])->name('users.security.password-policy');
+    Route::post('/security/authentication', [SecurityController::class, 'updateAuthentication'])->name('users.security.authentication');
+    Route::post('/security/audit-log', [SecurityController::class, 'updateAuditLog'])->name('users.security.audit-log');
+    Route::post('/security/ip-whitelist', [SecurityController::class, 'addIpWhitelist'])->name('security.ip-whitelist.add');
+    Route::delete('/security/ip-whitelist/{index}', [SecurityController::class, 'removeIpWhitelist'])->name('security.ip-whitelist.remove');
+    Route::post('/security/ip-blacklist', [SecurityController::class, 'addIpBlacklist'])->name('security.ip-blacklist.add');
+    Route::delete('/security/ip-blacklist/{index}', [SecurityController::class, 'removeIpBlacklist'])->name('security.ip-blacklist.remove');
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

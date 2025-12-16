@@ -381,46 +381,93 @@
             
             
 
-            <!-- Other Section Header -->
-            <li class="nav-item mt-4">
+            <!-- System & Settings Section Header -->
+            <li class="nav-item mt-3">
                 <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-ellipsis-h me-2 small"></i>
-                    <span>Others</span>
+                    <i class="fas fa-cog me-2 small"></i>
+                    <span>System Management</span>
                 </div>
             </li>
-
+            
             <!-- Reports -->
             <li class="nav-item">
                 <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
-                    <span>All Business Reports</span>
+                    <span>Reports & Analytics</span>
                 </a>
             </li>
             
             <!-- Settings -->
-            {{-- @if(auth()->user()->isAdmin()) --}}
-            <li class="nav-item">
-                <a href="#settingsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'true' : 'false' }}">
-                    <i class="fas fa-cog me-3" style="width: 20px;"></i>
+            {{-- <li class="nav-item">
+                <a href="#settingsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('settings.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-sliders-h me-3" style="width: 20px;"></i>
                     <span class="flex-grow-1">Settings</span>
                     <i class="fas fa-chevron-down small"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'show' : '' }}" id="settingsMenu">
+                <div class="collapse {{ request()->routeIs('settings.*') ? 'show' : '' }}" id="settingsMenu">
                     <ul class="nav flex-column bg-black bg-opacity-25 py-1">
                         <li class="nav-item">
-                            <a href="{{ route('settings.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('settings.index') ? 'text-white' : '' }}">
-                                <i class="fas fa-sliders-h me-2"></i> General Settings
+                            <a href="{{ route('settings.general') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('settings.general') ? 'text-white' : '' }}">
+                                <i class="fas fa-cog me-2"></i> General Settings
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('users.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.*') ? 'text-white' : '' }}">
-                                <i class="fas fa-user-shield me-2"></i> User Management
+                            <a href="{{ route('settings.business') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('settings.business') ? 'text-white' : '' }}">
+                                <i class="fas fa-building me-2"></i> Business Units
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('settings.integrations') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('settings.integrations') ? 'text-white' : '' }}">
+                                <i class="fas fa-plug me-2"></i> Integrations
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li> --}}
+            
+            <!-- User Management with Submenu -->
+            <li class="nav-item">
+                <a href="#userManagementMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-user-shield me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">User Management</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'show' : '' }}" id="userManagementMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('users.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.index') || request()->is('users') ? 'text-white' : '' }}">
+                                <i class="fas fa-users me-2"></i> All Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('users.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-plus me-2"></i> Add New User
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('roles.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('roles.*') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-tag me-2"></i> Roles & Permissions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('departments.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('departments.*') ? 'text-white' : '' }}">
+                                <i class="fas fa-sitemap me-2"></i> Departments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('users.activity') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.activity') ? 'text-white' : '' }}">
+                                <i class="fas fa-history me-2"></i> Activity Log
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('users.security') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.security') ? 'text-white' : '' }}">
+                                <i class="fas fa-shield-alt me-2"></i> Security Settings
                             </a>
                         </li>
                     </ul>
                 </div>
             </li>
-            {{-- @endif --}}
+            
         </ul>
     </nav>
     
