@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'phone',
         'password',
         'role',
+        'department_id',
         'is_active',
         'hourly_rate',
         'hire_date',
@@ -32,7 +34,8 @@ class User extends Authenticatable
         'address',
         'emergency_contact',
         'emergency_phone',
-        'permissions'
+        'permissions',
+        'profile_photo',
     ];
 
     /**
@@ -52,6 +55,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'department_id' => 'integer',
         'hourly_rate' => 'decimal:2',
         'hire_date' => 'date',
         'termination_date' => 'date',
@@ -72,6 +76,16 @@ class User extends Authenticatable
     public function inventoryLogs(): HasMany
     {
         return $this->hasMany(InventoryLog::class);
+    }
+
+    public function roleRecord(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role', 'slug');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**
@@ -103,7 +117,8 @@ class User extends Authenticatable
      */
     public function hasRole($role)
     {
-        return $this->role === $role;
+        $roles = is_array($role) ? $role : [$role];
+        return in_array($this->role, $roles, true);
     }
 
     /**
@@ -185,6 +200,11 @@ class User extends Authenticatable
         }
 
         $permissions = $this->permissions ?? [];
-        return in_array($permission, $permissions);
+        $rolePermissions = $this->roleRecord?->permissions ?? [];
+
+        return in_array('*', $permissions, true)
+            || in_array($permission, $permissions, true)
+            || in_array('*', $rolePermissions, true)
+            || in_array($permission, $rolePermissions, true);
     }
 }

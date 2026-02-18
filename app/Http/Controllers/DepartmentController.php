@@ -2,205 +2,177 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display a listing of departments
-     */
-    public function index()
+    public function index(): View
     {
         $user = Auth::guard('user')->user();
-        
-        // Sample departments (replace with actual database when table is created)
-        $departments = [
-            [
-                'id' => 1,
-                'name' => 'Management',
-                'icon' => 'user-tie',
-                'color' => 'primary',
-                'head' => 'John Doe',
-                'members' => 3,
-                'description' => 'Executive leadership and strategic planning'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Sales & Marketing',
-                'icon' => 'chart-line',
-                'color' => 'success',
-                'head' => 'Jane Smith',
-                'members' => 12,
-                'description' => 'Sales operations and marketing campaigns'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Operations',
-                'icon' => 'cogs',
-                'color' => 'info',
-                'head' => 'Mike Johnson',
-                'members' => 15,
-                'description' => 'Day-to-day business operations'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Finance',
-                'icon' => 'dollar-sign',
-                'color' => 'warning',
-                'head' => 'Sarah Williams',
-                'members' => 5,
-                'description' => 'Financial planning and accounting'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Human Resources',
-                'icon' => 'users',
-                'color' => 'danger',
-                'head' => 'Emily Brown',
-                'members' => 4,
-                'description' => 'Employee relations and recruitment'
-            ],
-            [
-                'id' => 6,
-                'name' => 'IT & Technology',
-                'icon' => 'laptop-code',
-                'color' => 'dark',
-                'head' => 'David Lee',
-                'members' => 6,
-                'description' => 'Technology infrastructure and support'
-            ],
-            [
-                'id' => 7,
-                'name' => 'Customer Service',
-                'icon' => 'headset',
-                'color' => 'secondary',
-                'head' => 'Lisa Garcia',
-                'members' => 8,
-                'description' => 'Customer support and relations'
-            ],
-            [
-                'id' => 8,
-                'name' => 'Logistics',
-                'icon' => 'truck',
-                'color' => 'primary',
-                'head' => 'Tom Anderson',
-                'members' => 7,
-                'description' => 'Supply chain and delivery management'
-            ]
-        ];
-        
-        // Statistics
-        $totalDepartments = count($departments);
-        $totalMembers = array_sum(array_column($departments, 'members'));
-        $departmentHeads = count($departments);
-        
+
+        $departments = Department::query()
+            ->with('head:id,first_name,last_name')
+            ->withCount('users')
+            ->orderBy('name')
+            ->get();
+
+        $totalDepartments = $departments->count();
+        $totalMembers = User::whereNotNull('department_id')->count();
+        $departmentHeads = $departments->whereNotNull('head_id')->count();
+        $availableHeads = User::active()->orderBy('first_name')->get();
+
         return view('pages.departments.index', compact(
             'user',
             'departments',
             'totalDepartments',
             'totalMembers',
-            'departmentHeads'
+            'departmentHeads',
+            'availableHeads'
         ));
     }
 
-    /**
-     * Store a newly created department
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:departments,name',
             'description' => 'nullable|string',
             'head_id' => 'nullable|exists:users,id',
             'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:20'
+            'color' => 'nullable|string|max:20',
+            'is_active' => 'nullable|boolean',
         ]);
-        
-        // TODO: Implement department creation when departments table is added
-        
+
+        Department::create([
+            'name' => $validated['name'],
+            'slug' => $this->makeUniqueSlug(Str::slug($validated['name'])),
+            'description' => $validated['description'] ?? null,
+            'head_id' => $validated['head_id'] ?? null,
+            'icon' => $validated['icon'] ?? 'users',
+            'color' => $validated['color'] ?? 'primary',
+            'is_active' => array_key_exists('is_active', $validated) ? (bool) $validated['is_active'] : true,
+        ]);
+
         return redirect()->route('departments.index')
-            ->with('success', 'Department created successfully!');
+            ->with('success', 'Department created successfully.');
     }
 
-    /**
-     * Display the specified department
-     */
-    public function show($id)
+    public function show(int $id): View
     {
         $user = Auth::guard('user')->user();
-        
-        // TODO: Fetch actual department when departments table exists
-        
-        return view('pages.departments.show', compact('user'));
+
+        $department = Department::with(['head:id,first_name,last_name,email', 'users' => function ($query) {
+            $query->orderBy('first_name');
+        }])->findOrFail($id);
+
+        return view('pages.departments.show', compact('user', 'department'));
     }
 
-    /**
-     * Update the specified department
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $department = Department::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:departments,name,' . $department->id,
             'description' => 'nullable|string',
             'head_id' => 'nullable|exists:users,id',
             'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:20'
+            'color' => 'nullable|string|max:20',
+            'is_active' => 'nullable|boolean',
         ]);
-        
-        // TODO: Implement department update when departments table is added
-        
-        return redirect()->route('departments.index')
-            ->with('success', 'Department updated successfully!');
+
+        $department->update([
+            'name' => $validated['name'],
+            'slug' => $this->makeUniqueSlug(Str::slug($validated['name']), $department->id),
+            'description' => $validated['description'] ?? null,
+            'head_id' => $validated['head_id'] ?? null,
+            'icon' => $validated['icon'] ?? 'users',
+            'color' => $validated['color'] ?? 'primary',
+            'is_active' => array_key_exists('is_active', $validated) ? (bool) $validated['is_active'] : $department->is_active,
+        ]);
+
+        return redirect()->route('departments.show', $department->id)
+            ->with('success', 'Department updated successfully.');
     }
 
-    /**
-     * Remove the specified department
-     */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-        // TODO: Implement department deletion when departments table is added
-        // Ensure no users are assigned to this department
-        
+        $department = Department::withCount('users')->findOrFail($id);
+
+        if ($department->users_count > 0) {
+            return redirect()->route('departments.index')
+                ->with('error', 'This department still has members. Remove them before deletion.');
+        }
+
+        $department->delete();
+
         return redirect()->route('departments.index')
-            ->with('success', 'Department deleted successfully!');
+            ->with('success', 'Department deleted successfully.');
     }
 
-    /**
-     * Show department members
-     */
-    public function members($id)
+    public function members(int $id): View
     {
         $user = Auth::guard('user')->user();
-        
-        // TODO: Fetch department members when departments table exists
-        
-        return view('pages.departments.members', compact('user'));
+
+        $department = Department::with('head:id,first_name,last_name')->findOrFail($id);
+        $members = User::where('department_id', $department->id)
+            ->orderBy('first_name')
+            ->paginate(20);
+
+        $availableUsers = User::where(function ($query) use ($department) {
+            $query->whereNull('department_id')
+                ->orWhere('department_id', '!=', $department->id);
+        })->orderBy('first_name')->get();
+
+        return view('pages.departments.members', compact('user', 'department', 'members', 'availableUsers'));
     }
 
-    /**
-     * Add member to department
-     */
-    public function addMember(Request $request, $id)
+    public function addMember(Request $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id'
+        $department = Department::findOrFail($id);
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
         ]);
-        
-        // TODO: Implement adding member to department
-        
-        return redirect()->route('departments.members', $id)
-            ->with('success', 'Member added to department successfully!');
+
+        User::where('id', $validated['user_id'])->update([
+            'department_id' => $department->id,
+        ]);
+
+        return redirect()->route('departments.members', $department->id)
+            ->with('success', 'Member added to department successfully.');
     }
 
-    /**
-     * Remove member from department
-     */
-    public function removeMember($departmentId, $userId)
+    public function removeMember(int $departmentId, int $userId): RedirectResponse
     {
-        // TODO: Implement removing member from department
-        
-        return redirect()->route('departments.members', $departmentId)
-            ->with('success', 'Member removed from department successfully!');
+        $department = Department::findOrFail($departmentId);
+
+        User::where('id', $userId)
+            ->where('department_id', $department->id)
+            ->update(['department_id' => null]);
+
+        return redirect()->route('departments.members', $department->id)
+            ->with('success', 'Member removed from department successfully.');
+    }
+
+    private function makeUniqueSlug(string $slug, ?int $ignoreId = null): string
+    {
+        $baseSlug = $slug !== '' ? $slug : 'department';
+        $candidate = $baseSlug;
+        $index = 2;
+
+        while (Department::where('slug', $candidate)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $candidate = $baseSlug . '-' . $index;
+            $index++;
+        }
+
+        return $candidate;
     }
 }

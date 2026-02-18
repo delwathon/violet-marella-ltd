@@ -2,61 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class RoleController extends Controller
 {
-    /**
-     * Display roles and permissions matrix
-     */
-    public function index()
+    public function index(): View
     {
         $user = Auth::guard('user')->user();
-        
-        // Get role statistics
-        $roles = [
-            [
-                'name' => 'Admin',
-                'slug' => 'admin',
-                'description' => 'Full administrative access to the system',
-                'users_count' => User::where('role', 'admin')->count(),
-                'color' => 'danger',
-                'is_system' => true
-            ],
-            [
-                'name' => 'Manager',
-                'slug' => 'manager',
-                'description' => 'Manage operations and team members',
-                'users_count' => User::where('role', 'manager')->count(),
-                'color' => 'primary',
-                'is_system' => true
-            ],
-            [
-                'name' => 'Cashier',
-                'slug' => 'cashier',
-                'description' => 'Process sales and handle transactions',
-                'users_count' => User::where('role', 'cashier')->count(),
-                'color' => 'success',
-                'is_system' => true
-            ],
-            [
-                'name' => 'Stock Keeper',
-                'slug' => 'stock_keeper',
-                'description' => 'Manage inventory and stock levels',
-                'users_count' => User::where('role', 'stock_keeper')->count(),
-                'color' => 'info',
-                'is_system' => true
-            ]
-        ];
-        
-        // Statistics
-        $totalRoles = count($roles);
-        $totalPermissions = 40; // Estimate
-        $customRoles = 0;
-        $permissionGroups = 8;
-        
+
+        $roles = Role::query()
+            ->withCount('users')
+            ->orderByDesc('is_system')
+            ->orderBy('name')
+            ->get();
+
+        $totalRoles = $roles->count();
+        $totalPermissions = $roles
+            ->flatMap(fn (Role $role) => $role->permissions ?? [])
+            ->unique()
+            ->count();
+        $customRoles = $roles->where('is_system', false)->count();
+        $permissionGroups = $roles
+            ->flatMap(function (Role $role) {
+                return collect($role->permissions ?? [])->map(function (string $permission) {
+                    return Str::contains($permission, '.')
+                        ? Str::before($permission, '.')
+                        : $permission;
+                });
+            })
+            ->unique()
+            ->count();
+
         return view('pages.roles.index', compact(
             'user',
             'roles',
@@ -67,88 +49,161 @@ class RoleController extends Controller
         ));
     }
 
-    /**
-     * Store a newly created role
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:roles,slug',
+            'slug' => 'nullable|string|max:255|unique:roles,slug',
             'description' => 'nullable|string',
-            'template' => 'nullable|in:admin,manager,cashier,stock_keeper'
+            'color' => 'nullable|string|max:20',
+            'template' => 'nullable|exists:roles,slug',
         ]);
-        
-        // TODO: Implement role creation when roles table is added
-        // For now, just redirect with success message
-        
+
+        $templateRole = null;
+        if (!empty($validated['template'])) {
+            $templateRole = Role::where('slug', $validated['template'])->first();
+        }
+
+        $slug = $validated['slug'] ?: Str::slug($validated['name']);
+        $slug = $this->makeUniqueSlug($slug);
+
+        Role::create([
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'description' => $validated['description'] ?? null,
+            'color' => $validated['color'] ?? 'primary',
+            'permissions' => $templateRole?->permissions ?? [],
+            'is_system' => false,
+        ]);
+
         return redirect()->route('roles.index')
-            ->with('success', 'Role created successfully!');
+            ->with('success', 'Role created successfully.');
     }
 
-    /**
-     * Display the specified role
-     */
-    public function show($id)
+    public function show(int $id): View
     {
         $user = Auth::guard('user')->user();
-        
-        // TODO: Fetch actual role when roles table exists
-        
-        return view('pages.roles.show', compact('user'));
+        $role = Role::withCount('users')->findOrFail($id);
+        $users = User::where('role', $role->slug)
+            ->orderBy('first_name')
+            ->paginate(20);
+
+        return view('pages.roles.show', compact('user', 'role', 'users'));
     }
 
-    /**
-     * Update the specified role
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
-        $request->validate([
+        $role = Role::findOrFail($id);
+
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'color' => 'nullable|string|max:20',
+            'slug' => 'nullable|string|max:255|unique:roles,slug,' . $role->id,
         ]);
-        
-        // TODO: Implement role update when roles table is added
-        
-        return redirect()->route('roles.index')
-            ->with('success', 'Role updated successfully!');
+
+        $payload = [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'color' => $validated['color'] ?? $role->color,
+        ];
+
+        if (!$role->is_system) {
+            $requestedSlug = $validated['slug'] ?? Str::slug($validated['name']);
+            $payload['slug'] = $this->makeUniqueSlug($requestedSlug, $role->id);
+        }
+
+        $role->update($payload);
+
+        return redirect()->route('roles.show', $role->id)
+            ->with('success', 'Role updated successfully.');
     }
 
-    /**
-     * Remove the specified role
-     */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-        // TODO: Implement role deletion when roles table is added
-        // Ensure role is not system role and has no users assigned
-        
+        $role = Role::withCount('users')->findOrFail($id);
+
+        if ($role->is_system) {
+            return redirect()->route('roles.index')
+                ->with('error', 'System roles cannot be deleted.');
+        }
+
+        if ($role->users_count > 0) {
+            return redirect()->route('roles.index')
+                ->with('error', 'This role has assigned users and cannot be deleted.');
+        }
+
+        $role->delete();
+
         return redirect()->route('roles.index')
-            ->with('success', 'Role deleted successfully!');
+            ->with('success', 'Role deleted successfully.');
     }
 
-    /**
-     * Update role permissions
-     */
-    public function updatePermissions(Request $request, $id)
+    public function updatePermissions(Request $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'permissions' => 'nullable|array'
+        $role = Role::findOrFail($id);
+
+        $validated = $request->validate([
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|max:100',
         ]);
-        
-        // TODO: Implement permissions update when roles table is added
-        
-        return redirect()->route('roles.index')
-            ->with('success', 'Role permissions updated successfully!');
+
+        $permissions = collect($validated['permissions'] ?? [])
+            ->map(fn (string $permission) => trim($permission))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $role->update([
+            'permissions' => $permissions,
+        ]);
+
+        return redirect()->route('roles.show', $role->id)
+            ->with('success', 'Role permissions updated successfully.');
     }
 
-    /**
-     * Duplicate an existing role
-     */
-    public function duplicate($id)
+    public function duplicate(int $id): RedirectResponse
     {
-        // TODO: Implement role duplication when roles table is added
-        
+        $role = Role::findOrFail($id);
+
+        $baseName = $role->name . ' Copy';
+        $copyName = $baseName;
+        $suffix = 2;
+
+        while (Role::where('name', $copyName)->exists()) {
+            $copyName = $baseName . ' ' . $suffix;
+            $suffix++;
+        }
+
+        $copySlug = $this->makeUniqueSlug(Str::slug($copyName));
+
+        Role::create([
+            'name' => $copyName,
+            'slug' => $copySlug,
+            'description' => $role->description,
+            'color' => $role->color,
+            'permissions' => $role->permissions,
+            'is_system' => false,
+        ]);
+
         return redirect()->route('roles.index')
-            ->with('success', 'Role duplicated successfully!');
+            ->with('success', 'Role duplicated successfully.');
+    }
+
+    private function makeUniqueSlug(string $slug, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($slug) ?: 'role';
+        $candidate = $baseSlug;
+        $index = 2;
+
+        while (Role::where('slug', $candidate)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $candidate = $baseSlug . '-' . $index;
+            $index++;
+        }
+
+        return $candidate;
     }
 }
