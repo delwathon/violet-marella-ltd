@@ -7,7 +7,10 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -39,8 +42,8 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
+        $this->middleware('guest:user')->except('logout');
+        $this->middleware('auth:user')->only('logout');
     }
 
     /**
@@ -63,19 +66,39 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
+        $authSettings = Cache::get('auth_settings', []);
+        $maxLoginAttempts = max(1, (int)($authSettings['max_login_attempts'] ?? 5));
+        $lockoutMinutes = max(1, (int)($authSettings['lockout_duration'] ?? 30));
+
+        $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxLoginAttempts)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            throw ValidationException::withMessages([
+                'email' => ['Too many login attempts. Try again in ' . ceil($seconds / 60) . ' minute(s).'],
+            ]);
+        }
+
         $user = User::where('email', $request->email)
                      ->where('is_active', true)
                      ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($throttleKey, $lockoutMinutes * 60);
+
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
+        RateLimiter::clear($throttleKey);
+
         Auth::guard('user')->login($user, $request->boolean('remember'));
+        $user->forceFill(['last_login_at' => now()])->save();
 
         $request->session()->regenerate();
+        $request->session()->put('last_activity_at', now()->timestamp);
 
         return redirect()->intended(route('dashboard'));
     }

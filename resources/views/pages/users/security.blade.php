@@ -3,233 +3,112 @@
 
 @section('content')
 <div class="content-area">
-    <!-- Page Header -->
     <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h1 class="h3 mb-1 fw-bold">Security Settings</h1>
-                <p class="text-muted mb-0">Configure system-wide security policies and authentication settings</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Security Overview -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-success bg-opacity-10 text-success rounded p-3 me-3">
-                            <i class="fas fa-shield-alt fa-2x"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Security Score</div>
-                            <h3 class="mb-0 fw-bold text-success">95%</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded p-3 me-3">
-                            <i class="fas fa-key fa-2x"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">2FA Enabled Users</div>
-                            <h3 class="mb-0 fw-bold">38</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-warning bg-opacity-10 text-warning rounded p-3 me-3">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Failed Logins (24h)</div>
-                            <h3 class="mb-0 fw-bold">12</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-danger bg-opacity-10 text-danger rounded p-3 me-3">
-                            <i class="fas fa-ban fa-2x"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Blocked IPs</div>
-                            <h3 class="mb-0 fw-bold">5</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h1 class="h3 mb-1 fw-bold">Security Settings</h1>
+        <p class="text-muted mb-0">Configure authentication and network access policies.</p>
     </div>
 
     <div class="row g-4">
-        <!-- Password Policies -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Password Policies</h5>
-                </div>
+                <div class="card-header bg-white py-3"><h5 class="mb-0">Password Policy</h5></div>
                 <div class="card-body">
                     <form action="{{ route('users.security.password-policy') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="min_length" class="form-label">Minimum Password Length</label>
-                            <input type="number" class="form-control" id="min_length" name="min_length" value="8" min="6" max="32">
+                            <label class="form-label">Minimum Password Length</label>
+                            <input type="number" name="min_length" class="form-control" min="6" max="32" value="{{ $passwordPolicy['min_length'] }}" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password Requirements</label>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="require_uppercase" name="require_uppercase" checked>
-                                <label class="form-check-label" for="require_uppercase">
-                                    Require uppercase letters
-                                </label>
+                            <label class="form-label d-block">Requirements</label>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="require_uppercase" id="require_uppercase" {{ $passwordPolicy['require_uppercase'] ? 'checked' : '' }}><label class="form-check-label" for="require_uppercase">Uppercase letters</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="require_lowercase" id="require_lowercase" {{ $passwordPolicy['require_lowercase'] ? 'checked' : '' }}><label class="form-check-label" for="require_lowercase">Lowercase letters</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="require_numbers" id="require_numbers" {{ $passwordPolicy['require_numbers'] ? 'checked' : '' }}><label class="form-check-label" for="require_numbers">Numbers</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="require_special" id="require_special" {{ $passwordPolicy['require_special'] ? 'checked' : '' }}><label class="form-check-label" for="require_special">Special characters</label></div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Password Expiry (days)</label>
+                                <input type="number" name="password_expiry" class="form-control" min="0" value="{{ $passwordPolicy['password_expiry'] }}" required>
                             </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="require_lowercase" name="require_lowercase" checked>
-                                <label class="form-check-label" for="require_lowercase">
-                                    Require lowercase letters
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="require_numbers" name="require_numbers" checked>
-                                <label class="form-check-label" for="require_numbers">
-                                    Require numbers
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="require_special" name="require_special">
-                                <label class="form-check-label" for="require_special">
-                                    Require special characters
-                                </label>
+                            <div class="col-md-6">
+                                <label class="form-label">Password History</label>
+                                <input type="number" name="password_history" class="form-control" min="0" value="{{ $passwordPolicy['password_history'] }}" required>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="password_expiry" class="form-label">Password Expiry (days)</label>
-                            <input type="number" class="form-control" id="password_expiry" name="password_expiry" value="90" min="0">
-                            <div class="form-text">Set to 0 for no expiry</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password_history" class="form-label">Password History</label>
-                            <input type="number" class="form-control" id="password_history" name="password_history" value="5" min="0">
-                            <div class="form-text">Prevent reuse of last N passwords</div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Save Password Policy
-                        </button>
+                        <button type="submit" class="btn btn-primary">Save Password Policy</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Authentication Settings -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Authentication Settings</h5>
-                </div>
+                <div class="card-header bg-white py-3"><h5 class="mb-0">Authentication</h5></div>
                 <div class="card-body">
                     <form action="{{ route('users.security.authentication') }}" method="POST">
                         @csrf
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="enable_2fa" name="enable_2fa" checked>
-                                <label class="form-check-label" for="enable_2fa">
-                                    <strong>Enable Two-Factor Authentication</strong>
-                                </label>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enable_2fa" name="enable_2fa" {{ $authSettings['enable_2fa'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="enable_2fa">Enable 2FA</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="force_2fa_admins" name="force_2fa_admins" {{ $authSettings['force_2fa_admins'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="force_2fa_admins">Force 2FA for admins</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enable_ip_whitelist" name="enable_ip_whitelist" {{ $authSettings['enable_ip_whitelist'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="enable_ip_whitelist">Enforce IP whitelist</label>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Session Timeout (min)</label>
+                                <input type="number" name="session_timeout" min="5" class="form-control" value="{{ $authSettings['session_timeout'] }}" required>
                             </div>
-                            <div class="form-text">Require 2FA for all users</div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="force_2fa_admins" name="force_2fa_admins" checked>
-                                <label class="form-check-label" for="force_2fa_admins">
-                                    <strong>Force 2FA for Administrators</strong>
-                                </label>
+                            <div class="col-md-4">
+                                <label class="form-label">Max Login Attempts</label>
+                                <input type="number" name="max_login_attempts" min="1" class="form-control" value="{{ $authSettings['max_login_attempts'] }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Lockout (min)</label>
+                                <input type="number" name="lockout_duration" min="5" class="form-control" value="{{ $authSettings['lockout_duration'] }}" required>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="session_timeout" class="form-label">Session Timeout (minutes)</label>
-                            <input type="number" class="form-control" id="session_timeout" name="session_timeout" value="120" min="5">
-                        </div>
-                        <div class="mb-3">
-                            <label for="max_login_attempts" class="form-label">Maximum Login Attempts</label>
-                            <input type="number" class="form-control" id="max_login_attempts" name="max_login_attempts" value="5" min="1">
-                            <div class="form-text">Account locked after this many failed attempts</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="lockout_duration" class="form-label">Lockout Duration (minutes)</label>
-                            <input type="number" class="form-control" id="lockout_duration" name="lockout_duration" value="30" min="5">
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Save Authentication Settings
-                        </button>
+                        <button type="submit" class="btn btn-primary">Save Authentication Settings</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- IP Whitelist -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-network-wired me-2"></i>IP Whitelist</h5>
-                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addIpModal">
-                            <i class="fas fa-plus me-1"></i>Add IP
-                        </button>
-                    </div>
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">IP Whitelist</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addIpModal">Add IP</button>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted small">Restrict access to specific IP addresses</p>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="enable_ip_whitelist" name="enable_ip_whitelist">
-                        <label class="form-check-label" for="enable_ip_whitelist">
-                            Enable IP Whitelist
-                        </label>
-                    </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>IP Address</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Action</th>
-                                </tr>
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr><th>IP</th><th>Description</th><th>Added</th><th class="text-end pe-3">Action</th></tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><code>192.168.1.100</code></td>
-                                    <td>Office Network</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><code>10.0.0.0/24</code></td>
-                                    <td>VPN Network</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                @forelse($whitelist as $index => $entry)
+                                    <tr>
+                                        <td><code>{{ $entry['ip'] }}</code></td>
+                                        <td>{{ $entry['description'] ?? '-' }}</td>
+                                        <td>{{ $entry['added_at'] ?? '-' }}</td>
+                                        <td class="text-end pe-3">
+                                            <form action="{{ route('security.ip-whitelist.remove', $index) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted py-3">No whitelisted IPs</td></tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -237,50 +116,35 @@
             </div>
         </div>
 
-        <!-- Blocked IPs -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-ban me-2"></i>Blocked IPs</h5>
-                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#blockIpModal">
-                            <i class="fas fa-ban me-1"></i>Block IP
-                        </button>
-                    </div>
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Blocked IPs</h5>
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#blockIpModal">Block IP</button>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted small">Prevent access from specific IP addresses</p>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>IP Address</th>
-                                    <th>Reason</th>
-                                    <th>Blocked On</th>
-                                    <th class="text-end">Action</th>
-                                </tr>
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr><th>IP</th><th>Reason</th><th>Blocked</th><th class="text-end pe-3">Action</th></tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><code>203.0.113.45</code></td>
-                                    <td>Multiple failed logins</td>
-                                    <td>2 hours ago</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-unlock"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><code>198.51.100.78</code></td>
-                                    <td>Suspicious activity</td>
-                                    <td>1 day ago</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-unlock"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                @forelse($blacklist as $index => $entry)
+                                    <tr>
+                                        <td><code>{{ $entry['ip'] }}</code></td>
+                                        <td>{{ $entry['reason'] ?? '-' }}</td>
+                                        <td>{{ $entry['blocked_at'] ?? '-' }}</td>
+                                        <td class="text-end pe-3">
+                                            <form action="{{ route('security.ip-blacklist.remove', $index) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-success" type="submit">Unblock</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted py-3">No blocked IPs</td></tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -288,40 +152,36 @@
             </div>
         </div>
 
-        <!-- Audit Log Settings -->
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Audit Log Settings</h5>
-                </div>
+                <div class="card-header bg-white py-3"><h5 class="mb-0">Audit Logging</h5></div>
                 <div class="card-body">
-                    <form action="{{ route('users.security.audit-log') }}" method="POST">
+                    <form action="{{ route('users.security.audit-log') }}" method="POST" class="row g-3 align-items-end">
                         @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="log_retention" class="form-label">Log Retention Period (days)</label>
-                                <input type="number" class="form-control" id="log_retention" name="log_retention" value="365" min="30">
+                        <div class="col-md-3">
+                            <label class="form-label">Retention (days)</label>
+                            <input type="number" name="log_retention" class="form-control" min="30" value="{{ $auditLogSettings['log_retention'] }}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="log_logins" id="log_logins" {{ $auditLogSettings['log_logins'] ? 'checked' : '' }}>
+                                <label class="form-check-label" for="log_logins">Log logins</label>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Events to Log</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="log_logins" name="log_logins" checked>
-                                    <label class="form-check-label" for="log_logins">Login attempts</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="log_changes" name="log_changes" checked>
-                                    <label class="form-check-label" for="log_changes">Data modifications</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="log_deletions" name="log_deletions" checked>
-                                    <label class="form-check-label" for="log_deletions">Data deletions</label>
-                                </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="log_changes" id="log_changes" {{ $auditLogSettings['log_changes'] ? 'checked' : '' }}>
+                                <label class="form-check-label" for="log_changes">Log changes</label>
                             </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Save Audit Settings
-                                </button>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="log_deletions" id="log_deletions" {{ $auditLogSettings['log_deletions'] ? 'checked' : '' }}>
+                                <label class="form-check-label" for="log_deletions">Log deletions</label>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" type="submit">Save Audit Settings</button>
                         </div>
                     </form>
                 </div>
@@ -330,60 +190,59 @@
     </div>
 </div>
 
-<!-- Add IP Modal -->
-<div class="modal fade" id="addIpModal" tabindex="-1">
+<div class="modal fade" id="addIpModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add IP to Whitelist</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form>
+            <form action="{{ route('security.ip-whitelist.add') }}" method="POST">
+                @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="ip_address" class="form-label">IP Address</label>
-                        <input type="text" class="form-control" id="ip_address" placeholder="e.g., 192.168.1.1 or 10.0.0.0/24">
+                        <label class="form-label">IP Address or CIDR</label>
+                        <input type="text" name="ip_address" class="form-control" placeholder="192.168.1.10 or 10.0.0.0/24" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="ip_description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="ip_description" placeholder="e.g., Office Network">
+                    <div class="mb-0">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Office network">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add to Whitelist</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add IP</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Block IP Modal -->
-<div class="modal fade" id="blockIpModal" tabindex="-1">
+<div class="modal fade" id="blockIpModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Block IP Address</h5>
+                <h5 class="modal-title">Block IP</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form>
+            <form action="{{ route('security.ip-blacklist.add') }}" method="POST">
+                @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="block_ip_address" class="form-label">IP Address</label>
-                        <input type="text" class="form-control" id="block_ip_address" placeholder="e.g., 192.168.1.1">
+                        <label class="form-label">IP Address or CIDR</label>
+                        <input type="text" name="ip_address" class="form-control" placeholder="203.0.113.45" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="block_reason" class="form-label">Reason</label>
-                        <textarea class="form-control" id="block_reason" rows="2" placeholder="Reason for blocking this IP"></textarea>
+                    <div class="mb-0">
+                        <label class="form-label">Reason</label>
+                        <input type="text" name="reason" class="form-control" placeholder="Multiple failed logins">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger">Block IP</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 @endsection
