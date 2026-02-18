@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
@@ -209,9 +210,79 @@ class UserController extends Controller
     public function activity(Request $request): View
     {
         $currentUser = Auth::guard('user')->user();
-        $activities = collect([]);
+        $activityQuery = $this->buildActivityQuery($request);
 
-        return view('pages.users.activity', compact('currentUser', 'activities') + ['user' => $currentUser]);
+        $activities = $activityQuery
+            ->with('user:id,first_name,last_name,email')
+            ->latest('created_at')
+            ->paginate(30)
+            ->withQueryString();
+
+        $totalActivities = ActivityLog::count();
+        $todayActivities = ActivityLog::whereDate('created_at', now())->count();
+        $securityAlerts = ActivityLog::where(function ($query) {
+            $query->where('module', 'security')
+                ->orWhere('status_code', '>=', 400);
+        })->count();
+        $activeUsersToday = ActivityLog::whereDate('created_at', now())
+            ->whereNotNull('user_id')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $usersForFilter = User::orderBy('first_name')->get(['id', 'first_name', 'last_name']);
+        $modules = ActivityLog::select('module')
+            ->whereNotNull('module')
+            ->distinct()
+            ->orderBy('module')
+            ->pluck('module');
+
+        return view('pages.users.activity', compact(
+            'currentUser',
+            'activities',
+            'totalActivities',
+            'todayActivities',
+            'securityAlerts',
+            'activeUsersToday',
+            'usersForFilter',
+            'modules'
+        ) + ['user' => $currentUser]);
+    }
+
+    public function exportActivity(Request $request)
+    {
+        $activities = $this->buildActivityQuery($request)
+            ->with('user:id,first_name,last_name,email')
+            ->latest('created_at')
+            ->limit(5000)
+            ->get();
+
+        $filename = 'activity_logs_' . now()->format('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = static function () use ($activities) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Timestamp', 'User', 'Action', 'Module', 'Method', 'URL', 'IP', 'Status']);
+
+            foreach ($activities as $activity) {
+                fputcsv($file, [
+                    $activity->created_at,
+                    $activity->user?->full_name ?? 'System',
+                    $activity->action,
+                    $activity->module,
+                    $activity->method,
+                    $activity->url,
+                    $activity->ip_address,
+                    $activity->status_code,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function security(): View
@@ -504,5 +575,32 @@ class UserController extends Controller
         }
 
         return $slugs;
+    }
+
+    private function buildActivityQuery(Request $request)
+    {
+        $query = ActivityLog::query();
+
+        if ($request->filled('user')) {
+            $query->where('user_id', $request->user);
+        }
+
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
+        }
+
+        if ($request->filled('module')) {
+            $query->where('module', $request->module);
+        }
+
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->to);
+        }
+
+        return $query;
     }
 }

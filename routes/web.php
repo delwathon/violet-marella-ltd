@@ -475,6 +475,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         // USER MANAGEMENT ROUTES
         Route::get('/users/activity/log', [UserController::class, 'activity'])->name('users.activity');
+        Route::get('/users/activity/export', [UserController::class, 'exportActivity'])->name('users.activity.export');
         Route::get('/users/security/settings', [UserController::class, 'security'])->name('users.security');
         Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->name('users.download-template');
         Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
