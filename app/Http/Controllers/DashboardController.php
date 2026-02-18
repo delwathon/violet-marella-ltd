@@ -353,7 +353,7 @@ class DashboardController extends Controller
             });
         
         // Recent Studio Sessions  
-        $recentSessions = StudioSession::with(['customer', 'studio'])
+        $recentSessions = StudioSession::with(['customer',])
             ->latest()
             ->limit(3)
             ->get()
@@ -363,9 +363,9 @@ class DashboardController extends Controller
                     'icon' => 'camera',
                     'color' => 'primary',
                     'title' => 'Studio Session',
-                    'description' => $session->customer->name . ' - ' . $session->studio->name,
-                    'amount' => $session->total_amount,
-                    'time' => $session->check_in_time,
+                    // 'description' => $session->customer->name . ' - ' . $session->studio->name,
+                    // 'amount' => $session->total_amount,
+                    // 'time' => $session->check_in_time,
                 ];
             });
         

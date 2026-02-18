@@ -256,17 +256,17 @@
 
 
             <!-- Photo Studio Section Header -->
-            <li class="nav-item mt-4">
+            <li class="nav-item mt-3">
                 <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                     <i class="fas fa-camera me-2 small"></i>
                     <span>Photo Studio</span>
                 </div>
             </li>
-            
+
             <!-- Photo Studio Dashboard -->
             <li class="nav-item">
-                <a href="{{ route('photo-studio.dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.dashboard') || (request()->routeIs('photo-studio.index') && !request()->has('tab')) ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-tachometer-alt me-3" style="width: 20px;"></i>
+                <a href="{{ route('photo-studio.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.index') || request()->routeIs('photo-studio.dashboard') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-th-large me-3" style="width: 20px;"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
@@ -274,59 +274,141 @@
             <!-- Active Sessions -->
             <li class="nav-item">
                 <a href="{{ route('photo-studio.sessions.active') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.sessions.active') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-play-circle me-3" style="width: 20px;"></i>
+                    <i class="fas fa-clock me-3" style="width: 20px;"></i>
                     <span>Active Sessions</span>
+                    @if(isset($activeSessions) && $activeSessions > 0)
+                        <span class="badge bg-danger ms-auto">{{ $activeSessions }}</span>
+                    @endif
                 </a>
+            </li>
+
+            <!-- Studio Categories -->
+            <li class="nav-item">
+                <a href="#studioCategoriesMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.categories.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('photo-studio.categories.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-layer-group me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Categories</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('photo-studio.categories.*') ? 'show' : '' }}" id="studioCategoriesMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.categories.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.categories.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.categories.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.categories.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-plus me-2"></i> Add Category
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Physical Rooms (Optional) -->
+            <li class="nav-item">
+                <a href="#studioRoomsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.rooms.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('photo-studio.rooms.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-door-open me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Physical Rooms</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('photo-studio.rooms.*') ? 'show' : '' }}" id="studioRoomsMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.rooms.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.rooms.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Rooms
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.rooms.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.rooms.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-plus me-2"></i> Add Room
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Customer Management -->
+            <li class="nav-item">
+                <a href="#studioCustomersMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.customers.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('photo-studio.customers.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-users me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Customers</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('photo-studio.customers.*') ? 'show' : '' }}" id="studioCustomersMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.customers.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-list me-2"></i> All Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.customers.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.customers.create') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-plus me-2"></i> Add Customer
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
 
             <!-- Session History -->
             <li class="nav-item">
-                <a href="{{ route('photo-studio.sessions.history') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.sessions.history') || request()->routeIs('photo-studio.sessions.index') ? 'bg-primary text-white' : '' }}">
+                <a href="{{ route('photo-studio.sessions.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.sessions.index') || request()->routeIs('photo-studio.sessions.show') ? 'bg-primary text-white' : '' }}">
                     <i class="fas fa-history me-3" style="width: 20px;"></i>
                     <span>Session History</span>
                 </a>
             </li>
 
-            <!-- Studio Customers -->
+            <!-- Reports & Analytics -->
             <li class="nav-item">
-                <a href="{{ route('photo-studio.customers.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.customers.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-user-friends me-3" style="width: 20px;"></i>
-                    <span>Customers</span>
+                <a href="#studioReportsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.reports.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('photo-studio.reports.*') ? 'true' : 'false' }}">
+                    <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
+                    <span class="flex-grow-1">Reports</span>
+                    <i class="fas fa-chevron-down small"></i>
                 </a>
+                <div class="collapse {{ request()->routeIs('photo-studio.reports.*') ? 'show' : '' }}" id="studioReportsMenu">
+                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.index') ? 'text-white' : '' }}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.daily') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.daily') ? 'text-white' : '' }}">
+                                <i class="fas fa-calendar-day me-2"></i> Daily Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.revenue') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.revenue') ? 'text-white' : '' }}">
+                                <i class="fas fa-naira-sign me-2"></i> Revenue Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.occupancy') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.occupancy') ? 'text-white' : '' }}">
+                                <i class="fas fa-percentage me-2"></i> Occupancy Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.customers') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.customers') ? 'text-white' : '' }}">
+                                <i class="fas fa-user-friends me-2"></i> Customer Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('photo-studio.reports.category-performance') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('photo-studio.reports.category-performance') ? 'text-white' : '' }}">
+                                <i class="fas fa-chart-line me-2"></i> Category Performance
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
 
-            <!-- Studio Management -->
+            <!-- Settings -->
             <li class="nav-item">
-                <a href="{{ route('photo-studio.studios.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.studios.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-door-open me-3" style="width: 20px;"></i>
-                    <span>Studio Rooms</span>
+                <a href="{{ route('photo-studio.settings.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.settings.*') ? 'bg-primary text-white' : '' }}">
+                    <i class="fas fa-cog me-3" style="width: 20px;"></i>
+                    <span>Settings</span>
                 </a>
             </li>
-
-            <!-- Rates & Pricing -->
-            <li class="nav-item">
-                <a href="{{ route('photo-studio.rates.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.rates.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-tags me-3" style="width: 20px;"></i>
-                    <span>Rates & Pricing</span>
-                </a>
-            </li>
-
-            <!-- QR Scanner -->
-            <li class="nav-item">
-                <a href="#" class="nav-link text-white-50 d-flex align-items-center py-2 px-4" onclick="openQRScanner(); return false;">
-                    <i class="fas fa-qrcode me-3" style="width: 20px;"></i>
-                    <span>QR Scanner</span>
-                </a>
-            </li>
-
-            <!-- Studio Reports -->
-            <li class="nav-item">
-                <a href="{{ route('photo-studio.reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('photo-studio.reports.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-chart-line me-3" style="width: 20px;"></i>
-                    <span>Studio Reports</span>
-                </a>
-            </li>
-
 
             
             <!-- Prop Rental Section Header -->

@@ -477,11 +477,11 @@
                 
                 <div class="activity-details">
                     <div class="activity-title">{{ $activity['title'] }}</div>
-                    <div class="activity-description">{{ $activity['description'] }}</div>
-                    <div class="activity-time">{{ $activity['time']->diffForHumans() }}</div>
+                    {{-- <div class="activity-description">{{ $activity['description'] }}</div> 
+                    <div class="activity-time">{{ $activity['time']->diffForHumans() }}</div> --}}
                 </div>
                 
-                <div class="activity-amount">₦{{ number_format($activity['amount'], 2) }}</div>
+                {{-- <div class="activity-amount">₦{{ number_format($activity['amount'], 2) }}</div> --}}
             </div>
         @empty
             <div class="text-center text-muted py-4">
