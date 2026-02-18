@@ -466,7 +466,8 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');
     
     // Settings
-    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('role:admin');
+    Route::post('settings', [SettingsController::class, 'update'])->name('settings.update')->middleware('role:admin');
 
     // =============================================
     // ADMIN ROUTES
