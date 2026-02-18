@@ -313,7 +313,7 @@ class StoreRootController extends Controller
     public function processSale(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:cash,card,transfer,mobile_money',
+            'payment_method' => 'required|in:cash,card,transfer,mobile_money,split',
             'amount_paid' => 'required|numeric|min:0',
             'customer_id' => 'nullable|exists:store_customers,id',
         ]);
@@ -348,6 +348,15 @@ class StoreRootController extends Controller
             }
             
             $totalAmount = $subtotal + $taxAmount - $discountAmount;
+
+            if ((float) $request->amount_paid < (float) $totalAmount) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Amount paid is less than the total amount due.',
+                ], 422);
+            }
+
             $changeAmount = $request->amount_paid - $totalAmount;
             
             // Create Sale
@@ -369,7 +378,9 @@ class StoreRootController extends Controller
             
             // Create Sale Items
             foreach ($cart as $item) {
-                $product = StoreProduct::findOrFail($item['product_id']);
+                $product = StoreProduct::whereKey($item['product_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
                 
                 $itemSubtotal = $item['price'] * $item['quantity'];
                 $taxRate = $item['tax_rate'] ?? 7.5;
@@ -387,8 +398,17 @@ class StoreRootController extends Controller
                 
                 // Update inventory if stock tracking is enabled
                 if ($product->track_stock) {
+                    if ((int) $product->stock_quantity < (int) $item['quantity']) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Insufficient stock for {$product->name}.",
+                        ], 409);
+                    }
+
                     $previousStock = $product->stock_quantity;
                     $product->decrement('stock_quantity', $item['quantity']);
+                    $newStock = $previousStock - $item['quantity'];
                     
                     // Log inventory change
                     StoreInventoryLog::create([
@@ -397,7 +417,7 @@ class StoreRootController extends Controller
                         'action_type' => 'sale',
                         'quantity_change' => -$item['quantity'],
                         'previous_stock' => $previousStock,
-                        'new_stock' => $product->stock_quantity,
+                        'new_stock' => $newStock,
                         'reference_number' => $sale->receipt_number,
                         'action_date' => now()
                     ]);
@@ -429,10 +449,11 @@ class StoreRootController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
+            report($e);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process sale: ' . $e->getMessage()
+                'message' => 'Failed to process sale. Please try again.'
             ], 500);
         }
     }

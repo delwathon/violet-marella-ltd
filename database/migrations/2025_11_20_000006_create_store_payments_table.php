@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('store_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_sale_id')->constrained('store_sales')->onDelete('cascade');
-            $table->enum('payment_method', ['cash', 'card', 'transfer', 'mobile']);
+            $table->enum('payment_method', ['cash', 'card', 'transfer', 'mobile_money']);
             $table->decimal('amount', 10, 2);
             $table->string('reference_number')->nullable();
             $table->timestamp('payment_date');

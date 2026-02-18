@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2);
             $table->decimal('amount_paid', 10, 2);
             $table->decimal('change_amount', 10, 2)->default(0);
-            $table->enum('payment_method', ['cash', 'card', 'transfer', 'split'])->default('cash');
+            $table->enum('payment_method', ['cash', 'card', 'transfer', 'mobile_money', 'split'])->default('cash');
             $table->enum('payment_status', ['pending', 'completed', 'partial', 'refunded'])->default('completed');
             $table->enum('status', ['completed', 'pending', 'cancelled', 'refunded'])->default('completed');
             $table->text('notes')->nullable();
