@@ -276,7 +276,7 @@
                         <a href="{{ route('anire-craft-store.customers.edit', $customer->id) }}" class="btn btn-outline-primary">
                             <i class="fas fa-edit"></i> Edit Customer
                         </a>
-                        <button class="btn btn-outline-info" onclick="sendMessage()">
+                        <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#messageCustomerModal">
                             <i class="fas fa-envelope"></i> Send Message
                         </button>
                         <hr>
@@ -323,6 +323,42 @@
     </div>
 </div>
 
+<!-- Message Customer Modal -->
+<div class="modal fade" id="messageCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Message to {{ $customer->full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="customerMessageSubject" value="Hello {{ $customer->full_name }}">
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" id="customerMessageBody" rows="4">Hi {{ $customer->full_name }},</textarea>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary" onclick="sendCustomerMessage('email')">
+                        <i class="fas fa-envelope me-1"></i>Email
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="sendCustomerMessage('whatsapp')">
+                        <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-outline-dark" onclick="sendCustomerMessage('sms')">
+                        <i class="fas fa-comment-alt me-1"></i>SMS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('styles')
 <style>
 .stat-box {
@@ -340,6 +376,10 @@
 
 @push('scripts')
 <script>
+const customerName = @json($customer->full_name);
+const customerEmail = @json($customer->email);
+const customerPhone = @json($customer->phone);
+
 function showAdjustPointsModal(action) {
     document.getElementById('adjustAction').value = action;
     document.getElementById('actionLabel').textContent = action === 'add' ? 'Add' : 'Deduct';
@@ -389,8 +429,62 @@ async function submitPointsAdjustment() {
     }
 }
 
-function sendMessage() {
-    alert('Messaging feature coming soon!');
+function sendCustomerMessage(channel) {
+    const subject = document.getElementById('customerMessageSubject').value.trim() || `Hello ${customerName}`;
+    const body = document.getElementById('customerMessageBody').value.trim();
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+
+    if (!body) {
+        alert('Please enter a message before sending.');
+        return;
+    }
+
+    if (channel === 'email') {
+        if (!customerEmail) {
+            alert('This customer does not have an email address.');
+            return;
+        }
+
+        window.open(`mailto:${customerEmail}?subject=${encodedSubject}&body=${encodedBody}`, '_blank');
+        return;
+    }
+
+    if (channel === 'whatsapp') {
+        const whatsappPhone = formatPhoneForWhatsApp(customerPhone);
+
+        if (!whatsappPhone) {
+            alert('This customer does not have a valid phone number for WhatsApp.');
+            return;
+        }
+
+        window.open(`https://wa.me/${whatsappPhone}?text=${encodedBody}`, '_blank');
+        return;
+    }
+
+    if (channel === 'sms') {
+        if (!customerPhone) {
+            alert('This customer does not have a phone number.');
+            return;
+        }
+
+        window.open(`sms:${customerPhone}?body=${encodedBody}`, '_blank');
+    }
+}
+
+function formatPhoneForWhatsApp(phone) {
+    if (!phone) {
+        return '';
+    }
+
+    const trimmed = String(phone).trim();
+    let digits = trimmed.replace(/[^\d]/g, '');
+
+    if (digits.startsWith('0')) {
+        digits = `234${digits.slice(1)}`;
+    }
+
+    return digits;
 }
 
 function deleteCustomer() {
