@@ -2,417 +2,474 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of users with filters
-     */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $query = User::query();
-        
-        // Search filter
+        $query = User::query()->with(['department', 'roleRecord']);
+
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
-        
-        // Role filter
+
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
-        
-        // Status filter
-        if ($request->filled('status')) {
-            if ($request->status === 'active') {
-                $query->where('is_active', true);
-            } else {
-                $query->where('is_active', false);
-            }
+
+        if ($request->filled('department')) {
+            $query->where('department_id', $request->department);
         }
-        
-        // Pagination
-        $users = $query->orderBy('created_at', 'desc')->paginate(15);
-        
-        // Get departments for filter (empty for now)
-        $departments = collect([]);
-        
-        // Calculate statistics
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        $users = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+
+        $departments = Department::orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+
         $totalUsers = User::count();
         $activeUsers = User::where('is_active', true)->count();
         $pendingUsers = User::where('is_active', false)->count();
         $adminUsers = User::where('role', 'admin')->count();
-        
-        // Get current authenticated user
-        $user = Auth::guard('user')->user();
-        
+
+        $currentUser = Auth::guard('user')->user();
+
         return view('pages.users.index', compact(
             'users',
-            'user',
+            'currentUser',
             'departments',
+            'roles',
             'totalUsers',
             'activeUsers',
             'pendingUsers',
             'adminUsers'
-        ));
+        ) + ['user' => $currentUser]);
     }
 
-    /**
-     * Show the form for creating a new user
-     */
-    public function create()
+    public function create(): View
     {
-        $user = Auth::guard('user')->user();
-        $departments = collect([]);
-        $roles = ['admin', 'manager', 'cashier', 'stock_keeper'];
-        
-        return view('pages.users.create', compact('user', 'departments', 'roles'));
+        $currentUser = Auth::guard('user')->user();
+        $departments = Department::orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+
+        return view('pages.users.create-edit', [
+            'currentUser' => $currentUser,
+            'user' => $currentUser,
+            'targetUser' => null,
+            'departments' => $departments,
+            'roles' => $roles,
+        ]);
     }
 
-    /**
-     * Store a newly created user
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        $roleSlugs = $this->allowedRoleSlugs();
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'password' => ['required', 'confirmed', Password::min(8)],
-            'role' => 'required|in:admin,manager,cashier,stock_keeper',
+            'role' => ['required', Rule::in($roleSlugs)],
+            'department_id' => 'nullable|exists:departments,id',
             'hire_date' => 'required|date',
             'hourly_rate' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
             'emergency_contact' => 'nullable|string|max:255',
             'emergency_phone' => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|max:2048',
-            'permissions' => 'nullable|array'
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|max:100',
+            'status' => 'nullable|in:active,inactive',
         ]);
-        
-        // Hash password
+
         $validated['password'] = Hash::make($validated['password']);
-        
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') || ($request->status === 'active');
-        
-        // Handle profile photo upload
+        $validated['is_active'] = ($request->status ?? 'active') === 'active';
+        $validated['permissions'] = array_values(array_unique($validated['permissions'] ?? []));
+
         if ($request->hasFile('profile_photo')) {
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $validated['profile_photo'] = $path;
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
         }
-        
-        // Convert permissions array to JSON
-        if (isset($validated['permissions'])) {
-            $validated['permissions'] = json_encode($validated['permissions']);
-        }
-        
-        // Create user
+
         User::create($validated);
-        
+
         return redirect()->route('users.index')
-            ->with('success', 'User created successfully!');
+            ->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified user
-     */
-    public function show($id)
+    public function show(int $id): View
     {
-        $user = Auth::guard('user')->user();
-        $targetUser = User::findOrFail($id);
-        
-        return view('pages.users.show', compact('user', 'targetUser'));
+        $currentUser = Auth::guard('user')->user();
+        $targetUser = User::with(['department', 'roleRecord'])->findOrFail($id);
+
+        return view('pages.users.show', compact('currentUser', 'targetUser') + ['user' => $currentUser]);
     }
 
-    /**
-     * Show the form for editing the specified user
-     */
-    public function edit($id)
+    public function edit(int $id): View
     {
-        $user = Auth::guard('user')->user();
+        $currentUser = Auth::guard('user')->user();
         $targetUser = User::findOrFail($id);
-        $departments = collect([]);
-        $roles = ['admin', 'manager', 'cashier', 'stock_keeper'];
-        
-        // Decode permissions if JSON
-        if ($targetUser->permissions) {
-            $targetUser->permissions = is_string($targetUser->permissions) 
-                ? json_decode($targetUser->permissions, true) 
-                : $targetUser->permissions;
-        }
-        
-        return view('pages.users.edit', compact('user', 'targetUser', 'departments', 'roles'));
+        $departments = Department::orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+
+        return view('pages.users.create-edit', compact('currentUser', 'targetUser', 'departments', 'roles') + ['user' => $currentUser]);
     }
 
-    /**
-     * Update the specified user
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $targetUser = User::findOrFail($id);
-        
+        $roleSlugs = $this->allowedRoleSlugs();
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $targetUser->id,
             'phone' => 'nullable|string|max:20',
             'password' => ['nullable', 'confirmed', Password::min(8)],
-            'role' => 'required|in:admin,manager,cashier,stock_keeper',
+            'role' => ['required', Rule::in($roleSlugs)],
+            'department_id' => 'nullable|exists:departments,id',
             'hire_date' => 'required|date',
             'hourly_rate' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
             'emergency_contact' => 'nullable|string|max:255',
             'emergency_phone' => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|max:2048',
-            'permissions' => 'nullable|array'
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|max:100',
+            'status' => 'nullable|in:active,inactive',
         ]);
-        
-        // Hash password if provided
+
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
         }
-        
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') || ($request->status === 'active');
-        
-        // Handle profile photo upload
+
+        $validated['is_active'] = ($request->status ?? ($targetUser->is_active ? 'active' : 'inactive')) === 'active';
+        $validated['permissions'] = array_values(array_unique($validated['permissions'] ?? []));
+
         if ($request->hasFile('profile_photo')) {
             if ($targetUser->profile_photo) {
                 Storage::disk('public')->delete($targetUser->profile_photo);
             }
-            
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $validated['profile_photo'] = $path;
+
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
         }
-        
-        // Convert permissions array to JSON
-        if (isset($validated['permissions'])) {
-            $validated['permissions'] = json_encode($validated['permissions']);
-        }
-        
-        // Update user
+
         $targetUser->update($validated);
-        
+
         return redirect()->route('users.index')
-            ->with('success', 'User updated successfully!');
+            ->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified user
-     */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $targetUser = User::findOrFail($id);
-        $userName = $targetUser->first_name . ' ' . $targetUser->last_name;
-        
-        // Delete profile photo if exists
+
+        if ((int) Auth::guard('user')->id() === $targetUser->id) {
+            return redirect()->route('users.index')
+                ->with('error', 'You cannot delete your own account while logged in.');
+        }
+
+        $userName = $targetUser->full_name;
+
         if ($targetUser->profile_photo) {
             Storage::disk('public')->delete($targetUser->profile_photo);
         }
-        
+
         $targetUser->delete();
-        
+
         return redirect()->route('users.index')
-            ->with('success', "User {$userName} deleted successfully!");
+            ->with('success', "User {$userName} deleted successfully.");
     }
 
-    /**
-     * Show user activity log
-     */
-    public function activity(Request $request)
+    public function activity(Request $request): View
     {
-        $user = Auth::guard('user')->user();
+        $currentUser = Auth::guard('user')->user();
         $activities = collect([]);
-        
-        return view('pages.users.activity', compact('user', 'activities'));
+
+        return view('pages.users.activity', compact('currentUser', 'activities') + ['user' => $currentUser]);
     }
 
-    /**
-     * Show security settings
-     */
-    public function security()
+    public function security(): View
     {
-        $user = Auth::guard('user')->user();
-        
-        return view('pages.users.security', compact('user'));
+        $currentUser = Auth::guard('user')->user();
+
+        return view('pages.users.security', compact('currentUser') + ['user' => $currentUser]);
     }
 
-    /**
-     * Import users from CSV/Excel
-     */
-    public function import(Request $request)
+    public function import(Request $request): RedirectResponse
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,xlsx,xls|max:5120'
+            'file' => 'required|file|mimes:csv,txt|max:5120',
         ]);
-        
-        // TODO: Implement import logic
-        
+
+        $roleSlugs = $this->allowedRoleSlugs();
+        $file = fopen($request->file('file')->getRealPath(), 'r');
+
+        if ($file === false) {
+            return redirect()->route('users.index')
+                ->with('error', 'Unable to read uploaded file.');
+        }
+
+        $header = fgetcsv($file);
+        if ($header === false) {
+            fclose($file);
+            return redirect()->route('users.index')
+                ->with('error', 'CSV file is empty.');
+        }
+
+        $header = array_map(fn ($value) => strtolower(trim((string) $value)), $header);
+
+        $required = ['first_name', 'last_name', 'email', 'role', 'hire_date'];
+        foreach ($required as $column) {
+            if (!in_array($column, $header, true)) {
+                fclose($file);
+                return redirect()->route('users.index')
+                    ->with('error', "Missing required column: {$column}");
+            }
+        }
+
+        $processed = 0;
+        $created = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        while (($row = fgetcsv($file)) !== false) {
+            $processed++;
+            $data = [];
+
+            foreach ($header as $index => $column) {
+                $data[$column] = isset($row[$index]) ? trim((string) $row[$index]) : null;
+            }
+
+            if (!filter_var($data['email'] ?? null, FILTER_VALIDATE_EMAIL)) {
+                $skipped++;
+                continue;
+            }
+
+            if (!in_array($data['role'], $roleSlugs, true)) {
+                $skipped++;
+                continue;
+            }
+
+            $departmentId = null;
+            if (!empty($data['department_id']) && is_numeric($data['department_id'])) {
+                $departmentId = Department::where('id', (int) $data['department_id'])->value('id');
+            }
+
+            $payload = [
+                'first_name' => $data['first_name'] ?: 'N/A',
+                'last_name' => $data['last_name'] ?: 'N/A',
+                'phone' => $data['phone'] ?: null,
+                'role' => $data['role'],
+                'department_id' => $departmentId,
+                'hire_date' => $this->safeDate($data['hire_date']),
+                'hourly_rate' => is_numeric($data['hourly_rate'] ?? null) ? $data['hourly_rate'] : null,
+                'address' => $data['address'] ?: null,
+                'emergency_contact' => $data['emergency_contact'] ?: null,
+                'emergency_phone' => $data['emergency_phone'] ?: null,
+                'is_active' => !isset($data['is_active']) || in_array(strtolower((string) $data['is_active']), ['1', 'true', 'yes', 'active'], true),
+            ];
+
+            $existingUser = User::where('email', $data['email'])->first();
+
+            if ($existingUser) {
+                $existingUser->update($payload);
+                $updated++;
+                continue;
+            }
+
+            $payload['email'] = $data['email'];
+            $payload['password'] = Hash::make($data['password'] ?: Str::random(12));
+            $payload['permissions'] = [];
+
+            User::create($payload);
+            $created++;
+        }
+
+        fclose($file);
+
         return redirect()->route('users.index')
-            ->with('success', 'Users imported successfully!');
+            ->with('success', "Import complete: {$created} created, {$updated} updated, {$skipped} skipped ({$processed} rows processed).");
     }
 
-    /**
-     * Export users to CSV
-     */
     public function export(Request $request)
     {
-        $users = User::all();
+        $users = User::with('department')->get();
         $filename = 'users_' . date('Y-m-d_His') . '.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
-        
-        $callback = function() use ($users) {
+
+        $callback = static function () use ($users) {
             $file = fopen('php://output', 'w');
-            
-            fputcsv($file, ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Role', 'Active', 'Hire Date']);
-            
-            foreach ($users as $user) {
+
+            fputcsv($file, ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Role', 'Department', 'Active', 'Hire Date']);
+
+            foreach ($users as $exportUser) {
                 fputcsv($file, [
-                    $user->id,
-                    $user->first_name,
-                    $user->last_name,
-                    $user->email,
-                    $user->phone,
-                    $user->role,
-                    $user->is_active ? 'Yes' : 'No',
-                    $user->hire_date
+                    $exportUser->id,
+                    $exportUser->first_name,
+                    $exportUser->last_name,
+                    $exportUser->email,
+                    $exportUser->phone,
+                    $exportUser->role,
+                    $exportUser->department?->name,
+                    $exportUser->is_active ? 'Yes' : 'No',
+                    $exportUser->hire_date,
                 ]);
             }
-            
+
             fclose($file);
         };
-        
+
         return response()->stream($callback, 200, $headers);
     }
 
-    /**
-     * Download CSV template
-     */
     public function downloadTemplate()
     {
         $filename = 'user_import_template.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
-        
-        $callback = function() {
+
+        $callback = static function () {
             $file = fopen('php://output', 'w');
-            
-            fputcsv($file, ['first_name', 'last_name', 'email', 'phone', 'role', 'hire_date', 'hourly_rate', 'address']);
-            fputcsv($file, ['John', 'Doe', 'john@example.com', '1234567890', 'cashier', '2024-01-01', '50.00', '123 Main St']);
-            
+
+            fputcsv($file, ['first_name', 'last_name', 'email', 'phone', 'role', 'department_id', 'hire_date', 'hourly_rate', 'address', 'emergency_contact', 'emergency_phone', 'is_active']);
+            fputcsv($file, ['John', 'Doe', 'john@example.com', '+2348000000000', 'cashier', '1', '2025-01-01', '50.00', '123 Main St', 'Jane Doe', '+2348000000001', 'true']);
+
             fclose($file);
         };
-        
+
         return response()->stream($callback, 200, $headers);
     }
 
-    /**
-     * Bulk operations
-     */
-    public function bulkActivate(Request $request)
-    {
-        $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id'
-        ]);
-        
-        User::whereIn('id', $request->user_ids)->update(['is_active' => true]);
-        
-        return redirect()->route('users.index')
-            ->with('success', count($request->user_ids) . ' user(s) activated!');
-    }
-
-    public function bulkSuspend(Request $request)
-    {
-        $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id'
-        ]);
-        
-        User::whereIn('id', $request->user_ids)->update(['is_active' => false]);
-        
-        return redirect()->route('users.index')
-            ->with('success', count($request->user_ids) . ' user(s) suspended!');
-    }
-
-    public function bulkDelete(Request $request)
-    {
-        $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id'
-        ]);
-        
-        User::whereIn('id', $request->user_ids)->delete();
-        
-        return redirect()->route('users.index')
-            ->with('success', count($request->user_ids) . ' user(s) deleted!');
-    }
-
-    public function bulkAssignRole(Request $request)
+    public function bulkActivate(Request $request): RedirectResponse
     {
         $request->validate([
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
-            'role' => 'required|in:admin,manager,cashier,stock_keeper'
         ]);
-        
-        User::whereIn('id', $request->user_ids)->update(['role' => $request->role]);
-        
+
+        User::whereIn('id', $request->user_ids)->update(['is_active' => true]);
+
         return redirect()->route('users.index')
-            ->with('success', count($request->user_ids) . ' user(s) role updated!');
+            ->with('success', count($request->user_ids) . ' user(s) activated.');
     }
 
-    /**
-     * User permissions
-     */
-    public function permissions($id)
+    public function bulkSuspend(Request $request): RedirectResponse
     {
-        $user = Auth::guard('user')->user();
-        $targetUser = User::findOrFail($id);
-        
-        if ($targetUser->permissions) {
-            $targetUser->permissions = is_string($targetUser->permissions) 
-                ? json_decode($targetUser->permissions, true) 
-                : $targetUser->permissions;
-        }
-        
-        return view('pages.users.permissions', compact('user', 'targetUser'));
-    }
-
-    public function updatePermissions(Request $request, $id)
-    {
-        $targetUser = User::findOrFail($id);
-        
         $request->validate([
-            'permissions' => 'nullable|array'
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
         ]);
-        
-        $targetUser->update([
-            'permissions' => json_encode($request->permissions ?? [])
-        ]);
-        
+
+        User::whereIn('id', $request->user_ids)->update(['is_active' => false]);
+
         return redirect()->route('users.index')
-            ->with('success', 'User permissions updated!');
+            ->with('success', count($request->user_ids) . ' user(s) suspended.');
+    }
+
+    public function bulkDelete(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $currentUserId = Auth::guard('user')->id();
+        $ids = collect($request->user_ids)->reject(fn ($id) => (int) $id === (int) $currentUserId)->values();
+
+        User::whereIn('id', $ids)->delete();
+
+        return redirect()->route('users.index')
+            ->with('success', $ids->count() . ' user(s) deleted.');
+    }
+
+    public function bulkAssignRole(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+            'role' => ['required', Rule::in($this->allowedRoleSlugs())],
+        ]);
+
+        User::whereIn('id', $request->user_ids)->update(['role' => $request->role]);
+
+        return redirect()->route('users.index')
+            ->with('success', count($request->user_ids) . ' user(s) role updated.');
+    }
+
+    public function permissions(int $id): View
+    {
+        $currentUser = Auth::guard('user')->user();
+        $targetUser = User::findOrFail($id);
+
+        return view('pages.users.permissions', compact('currentUser', 'targetUser') + ['user' => $currentUser]);
+    }
+
+    public function updatePermissions(Request $request, int $id): RedirectResponse
+    {
+        $targetUser = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|max:100',
+        ]);
+
+        $targetUser->update([
+            'permissions' => array_values(array_unique($validated['permissions'] ?? [])),
+        ]);
+
+        return redirect()->route('users.permissions', $targetUser->id)
+            ->with('success', 'User permissions updated.');
+    }
+
+    private function safeDate(?string $value): string
+    {
+        try {
+            return Carbon::parse($value)->toDateString();
+        } catch (\Throwable $e) {
+            return now()->toDateString();
+        }
+    }
+
+    private function allowedRoleSlugs(): array
+    {
+        $slugs = Role::query()->pluck('slug')->all();
+
+        if ($slugs === []) {
+            return ['admin', 'manager', 'cashier', 'stock_keeper'];
+        }
+
+        return $slugs;
     }
 }

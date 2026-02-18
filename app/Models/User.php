@@ -36,6 +36,7 @@ class User extends Authenticatable
         'emergency_phone',
         'permissions',
         'profile_photo',
+        'last_login_at',
     ];
 
     /**
@@ -60,6 +61,7 @@ class User extends Authenticatable
         'hire_date' => 'date',
         'termination_date' => 'date',
         'permissions' => 'array',
+        'last_login_at' => 'datetime',
     ];
 
     /**
