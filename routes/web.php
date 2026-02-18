@@ -167,6 +167,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
             Route::get('/{id}/adjust', [InventoryController::class, 'adjust'])->name('adjust');
             Route::post('/{id}/adjust', [InventoryController::class, 'processAdjustment'])->name('process-adjustment');
             Route::get('/low-stock', [InventoryController::class, 'lowStock'])->name('low-stock');
+            Route::get('/purchase-order', [InventoryController::class, 'purchaseOrder'])->name('purchase-order');
             
             // AJAX endpoints
             Route::get('/export/csv', [InventoryController::class, 'export'])->name('export');
@@ -278,6 +279,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
             Route::get('/{id}/adjust', [StoreInventoryController::class, 'adjust'])->name('adjust');
             Route::post('/{id}/adjust', [StoreInventoryController::class, 'processAdjustment'])->name('process-adjustment');
             Route::get('/low-stock', [StoreInventoryController::class, 'lowStock'])->name('low-stock');
+            Route::get('/purchase-order', [StoreInventoryController::class, 'purchaseOrder'])->name('purchase-order');
             
             // AJAX endpoints
             Route::get('/export/csv', [StoreInventoryController::class, 'export'])->name('export');

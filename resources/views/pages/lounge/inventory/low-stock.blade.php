@@ -459,15 +459,16 @@ function submitBulkRestock() {
 }
 
 function generatePurchaseOrder() {
-    const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'));
+    const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+        .map(cb => cb.value);
     
     if (selectedProducts.length === 0) {
         alert('Please select products to generate purchase order');
         return;
     }
-    
-    alert('Purchase Order generation coming soon!');
-    // This would generate a PO document with all selected items
+
+    const ids = encodeURIComponent(selectedProducts.join(','));
+    window.location.href = `{{ route('lounge.inventory.purchase-order') }}?ids=${ids}`;
 }
 
 function exportLowStock() {
