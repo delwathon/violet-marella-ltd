@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\SecuritySettings;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -66,7 +66,7 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $authSettings = Cache::get('auth_settings', []);
+        $authSettings = SecuritySettings::authSettings();
         $maxLoginAttempts = max(1, (int)($authSettings['max_login_attempts'] ?? 5));
         $lockoutMinutes = max(1, (int)($authSettings['lockout_duration'] ?? 30));
 

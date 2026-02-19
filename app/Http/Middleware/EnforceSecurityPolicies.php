@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\SecuritySettings;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,20 +15,21 @@ class EnforceSecurityPolicies
     {
         $ip = $request->ip();
 
-        $blacklist = Cache::get('ip_blacklist', []);
+        $blacklist = SecuritySettings::ipBlacklist();
         if ($this->matchesIpList($ip, $blacklist, 'ip')) {
             abort(403, 'Access denied from this IP address.');
         }
 
-        $whitelistEnabled = (bool) Cache::get('ip_whitelist_enabled', false);
-        $whitelist = Cache::get('ip_whitelist', []);
+        $authSettings = SecuritySettings::authSettings();
+        $whitelistEnabled = (bool) ($authSettings['enable_ip_whitelist'] ?? false)
+            || (bool) Cache::get('ip_whitelist_enabled', false);
+        $whitelist = SecuritySettings::ipWhitelist();
         if ($whitelistEnabled && $whitelist !== [] && !$this->matchesIpList($ip, $whitelist, 'ip')) {
             abort(403, 'Your IP address is not authorized.');
         }
 
         if (Auth::guard('user')->check()) {
-            $settings = Cache::get('auth_settings', []);
-            $timeoutMinutes = max(5, (int) ($settings['session_timeout'] ?? 120));
+            $timeoutMinutes = max(5, (int) ($authSettings['session_timeout'] ?? 120));
 
             $now = now()->timestamp;
             $lastActivity = (int) $request->session()->get('last_activity_at', $now);

@@ -6,11 +6,11 @@ use App\Models\ActivityLog;
 use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\SecuritySettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -288,31 +288,11 @@ class UserController extends Controller
     public function security(): View
     {
         $currentUser = Auth::guard('user')->user();
-        $passwordPolicy = Cache::get('password_policy', [
-            'min_length' => 8,
-            'require_uppercase' => true,
-            'require_lowercase' => true,
-            'require_numbers' => true,
-            'require_special' => false,
-            'password_expiry' => 90,
-            'password_history' => 5,
-        ]);
-        $authSettings = Cache::get('auth_settings', [
-            'enable_2fa' => false,
-            'force_2fa_admins' => false,
-            'session_timeout' => 120,
-            'max_login_attempts' => 5,
-            'lockout_duration' => 30,
-            'enable_ip_whitelist' => false,
-        ]);
-        $auditLogSettings = Cache::get('audit_log_settings', [
-            'log_retention' => 365,
-            'log_logins' => true,
-            'log_changes' => true,
-            'log_deletions' => true,
-        ]);
-        $whitelist = Cache::get('ip_whitelist', []);
-        $blacklist = Cache::get('ip_blacklist', []);
+        $passwordPolicy = SecuritySettings::passwordPolicy();
+        $authSettings = SecuritySettings::authSettings();
+        $auditLogSettings = SecuritySettings::auditLogSettings();
+        $whitelist = SecuritySettings::ipWhitelist();
+        $blacklist = SecuritySettings::ipBlacklist();
 
         return view('pages.users.security', compact(
             'currentUser',

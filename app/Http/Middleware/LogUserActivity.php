@@ -3,10 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Models\ActivityLog;
+use App\Support\SecuritySettings;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogUserActivity
@@ -15,12 +15,7 @@ class LogUserActivity
     {
         $response = $next($request);
 
-        $auditSettings = Cache::get('audit_log_settings', [
-            'log_retention' => 365,
-            'log_logins' => true,
-            'log_changes' => true,
-            'log_deletions' => true,
-        ]);
+        $auditSettings = SecuritySettings::auditLogSettings();
 
         $routeName = $request->route()?->getName();
         $method = strtoupper($request->method());

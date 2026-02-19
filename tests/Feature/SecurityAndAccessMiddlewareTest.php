@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\LogUserActivity;
 use App\Models\User;
+use App\Support\SecuritySettings;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
@@ -58,7 +59,10 @@ class SecurityAndAccessMiddlewareTest extends TestCase
 
     public function test_whitelist_enforcement_blocks_non_whitelisted_ip(): void
     {
-        Cache::put('ip_whitelist_enabled', true);
+        Cache::put('auth_settings', array_merge(
+            SecuritySettings::authSettingsDefaults(),
+            ['enable_ip_whitelist' => true]
+        ));
         Cache::put('ip_whitelist', [
             ['ip' => '10.0.0.1', 'description' => 'Allowed network'],
         ]);

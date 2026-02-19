@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SecuritySettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class SecurityController extends Controller
 {
@@ -31,7 +31,7 @@ class SecurityController extends Controller
             'password_history' => (int) $request->password_history,
         ];
 
-        Cache::put('password_policy', $settings, now()->addYears(1));
+        SecuritySettings::persistPasswordPolicy($settings);
 
         return redirect()->route('users.security')
             ->with('success', 'Password policy updated successfully.');
@@ -57,8 +57,7 @@ class SecurityController extends Controller
             'enable_ip_whitelist' => $request->boolean('enable_ip_whitelist'),
         ];
 
-        Cache::put('auth_settings', $settings, now()->addYears(1));
-        Cache::put('ip_whitelist_enabled', $settings['enable_ip_whitelist'], now()->addYears(1));
+        SecuritySettings::persistAuthSettings($settings);
 
         return redirect()->route('users.security')
             ->with('success', 'Authentication settings updated successfully.');
@@ -80,7 +79,7 @@ class SecurityController extends Controller
             'log_deletions' => $request->boolean('log_deletions'),
         ];
 
-        Cache::put('audit_log_settings', $settings, now()->addYears(1));
+        SecuritySettings::persistAuditLogSettings($settings);
 
         return redirect()->route('users.security')
             ->with('success', 'Audit log settings updated successfully.');
@@ -99,7 +98,7 @@ class SecurityController extends Controller
         }
 
         $ip = trim($request->ip_address);
-        $whitelist = Cache::get('ip_whitelist', []);
+        $whitelist = SecuritySettings::ipWhitelist();
 
         foreach ($whitelist as $entry) {
             if (($entry['ip'] ?? null) === $ip) {
@@ -114,7 +113,7 @@ class SecurityController extends Controller
             'added_at' => now()->toDateTimeString(),
         ];
 
-        Cache::put('ip_whitelist', $whitelist, now()->addYears(1));
+        SecuritySettings::persistIpWhitelist($whitelist);
 
         return redirect()->route('users.security')
             ->with('success', 'IP added to whitelist successfully.');
@@ -122,11 +121,11 @@ class SecurityController extends Controller
 
     public function removeIpWhitelist(int $index): RedirectResponse
     {
-        $whitelist = Cache::get('ip_whitelist', []);
+        $whitelist = SecuritySettings::ipWhitelist();
 
         if (isset($whitelist[$index])) {
             unset($whitelist[$index]);
-            Cache::put('ip_whitelist', array_values($whitelist), now()->addYears(1));
+            SecuritySettings::persistIpWhitelist(array_values($whitelist));
         }
 
         return redirect()->route('users.security')
@@ -146,7 +145,7 @@ class SecurityController extends Controller
         }
 
         $ip = trim($request->ip_address);
-        $blacklist = Cache::get('ip_blacklist', []);
+        $blacklist = SecuritySettings::ipBlacklist();
 
         foreach ($blacklist as $entry) {
             if (($entry['ip'] ?? null) === $ip) {
@@ -162,7 +161,7 @@ class SecurityController extends Controller
             'blocked_by' => Auth::guard('user')->id(),
         ];
 
-        Cache::put('ip_blacklist', $blacklist, now()->addYears(1));
+        SecuritySettings::persistIpBlacklist($blacklist);
 
         return redirect()->route('users.security')
             ->with('success', 'IP blocked successfully.');
@@ -170,11 +169,11 @@ class SecurityController extends Controller
 
     public function removeIpBlacklist(int $index): RedirectResponse
     {
-        $blacklist = Cache::get('ip_blacklist', []);
+        $blacklist = SecuritySettings::ipBlacklist();
 
         if (isset($blacklist[$index])) {
             unset($blacklist[$index]);
-            Cache::put('ip_blacklist', array_values($blacklist), now()->addYears(1));
+            SecuritySettings::persistIpBlacklist(array_values($blacklist));
         }
 
         return redirect()->route('users.security')
