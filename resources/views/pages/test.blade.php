@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <!-- Add test dashboard widgets, cards, and layout as needed, matching vb/test.html structure -->
+        <!-- Add test dashboard widgets, cards, and layout as needed. -->
     </div>
 </div>
 @endsection
