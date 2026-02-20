@@ -792,6 +792,11 @@
 </div>
 
 @push('scripts')
+<script>
+window.anireCraftStoreConfig = {
+    basePath: @json(route('anire-craft-store.index'))
+};
+</script>
 <script src="{{ asset('assets/js/anire-craft-store-laravel.js') }}"></script>
 @endpush
 @endsection

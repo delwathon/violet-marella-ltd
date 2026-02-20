@@ -430,13 +430,13 @@
                                         <td>{{ $customer->formatted_total_spent }}</td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('prop-rental.lounge.customers.show', $customer->id) }}" class="btn btn-outline-primary" title="View">
+                                                <a href="{{ route('prop-rental.customers.show', $customer->id) }}" class="btn btn-outline-primary" title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#newRentalModal" onclick="setCustomerInModal({{ $customer->id }})" title="New Rental">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
-                                                <a href="{{ route('prop-rental.lounge.customers.edit', $customer->id) }}" class="btn btn-outline-info" title="Edit">
+                                                <a href="{{ route('prop-rental.customers.edit', $customer->id) }}" class="btn btn-outline-info" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </div>
@@ -606,6 +606,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (startDateInput) startDateInput.addEventListener('change', calculateRentalAmount);
     if (endDateInput) endDateInput.addEventListener('change', calculateRentalAmount);
     if (propSelect) propSelect.addEventListener('change', calculateRentalAmount);
+
+    const formContext = @json(old('form_context'));
+    if (formContext === 'new_rental') {
+        const rentalModalElement = document.getElementById('newRentalModal');
+        if (rentalModalElement) {
+            const rentalModal = new bootstrap.Modal(rentalModalElement);
+            rentalModal.show();
+        }
+    } else if (formContext === 'new_customer') {
+        const customersTabTrigger = document.querySelector('#customers-tab');
+        if (customersTabTrigger) {
+            const customerTab = new bootstrap.Tab(customersTabTrigger);
+            customerTab.show();
+        }
+
+        const customerModalElement = document.getElementById('newCustomerModal');
+        if (customerModalElement) {
+            const customerModal = new bootstrap.Modal(customerModalElement);
+            customerModal.show();
+        }
+    } else if (formContext === 'new_prop') {
+        const propModalElement = document.getElementById('newPropModal');
+        if (propModalElement) {
+            const propModal = new bootstrap.Modal(propModalElement);
+            propModal.show();
+        }
+    }
 });
 </script>
 @endpush

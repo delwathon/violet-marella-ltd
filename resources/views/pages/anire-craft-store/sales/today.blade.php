@@ -235,7 +235,7 @@ new Chart(ctx, {
 });
 
 function printReceipt(saleId) {
-    window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
+    window.open(`{{ route('anire-craft-store.sales.index') }}/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

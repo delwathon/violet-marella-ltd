@@ -691,7 +691,7 @@ async function submitStockAdjustment() {
     }
     
     try {
-        const response = await fetch('/app/lounge/products/{{ $product->id }}/adjust-stock', {
+        const response = await fetch('{{ route('lounge.products.adjust-stock', $product->id) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -891,7 +891,7 @@ function deleteProduct() {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/app/lounge/products/{{ $product->id }}';
+    form.action = '{{ route('lounge.products.destroy', $product->id) }}';
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

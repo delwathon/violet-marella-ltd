@@ -113,15 +113,15 @@
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRentalModal" onclick="setCustomerInModal({{ $customer->id }})">
                             <i class="fas fa-plus me-2"></i>New Rental
                         </button>
-                        <a href="{{ route('prop-rental.lounge.customers.edit', $customer->id) }}" class="btn btn-outline-info">
+                        <a href="{{ route('prop-rental.customers.edit', $customer->id) }}" class="btn btn-outline-info">
                             <i class="fas fa-edit me-2"></i>Edit Details
                         </a>
                         @if($customer->status == 'active' && $customer->current_rentals == 0)
-                        <a href="{{ route('prop-rental.lounge.customers.deactivate-form', $customer->id) }}" class="btn btn-outline-danger">
+                        <a href="{{ route('prop-rental.customers.deactivate-form', $customer->id) }}" class="btn btn-outline-danger">
                             <i class="fas fa-ban me-2"></i>Deactivate
                         </a>
                         @elseif($customer->status == 'inactive')
-                        <form action="{{ route('prop-rental.lounge.customers.activate', $customer->id) }}" method="POST">
+                        <form action="{{ route('prop-rental.customers.activate', $customer->id) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-outline-success w-100">
                                 <i class="fas fa-check me-2"></i>Activate

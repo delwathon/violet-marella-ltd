@@ -17,17 +17,17 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="name" placeholder="e.g., Classic, Deluxe" required>
+                        <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="e.g., Classic, Deluxe" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Color Code</label>
-                        <input type="color" class="form-control form-control-color" name="color" value="#6f42c1">
+                        <input type="color" class="form-control form-control-color" name="color" value="{{ old('color', '#6f42c1') }}">
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Description</label>
-                    <textarea class="form-control" name="description" rows="2"></textarea>
+                    <textarea class="form-control" name="description" rows="2">{{ old('description') }}</textarea>
                 </div>
 
                 <hr>
@@ -36,11 +36,11 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Base Time (minutes) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="base_time" value="30" min="10" required>
+                        <input type="number" class="form-control" name="base_time" value="{{ old('base_time', 30) }}" min="10" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Base Price (₦) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="base_price" value="30000" min="0" required>
+                        <input type="number" class="form-control" name="base_price" value="{{ old('base_price', 30000) }}" min="0" required>
                     </div>
                 </div>
 
@@ -50,18 +50,18 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Max Occupants <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="max_occupants" value="4" min="1" required>
+                        <input type="number" class="form-control" name="max_occupants" value="{{ old('max_occupants', 4) }}" min="1" required>
                         <small class="text-muted">Maximum people allowed per session</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Max Concurrent Sessions <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="max_concurrent_sessions" value="3" min="1" required>
+                        <input type="number" class="form-control" name="max_concurrent_sessions" value="{{ old('max_concurrent_sessions', 3) }}" min="1" required>
                         <small class="text-muted">How many sessions can run at once</small>
                     </div>
                 </div>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
+                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active" {{ old('is_active', true) ? 'checked' : '' }}>
                     <label class="form-check-label" for="is_active">Active (available for booking)</label>
                 </div>
             </div>

@@ -74,7 +74,7 @@ class CategoryController extends Controller
             
             Category::create($data);
             
-            return redirect()->route('categories.index')
+            return redirect()->route('lounge.categories.index')
                 ->with('success', 'Category created successfully.');
                 
         } catch (\Exception $e) {
@@ -138,7 +138,7 @@ class CategoryController extends Controller
             
             $category->update($data);
             
-            return redirect()->route('categories.index')
+            return redirect()->route('lounge.categories.index')
                 ->with('success', 'Category updated successfully.');
                 
         } catch (\Exception $e) {
@@ -167,7 +167,7 @@ class CategoryController extends Controller
             
             $category->delete();
             
-            return redirect()->route('categories.index')
+            return redirect()->route('lounge.categories.index')
                 ->with('success', 'Category deleted successfully.');
                 
         } catch (\Exception $e) {

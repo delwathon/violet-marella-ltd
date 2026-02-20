@@ -153,7 +153,7 @@ class InventoryController extends Controller
             
             DB::commit();
             
-            return redirect()->route('inventory.index')
+            return redirect()->route('lounge.inventory.index')
                 ->with('success', 'Stock adjusted successfully.');
                 
         } catch (\Exception $e) {

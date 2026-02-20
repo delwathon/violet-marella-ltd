@@ -11,7 +11,7 @@
                 <p class="page-subtitle">{{ $customer->name }}</p>
             </div>
             <div class="col-auto">
-                <a href="{{ route('prop-rental.lounge.customers.show', $customer->id) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('prop-rental.customers.show', $customer->id) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back
                 </a>
             </div>
@@ -27,7 +27,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('prop-rental.lounge.customers.update', $customer->id) }}" method="POST">
+                    <form action="{{ route('prop-rental.customers.update', $customer->id) }}" method="POST">
                         @csrf
                         @method('PUT')
                         
@@ -92,7 +92,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Update Customer
                             </button>
-                            <a href="{{ route('prop-rental.lounge.customers.show', $customer->id) }}" class="btn btn-secondary">
+                            <a href="{{ route('prop-rental.customers.show', $customer->id) }}" class="btn btn-secondary">
                                 Cancel
                             </a>
                         </div>

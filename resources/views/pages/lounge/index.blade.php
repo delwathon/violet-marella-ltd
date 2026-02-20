@@ -792,6 +792,11 @@
 </div>
 
 @push('scripts')
+<script>
+window.loungeConfig = {
+    basePath: @json(route('lounge.index'))
+};
+</script>
 <script src="{{ asset('assets/js/lounge-laravel.js') }}"></script>
 @endpush
 @endsection

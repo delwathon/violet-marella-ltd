@@ -63,7 +63,7 @@ class StudioSessionController extends Controller
     public function show($id)
     {
         $user = Auth::guard('user')->user();
-        $session = StudioSession::with(['category', 'customer', 'payments', 'creator', 'checkoutStaff'])
+        $session = StudioSession::with(['category', 'customer', 'payments.receivedBy', 'creator', 'checkoutStaff'])
                                 ->findOrFail($id);
         
         return view('pages.photo-studio.sessions.show', compact('user', 'session'));
@@ -91,7 +91,7 @@ class StudioSessionController extends Controller
         $payment = $session->processPayment(
             $validated['amount'],
             $validated['payment_method'],
-            auth()->id()
+            Auth::guard('user')->id()
         );
 
         return response()->json([

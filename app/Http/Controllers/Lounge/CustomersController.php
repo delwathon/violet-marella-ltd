@@ -97,7 +97,7 @@ class CustomersController extends Controller
             
             $customer = Customer::create($data);
             
-            return redirect()->route('customers.index')
+            return redirect()->route('lounge.customers.index')
                 ->with('success', 'Customer created successfully.');
                 
         } catch (\Exception $e) {
@@ -193,7 +193,7 @@ class CustomersController extends Controller
             
             $customer->update($data);
             
-            return redirect()->route('customers.index')
+            return redirect()->route('lounge.customers.index')
                 ->with('success', 'Customer updated successfully.');
                 
         } catch (\Exception $e) {
@@ -217,7 +217,7 @@ class CustomersController extends Controller
             
             $customer->delete();
             
-            return redirect()->route('customers.index')
+            return redirect()->route('lounge.customers.index')
                 ->with('success', 'Customer deleted successfully.');
                 
         } catch (\Exception $e) {

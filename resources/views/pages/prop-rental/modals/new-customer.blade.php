@@ -1,8 +1,9 @@
 <div class="modal fade" id="newCustomerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('prop-rental.lounge.customers.store') }}" method="POST">
+            <form action="{{ route('prop-rental.customers.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="form_context" value="new_customer">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

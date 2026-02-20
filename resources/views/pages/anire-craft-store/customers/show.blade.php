@@ -400,7 +400,7 @@ async function submitPointsAdjustment() {
     }
     
     try {
-        const response = await fetch('/app/anire-craft-store/customers/{{ $customer->id }}/loyalty', {
+        const response = await fetch('{{ route('anire-craft-store.customers.adjust-loyalty', $customer->id) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -494,7 +494,7 @@ function deleteCustomer() {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/app/anire-craft-store/customers/{{ $customer->id }}';
+    form.action = '{{ route('anire-craft-store.customers.destroy', $customer->id) }}';
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
@@ -513,7 +513,7 @@ function deleteCustomer() {
 }
 
 function printReceipt(saleId) {
-    window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
+    window.open(`{{ route('anire-craft-store.sales.index') }}/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

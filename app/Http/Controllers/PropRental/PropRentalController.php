@@ -195,6 +195,42 @@ class PropRentalController extends Controller
             });
         }
     }
+
+    /**
+     * Get revenue trend for an arbitrary custom date range
+     */
+    private function getRevenueTrendForDateRange(Carbon $startDate, Carbon $endDate)
+    {
+        $startDate = $startDate->copy()->startOfDay();
+        $endDate = $endDate->copy()->endOfDay();
+        $dayDiff = $startDate->diffInDays($endDate);
+
+        if ($dayDiff <= 31) {
+            return collect(range(0, $dayDiff))->map(function ($offset) use ($startDate) {
+                $date = $startDate->copy()->addDays($offset);
+
+                return [
+                    'label' => $date->format('j M'),
+                    'revenue' => PropRental::whereDate('created_at', $date)->sum('total_amount'),
+                ];
+            });
+        }
+
+        $startMonth = $startDate->copy()->startOfMonth();
+        $endMonth = $endDate->copy()->startOfMonth();
+        $monthDiff = $startMonth->diffInMonths($endMonth);
+
+        return collect(range(0, $monthDiff))->map(function ($offset) use ($startMonth) {
+            $month = $startMonth->copy()->addMonths($offset);
+
+            return [
+                'label' => $month->format('M Y'),
+                'revenue' => PropRental::whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->sum('total_amount'),
+            ];
+        });
+    }
     
     /**
      * Get activity title
@@ -265,6 +301,10 @@ class PropRentalController extends Controller
         // Get filter parameters
         $category = $request->get('category', 'all');
         $activeTab = $request->get('tab', 'props');
+        $allowedTabs = ['props', 'active-rentals', 'calendar', 'customers'];
+        if (!in_array($activeTab, $allowedTabs, true)) {
+            $activeTab = 'props';
+        }
         
         // Get statistics
         $stats = [
@@ -320,6 +360,13 @@ class PropRentalController extends Controller
      */
     public function reports(Request $request)
     {
+        $request->validate([
+            'range' => 'nullable|in:today,week,month,year,custom',
+            'payment_status' => 'nullable|in:all,paid,partial,unpaid',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
         $user = Auth::guard('user')->user();
         $range = $request->get('range', 'month');
         $paymentStatus = $request->get('payment_status', 'all');
@@ -327,15 +374,24 @@ class PropRentalController extends Controller
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
         
-        if ($range !== 'custom') {
-            [$start, $end] = $this->getDateRange($range);
-            $startDate = $start->format('Y-m-d');
-            $endDate = $end->format('Y-m-d');
+        if ($range === 'custom') {
+            $startDateTime = Carbon::parse($startDate)->startOfDay();
+            $endDateTime = Carbon::parse($endDate)->endOfDay();
+        } else {
+            [$startDateTime, $endDateTime] = $this->getDateRange($range);
+            $startDate = $startDateTime->format('Y-m-d');
+            $endDate = $endDateTime->format('Y-m-d');
+        }
+
+        if ($startDateTime->gt($endDateTime)) {
+            [$startDateTime, $endDateTime] = [$endDateTime->copy()->startOfDay(), $startDateTime->copy()->endOfDay()];
+            $startDate = $startDateTime->format('Y-m-d');
+            $endDate = $endDateTime->format('Y-m-d');
         }
         
-        // Base query
+        // Base query for rental history table
         $rentalsQuery = PropRental::with(['prop', 'customer'])
-            ->whereBetween('created_at', [$startDate, $endDate]);
+            ->whereBetween('created_at', [$startDateTime, $endDateTime]);
         
         // Apply payment status filter
         if ($paymentStatus === 'paid') {
@@ -347,26 +403,33 @@ class PropRentalController extends Controller
             $rentalsQuery->where('amount_paid', '<=', 0);
         }
         
-        // Summary data
-        $allRentalsQuery = PropRental::with(['prop', 'customer'])
-            ->whereBetween('created_at', [$startDate, $endDate]);
+        // Summary data (always across all rentals in the selected date range)
+        $summaryQuery = PropRental::query()
+            ->whereBetween('created_at', [$startDateTime, $endDateTime]);
         
         $summary = [
-            'total_rentals' => $allRentalsQuery->count(),
-            'total_revenue' => $allRentalsQuery->sum('total_amount'),
-            'total_collected' => $allRentalsQuery->sum('amount_paid'),
-            'total_balance' => $allRentalsQuery->sum('balance_due'),
-            'avg_rental_value' => $allRentalsQuery->avg('total_amount'),
-            'avg_duration' => round($allRentalsQuery->avg(DB::raw('DATEDIFF(end_date, start_date)')), 1),
+            'total_rentals' => (clone $summaryQuery)->count(),
+            'total_revenue' => (clone $summaryQuery)->sum('total_amount'),
+            'total_collected' => (clone $summaryQuery)->sum('amount_paid'),
+            'total_balance' => (clone $summaryQuery)->sum('balance_due'),
+            'avg_rental_value' => (float) ((clone $summaryQuery)->avg('total_amount') ?? 0),
+            'avg_duration' => round((float) ((clone $summaryQuery)->avg(DB::raw('DATEDIFF(end_date, start_date)')) ?? 0), 1),
         ];
         
         // Payment statistics
-        $summary['fully_paid_count'] = $allRentalsQuery->clone()->where('balance_due', '<=', 0)->count();
-        $summary['partially_paid_count'] = $allRentalsQuery->clone()
+        $summary['fully_paid_count'] = (clone $summaryQuery)->where('balance_due', '<=', 0)->count();
+        $summary['partially_paid_count'] = (clone $summaryQuery)
             ->where('balance_due', '>', 0)
             ->where('amount_paid', '>', 0)
             ->count();
-        $summary['unpaid_count'] = $allRentalsQuery->clone()->where('amount_paid', '<=', 0)->count();
+        $summary['unpaid_count'] = (clone $summaryQuery)->where('amount_paid', '<=', 0)->count();
+        $summary['fully_paid_collected'] = (clone $summaryQuery)->where('balance_due', '<=', 0)->sum('amount_paid');
+        $summary['partially_paid_balance'] = (clone $summaryQuery)
+            ->where('balance_due', '>', 0)
+            ->where('amount_paid', '>', 0)
+            ->sum('balance_due');
+        $summary['unpaid_total_due'] = (clone $summaryQuery)->where('amount_paid', '<=', 0)->sum('total_amount');
+        $summary['outstanding_rentals_count'] = $summary['partially_paid_count'] + $summary['unpaid_count'];
         $summary['collection_rate'] = $summary['total_revenue'] > 0 
             ? round(($summary['total_collected'] / $summary['total_revenue']) * 100, 1) 
             : 0;
@@ -374,15 +437,16 @@ class PropRentalController extends Controller
         // Revenue by prop
         $revenueByProp = PropRental::with('prop')
             ->select('prop_id', DB::raw('COUNT(*) as rental_count'), DB::raw('SUM(total_amount) as total_revenue'))
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->groupBy('prop_id')
             ->orderBy('total_revenue', 'desc')
             ->limit(10)
             ->get()
             ->map(function($item) {
+                $prop = $item->prop;
                 return (object)[
-                    'prop_name' => $item->prop->name,
-                    'category' => ucfirst($item->prop->category),
+                    'prop_name' => $prop?->name ?? 'Deleted Prop',
+                    'category' => $prop ? ucfirst($prop->category) : 'N/A',
                     'rental_count' => $item->rental_count,
                     'total_revenue' => $item->total_revenue,
                 ];
@@ -391,30 +455,35 @@ class PropRentalController extends Controller
         // Revenue by customer
         $revenueByCustomer = PropRental::with('customer')
             ->select('rental_customer_id', DB::raw('COUNT(*) as rental_count'), DB::raw('SUM(total_amount) as total_revenue'))
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->groupBy('rental_customer_id')
             ->orderBy('total_revenue', 'desc')
             ->limit(10)
             ->get()
             ->map(function($item) {
+                $customer = $item->customer;
                 return (object)[
-                    'customer_name' => $item->customer->name,
-                    'customer_phone' => $item->customer->phone,
+                    'customer_name' => $customer?->name ?? 'Deleted Customer',
+                    'customer_phone' => $customer?->phone ?? '-',
                     'rental_count' => $item->rental_count,
                     'total_revenue' => $item->total_revenue,
                 ];
             });
         
         // Performance metrics
-        $totalRentals = PropRental::whereBetween('created_at', [$startDate, $endDate])->count();
-        $completedRentals = PropRental::whereBetween('created_at', [$startDate, $endDate])->where('status', 'completed')->count();
-        $ontimeReturns = PropRental::whereBetween('created_at', [$startDate, $endDate])
+        $totalRentals = (clone $summaryQuery)->count();
+        $completedRentals = (clone $summaryQuery)->where('status', 'completed')->count();
+        $ontimeReturns = (clone $summaryQuery)
             ->where('status', 'completed')
             ->whereRaw('returned_at <= end_date')
             ->count();
-        $repeatCustomers = RentalCustomer::where('total_rentals', '>', 1)->count();
+        $repeatCustomers = PropRental::whereBetween('created_at', [$startDateTime, $endDateTime])
+            ->select('rental_customer_id')
+            ->groupBy('rental_customer_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->count();
         $totalCustomers = RentalCustomer::count();
-        $cancelledRentals = PropRental::whereBetween('created_at', [$startDate, $endDate])->where('status', 'cancelled')->count();
+        $cancelledRentals = (clone $summaryQuery)->where('status', 'cancelled')->count();
         
         $metrics = [
             'completion_rate' => $totalRentals > 0 ? round(($completedRentals / $totalRentals) * 100, 1) : 0,
@@ -424,21 +493,25 @@ class PropRentalController extends Controller
         ];
         
         // Chart data
-        $chartTrend = $this->getRevenueTrend($range === 'custom' ? 'month' : $range);
+        $chartTrend = $range === 'custom'
+            ? $this->getRevenueTrendForDateRange($startDateTime, $endDateTime)
+            : $this->getRevenueTrend($range);
         $chartLabels = $chartTrend->pluck('label')->toArray();
         $chartData = $chartTrend->pluck('revenue')->toArray();
         
         // Category distribution
         $categoryDistribution = PropRental::with('prop')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->get()
-            ->groupBy('prop.category')
+            ->groupBy(function ($rental) {
+                return $rental->prop?->category ?? 'unknown';
+            })
             ->map(function($group) {
                 return $group->count();
             });
         
         $categoryLabels = $categoryDistribution->keys()->map(function($cat) {
-            return ucfirst($cat);
+            return ucfirst(str_replace('-', ' ', $cat));
         })->toArray();
         $categoryData = $categoryDistribution->values()->toArray();
         
@@ -927,13 +1000,44 @@ class PropRentalController extends Controller
      */
     public function export(Request $request)
     {
-        $rentals = PropRental::with(['prop', 'customer'])
-            ->when($request->status, function($query, $status) {
-                return $query->where('status', $status);
-            })
-            ->get();
+        $request->validate([
+            'status' => 'nullable|in:active,completed,overdue,cancelled',
+            'payment_status' => 'nullable|in:all,paid,partial,unpaid',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $query = PropRental::with(['prop', 'customer']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
+        }
+
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
+        }
+
+        $paymentStatus = $request->get('payment_status', 'all');
+        if ($paymentStatus === 'paid') {
+            $query->where('balance_due', '<=', 0);
+        } elseif ($paymentStatus === 'partial') {
+            $query->where('balance_due', '>', 0)
+                ->where('amount_paid', '>', 0);
+        } elseif ($paymentStatus === 'unpaid') {
+            $query->where('amount_paid', '<=', 0);
+        }
+
+        $rentals = $query->latest()->get();
         
-        $filename = 'prop-rentals-' . date('Y-m-d') . '.csv';
+        $filename = 'prop-rentals';
+        if ($request->filled('start_date') || $request->filled('end_date')) {
+            $filename .= '-' . ($request->get('start_date') ?: 'start') . '-to-' . ($request->get('end_date') ?: 'today');
+        }
+        $filename .= '-' . date('Y-m-d') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
@@ -944,21 +1048,31 @@ class PropRentalController extends Controller
             
             fputcsv($file, [
                 'Rental ID', 'Customer', 'Phone', 'Prop', 'Start Date', 'End Date', 
-                'Daily Rate', 'Total Amount', 'Security Deposit', 'Status', 'Notes'
+                'Daily Rate', 'Total Amount', 'Amount Paid', 'Balance Due', 'Security Deposit',
+                'Status', 'Payment Status', 'Refund Amount', 'Created At', 'Notes'
             ]);
             
             foreach ($rentals as $rental) {
+                $customerName = $rental->customer?->name ?? 'Deleted Customer';
+                $customerPhone = $rental->customer?->phone ?? '';
+                $propName = $rental->prop?->name ?? 'Deleted Prop';
+
                 fputcsv($file, [
                     $rental->rental_id,
-                    $rental->customer->name,
-                    $rental->customer->phone,
-                    $rental->prop->name,
+                    $customerName,
+                    $customerPhone,
+                    $propName,
                     $rental->start_date->format('Y-m-d'),
                     $rental->end_date->format('Y-m-d'),
                     $rental->daily_rate,
                     $rental->total_amount,
+                    $rental->amount_paid,
+                    $rental->balance_due,
                     $rental->security_deposit,
                     $rental->status_display,
+                    $rental->payment_status,
+                    $rental->refund_amount,
+                    $rental->created_at->format('Y-m-d H:i:s'),
                     $rental->notes ?? '',
                 ]);
             }

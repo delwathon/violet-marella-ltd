@@ -69,12 +69,12 @@ class PropRental extends Model
     // Relationships
     public function prop()
     {
-        return $this->belongsTo(Prop::class);
+        return $this->belongsTo(Prop::class)->withTrashed();
     }
 
     public function customer()
     {
-        return $this->belongsTo(RentalCustomer::class, 'rental_customer_id');
+        return $this->belongsTo(RentalCustomer::class, 'rental_customer_id')->withTrashed();
     }
 
     public function creator()

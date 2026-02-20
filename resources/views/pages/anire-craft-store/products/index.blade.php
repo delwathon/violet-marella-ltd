@@ -351,7 +351,7 @@ async function submitStockAdjustment() {
     }
     
     try {
-        const response = await fetch(`/app/anire-craft-store/products/${productId}/adjust-stock`, {
+        const response = await fetch(`{{ route('anire-craft-store.products.index') }}/${productId}/adjust-stock`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -384,7 +384,7 @@ function deleteProduct(productId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/anire-craft-store/products/${productId}`;
+    form.action = `{{ route('anire-craft-store.products.index') }}/${productId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

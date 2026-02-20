@@ -23,6 +23,13 @@ const LoungeState = {
     }
 };
 
+const LoungeConfig = window.loungeConfig || {};
+const LOUNGE_BASE_PATH = (LoungeConfig.basePath || '/app/lounge').replace(/\/$/, '');
+
+function buildLoungeUrl(path) {
+    return `${LOUNGE_BASE_PATH}${path}`;
+}
+
 /**
  * Initialize Lounge POS
  */
@@ -124,7 +131,7 @@ function bindLoungeEvents() {
  */
 async function searchProducts(searchTerm) {
     try {
-        const response = await fetch(`/app/lounge/products/search?q=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${buildLoungeUrl('/products/search')}?q=${encodeURIComponent(searchTerm)}`);
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -144,7 +151,7 @@ async function searchProducts(searchTerm) {
  */
 async function filterProductsByCategory(categoryId) {
     try {
-        let url = '/app/lounge/products/search';
+        let url = buildLoungeUrl('/products/search');
         if (categoryId) {
             url += `?category_id=${categoryId}`;
         }
@@ -229,7 +236,7 @@ function updateProductGrid(products) {
  */
 async function addToCart(productId, quantity = 1) {
     try {
-        const response = await fetch('/app/lounge/cart/add', {
+        const response = await fetch(buildLoungeUrl('/cart/add'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -264,7 +271,7 @@ function updateCartDisplay() {
     if (!cartItems) return;
 
     // Get cart from Laravel session via AJAX
-    fetch('/app/lounge/cart')
+    fetch(buildLoungeUrl('/cart'))
         .then(response => response.json())
         .then(data => {
             if (data.success && data.cart && data.cart.length > 0) {
@@ -309,7 +316,7 @@ function updateCartDisplay() {
  */
 function updateCartSummary() {
     // Get cart summary from Laravel
-    fetch('/app/lounge/cart/summary')
+    fetch(buildLoungeUrl('/cart/summary'))
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -335,7 +342,7 @@ function updateCartSummary() {
  */
 async function removeFromCart(productId) {
     try {
-        const response = await fetch(`/app/lounge/cart/remove/${productId}`, {
+        const response = await fetch(buildLoungeUrl(`/cart/remove/${productId}`), {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -362,7 +369,7 @@ async function removeFromCart(productId) {
  */
 async function updateQuantity(productId, change) {
     try {
-        const response = await fetch('/app/lounge/cart/update', {
+        const response = await fetch(buildLoungeUrl('/cart/update'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -395,7 +402,7 @@ async function clearCart() {
     if (!confirm('Are you sure you want to clear the cart?')) return;
 
     try {
-        const response = await fetch('/app/lounge/cart/clear', {
+        const response = await fetch(buildLoungeUrl('/cart/clear'), {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -422,7 +429,7 @@ async function clearCart() {
  */
 function processCheckout() {
     // Get cart summary first
-    fetch('/app/lounge/cart/summary')
+    fetch(buildLoungeUrl('/cart/summary'))
         .then(response => response.json())
         .then(data => {
             if (data.success && data.count > 0) {
@@ -535,7 +542,7 @@ async function searchCustomers() {
     }
     
     try {
-        const response = await fetch(`/app/lounge/customers/search/query?search=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${buildLoungeUrl('/customers/search/query')}?search=${encodeURIComponent(searchTerm)}`);
         const data = await response.json();
         
         const resultsDiv = document.getElementById('customerSearchResults');
@@ -612,7 +619,7 @@ async function saveQuickCustomer() {
     }
     
     try {
-        const response = await fetch('/app/lounge/customers/quick/create', {
+        const response = await fetch(buildLoungeUrl('/customers/quick/create'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -653,7 +660,7 @@ async function viewLowStock() {
     modal.show();
     
     try {
-        const response = await fetch('/app/lounge/products/low-stock/list');
+        const response = await fetch(buildLoungeUrl('/products/low-stock/list'));
         const data = await response.json();
         
         const tbody = document.getElementById('lowStockTableBody');
@@ -671,7 +678,7 @@ async function viewLowStock() {
                     </td>
                     <td>${product.minimum_stock_level}</td>
                     <td>
-                        <a href="/app/lounge/products/${product.id}/edit" class="btn btn-sm btn-primary" target="_blank">
+                        <a href="${buildLoungeUrl(`/products/${product.id}/edit`)}" class="btn btn-sm btn-primary" target="_blank">
                             <i class="fas fa-edit"></i> Restock
                         </a>
                     </td>
@@ -707,7 +714,7 @@ async function viewDailySales() {
     modal.show();
     
     try {
-        const response = await fetch('/app/lounge/daily-report');
+        const response = await fetch(buildLoungeUrl('/daily-report'));
         const data = await response.json();
         
         if (data.success) {
@@ -828,7 +835,7 @@ async function completePayment() {
         completeBtn.disabled = true;
         completeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
-        const response = await fetch('/app/lounge/checkout', {
+        const response = await fetch(buildLoungeUrl('/checkout'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -897,7 +904,7 @@ async function completePayment() {
  * Print Receipt
  */
 function printReceipt(saleId) {
-    window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+    window.open(buildLoungeUrl(`/sales/${saleId}/receipt`), '_blank');
 }
 
 /**

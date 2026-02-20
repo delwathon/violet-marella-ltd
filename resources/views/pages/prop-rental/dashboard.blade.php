@@ -165,6 +165,9 @@
                     <h5 class="mb-0 fw-semibold">Most Rented Props</h5>
                 </div>
                 <div class="card-body">
+                    @php
+                        $maxPopularRentals = max((int) ($popularProps->max('rentals_count') ?? 0), 1);
+                    @endphp
                     @forelse($popularProps as $prop)
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
@@ -175,13 +178,12 @@
                                 <small class="text-muted">{{ $prop->brand }} {{ $prop->model }}</small>
                             </div>
                             <div class="text-end">
-                                <div class="fw-bold text-primary">{{ $prop->rental_count }}</div>
+                                <div class="fw-bold text-primary">{{ $prop->rentals_count }}</div>
                                 <small class="text-muted">rentals</small>
                             </div>
                         </div>
                         <div class="progress mb-3" style="height: 6px;">
-                            <div class="progress-bar bg-primary" >
-                                 {{-- style="width: {{ ($prop->rental_count / $popularProps->first()->rental_count) * 100 }}%"> --}}
+                            <div class="progress-bar bg-primary" style="width: {{ round(($prop->rentals_count / $maxPopularRentals) * 100, 1) }}%">
                             </div>
                         </div>
                     @empty

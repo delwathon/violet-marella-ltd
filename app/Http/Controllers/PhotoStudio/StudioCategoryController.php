@@ -105,14 +105,19 @@ class StudioCategoryController extends Controller
     /**
      * Show the form for editing the specified category (AJAX)
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $category = StudioCategory::findOrFail($id);
-        
-        return response()->json([
-            'success' => true,
-            'category' => $category,
-        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+            ]);
+        }
+
+        $user = Auth::guard('user')->user();
+        return view('pages.photo-studio.categories.edit', compact('user', 'category'));
     }
 
     /**

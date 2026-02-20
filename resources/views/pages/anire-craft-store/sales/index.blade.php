@@ -209,11 +209,11 @@
 <script>
 function exportSales() {
     const params = new URLSearchParams(window.location.search);
-    window.location.href = '{{ route("lounge.sales.export") }}?' + params.toString();
+    window.location.href = '{{ route("anire-craft-store.sales.export") }}?' + params.toString();
 }
 
 function printReceipt(saleId) {
-    window.open(`/app/anire-craft-store/sales/${saleId}/receipt`, '_blank');
+    window.open(`{{ route('anire-craft-store.sales.index') }}/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

@@ -235,7 +235,7 @@ function deleteCustomer(customerId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/lounge/customers/${customerId}`;
+    form.action = `{{ route('lounge.customers.index') }}/${customerId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

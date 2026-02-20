@@ -235,7 +235,7 @@ new Chart(ctx, {
 });
 
 function printReceipt(saleId) {
-    window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+    window.open(`{{ route('lounge.sales.index') }}/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

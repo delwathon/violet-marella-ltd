@@ -3,6 +3,7 @@
         <div class="modal-content">
             <form action="{{ route('prop-rental.rentals.store') }}" method="POST" id="newRentalForm">
                 @csrf
+                <input type="hidden" name="form_context" value="new_rental">
                 <div class="modal-header">
                     <h5 class="modal-title">New Rental</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

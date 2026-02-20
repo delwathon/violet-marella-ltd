@@ -35,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-md-8">
                         <input type="text" name="search" class="form-control" 
-                               placeholder="Search lounge.categories..." 
+                               placeholder="Search categories..." 
                                value="{{ request('search') }}">
                     </div>
                     <div class="col-md-2">
@@ -141,7 +141,7 @@ function deleteCategory(categoryId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/anire-craft-store/categories/${categoryId}`;
+    form.action = `{{ route('anire-craft-store.categories.index') }}/${categoryId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

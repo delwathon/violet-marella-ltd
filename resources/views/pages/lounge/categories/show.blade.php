@@ -263,7 +263,7 @@ function deleteCategory() {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/app/lounge/categories/{{ $category->id }}';
+    form.action = '{{ route('lounge.categories.destroy', $category->id) }}';
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';

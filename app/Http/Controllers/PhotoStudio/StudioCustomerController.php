@@ -67,6 +67,17 @@ class StudioCustomerController extends Controller
             'preferences' => 'nullable|array',
         ]);
 
+        if (isset($validated['preferences'])) {
+            $validated['preferences'] = array_values(array_filter(
+                $validated['preferences'],
+                fn($item) => !empty(trim((string) $item))
+            ));
+
+            if (count($validated['preferences']) === 0) {
+                $validated['preferences'] = null;
+            }
+        }
+
         $customer = StudioCustomer::create($validated);
 
         if ($request->expectsJson()) {
@@ -123,14 +134,19 @@ class StudioCustomerController extends Controller
     /**
      * Show the form for editing the specified customer (AJAX)
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $customer = StudioCustomer::findOrFail($id);
-        
-        return response()->json([
-            'success' => true,
-            'customer' => $customer
-        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'customer' => $customer
+            ]);
+        }
+
+        $user = Auth::guard('user')->user();
+        return view('pages.photo-studio.customers.edit', compact('user', 'customer'));
     }
 
     /**
@@ -151,7 +167,18 @@ class StudioCustomerController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $validated['is_active'] = $request->has('is_active');
+        if (isset($validated['preferences'])) {
+            $validated['preferences'] = array_values(array_filter(
+                $validated['preferences'],
+                fn($item) => !empty(trim((string) $item))
+            ));
+
+            if (count($validated['preferences']) === 0) {
+                $validated['preferences'] = null;
+            }
+        }
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         $customer->update($validated);
 

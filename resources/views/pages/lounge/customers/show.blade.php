@@ -400,7 +400,7 @@ async function submitPointsAdjustment() {
     }
     
     try {
-        const response = await fetch('/app/lounge/customers/{{ $customer->id }}/loyalty', {
+        const response = await fetch('{{ route('lounge.customers.adjust-loyalty', $customer->id) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -494,7 +494,7 @@ function deleteCustomer() {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/app/lounge/customers/{{ $customer->id }}';
+    form.action = '{{ route('lounge.customers.destroy', $customer->id) }}';
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
@@ -513,7 +513,7 @@ function deleteCustomer() {
 }
 
 function printReceipt(saleId) {
-    window.open(`/app/lounge/sales/${saleId}/receipt`, '_blank');
+    window.open(`{{ route('lounge.sales.index') }}/${saleId}/receipt`, '_blank');
 }
 </script>
 @endpush

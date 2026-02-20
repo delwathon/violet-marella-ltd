@@ -56,7 +56,7 @@
                     @endif
                     <div class="col-md-3 ms-auto">
                         <label class="form-label small fw-semibold">&nbsp;</label>
-                        <a href="{{ route('prop-rental.rentals.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-success w-100">
+                        <a href="{{ route('prop-rental.rentals.export', ['start_date' => $startDate, 'end_date' => $endDate, 'payment_status' => $paymentStatus]) }}" class="btn btn-success w-100">
                             <i class="fas fa-download me-2"></i>Export CSV
                         </a>
                     </div>
@@ -287,10 +287,10 @@
                                     <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
                                     <div class="text-muted small mb-1">Amount Collected</div>
                                     <div class="h3 mb-0 fw-bold text-success">
-                                        ₦{{ number_format($rentals->sum('amount_paid'), 0) }}
+                                        ₦{{ number_format($summary['total_collected'], 0) }}
                                     </div>
                                     <small class="text-muted">
-                                        {{ $summary['total_revenue'] > 0 ? number_format(($rentals->sum('amount_paid') / $summary['total_revenue']) * 100, 1) : 0 }}% of total
+                                        {{ number_format($summary['collection_rate'], 1) }}% of total
                                     </small>
                                 </div>
                             </div>
@@ -303,10 +303,10 @@
                                     <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
                                     <div class="text-muted small mb-1">Outstanding Balance</div>
                                     <div class="h3 mb-0 fw-bold text-warning">
-                                        ₦{{ number_format($rentals->sum('balance_due'), 0) }}
+                                        ₦{{ number_format($summary['total_balance'], 0) }}
                                     </div>
                                     <small class="text-muted">
-                                        From {{ $rentals->where('balance_due', '>', 0)->count() }} rentals
+                                        From {{ $summary['outstanding_rentals_count'] }} rentals
                                     </small>
                                 </div>
                             </div>
@@ -319,11 +319,11 @@
                                     <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
                                     <div class="text-muted small mb-1">Collection Rate</div>
                                     <div class="h3 mb-0 fw-bold text-info">
-                                        {{ $summary['total_revenue'] > 0 ? number_format(($rentals->sum('amount_paid') / $summary['total_revenue']) * 100, 1) : 0 }}%
+                                        {{ number_format($summary['collection_rate'], 1) }}%
                                     </div>
                                     <div class="progress mt-2" style="height: 8px;">
                                         <div class="progress-bar bg-info" 
-                                            style="width: {{ $summary['total_revenue'] > 0 ? ($rentals->sum('amount_paid') / $summary['total_revenue']) * 100 : 0 }}%">
+                                            style="width: {{ $summary['collection_rate'] }}%">
                                         </div>
                                     </div>
                                 </div>
@@ -341,12 +341,12 @@
                                         <div>
                                             <div class="text-muted small">Fully Paid</div>
                                             <div class="h5 mb-0 fw-bold text-success">
-                                                {{ $rentals->where('balance_due', '<=', 0)->count() }}
+                                                {{ $summary['fully_paid_count'] }}
                                             </div>
                                         </div>
                                         <div class="text-end">
                                             <div class="text-success fw-bold">
-                                                ₦{{ number_format($rentals->where('balance_due', '<=', 0)->sum('amount_paid'), 0) }}
+                                                ₦{{ number_format($summary['fully_paid_collected'], 0) }}
                                             </div>
                                             <small class="text-muted">collected</small>
                                         </div>
@@ -357,12 +357,12 @@
                                         <div>
                                             <div class="text-muted small">Partially Paid</div>
                                             <div class="h5 mb-0 fw-bold text-warning">
-                                                {{ $rentals->where('balance_due', '>', 0)->where('amount_paid', '>', 0)->count() }}
+                                                {{ $summary['partially_paid_count'] }}
                                             </div>
                                         </div>
                                         <div class="text-end">
                                             <div class="text-warning fw-bold">
-                                                ₦{{ number_format($rentals->where('balance_due', '>', 0)->where('amount_paid', '>', 0)->sum('balance_due'), 0) }}
+                                                ₦{{ number_format($summary['partially_paid_balance'], 0) }}
                                             </div>
                                             <small class="text-muted">pending</small>
                                         </div>
@@ -373,12 +373,12 @@
                                         <div>
                                             <div class="text-muted small">Unpaid</div>
                                             <div class="h5 mb-0 fw-bold text-danger">
-                                                {{ $rentals->where('amount_paid', '<=', 0)->count() }}
+                                                {{ $summary['unpaid_count'] }}
                                             </div>
                                         </div>
                                         <div class="text-end">
                                             <div class="text-danger fw-bold">
-                                                ₦{{ number_format($rentals->where('amount_paid', '<=', 0)->sum('total_amount'), 0) }}
+                                                ₦{{ number_format($summary['unpaid_total_due'], 0) }}
                                             </div>
                                             <small class="text-muted">due</small>
                                         </div>
@@ -448,16 +448,16 @@
                                     <small class="text-muted">{{ $rental->created_at->format('h:i A') }}</small>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $rental->customer->name }}</div>
-                                    <small class="text-muted">{{ $rental->customer->phone }}</small>
+                                    <div class="fw-semibold">{{ $rental->customer->name ?? 'Deleted Customer' }}</div>
+                                    <small class="text-muted">{{ $rental->customer->phone ?? '-' }}</small>
                                 </td>
                                 <td>
-                                    <div>{{ $rental->prop->name }}</div>
-                                    <small class="text-muted">{{ $rental->prop->brand }}</small>
+                                    <div>{{ $rental->prop->name ?? 'Deleted Prop' }}</div>
+                                    <small class="text-muted">{{ $rental->prop->brand ?? '-' }}</small>
                                 </td>
                                 <td>
                                     <div>{{ $rental->duration }} days</div>
-                                    <small class="text-muted">@ {{ $rental->prop->formatted_daily_rate }}</small>
+                                    <small class="text-muted">@ {{ $rental->prop->formatted_daily_rate ?? '₦0.00' }}</small>
                                 </td>
                                 <td>
                                     <span class="badge {{ $rental->status_badge_class }}">

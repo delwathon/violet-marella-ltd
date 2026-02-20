@@ -121,14 +121,20 @@ class StudioRoomController extends Controller
     /**
      * Show the form for editing the specified room (AJAX)
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $room = StudioRoom::with('category')->findOrFail($id);
-        
-        return response()->json([
-            'success' => true,
-            'room' => $room,
-        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'room' => $room,
+            ]);
+        }
+
+        $user = Auth::guard('user')->user();
+        $categories = StudioCategory::active()->ordered()->get();
+        return view('pages.photo-studio.rooms.edit', compact('user', 'room', 'categories'));
     }
 
     /**

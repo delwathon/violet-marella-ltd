@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StudioSession extends Model
 {
@@ -207,6 +208,29 @@ class StudioSession extends Model
     /**
      * Business Logic Methods
      */
+
+    /**
+     * Auto-start pending sessions whose preparation window has elapsed.
+     * Uses scheduled_start_time as the actual start time so billing stays accurate.
+     */
+    public static function autoStartDueSessions(?int $sessionId = null): int
+    {
+        $query = self::query()
+            ->where('status', 'pending')
+            ->whereNull('actual_start_time')
+            ->whereNotNull('scheduled_start_time')
+            ->where('scheduled_start_time', '<=', now());
+
+        if ($sessionId !== null) {
+            $query->whereKey($sessionId);
+        }
+
+        return $query->update([
+            'status' => 'active',
+            'actual_start_time' => DB::raw('scheduled_start_time'),
+            'updated_at' => now(),
+        ]);
+    }
 
     /**
      * Check if session timer has started

@@ -85,7 +85,7 @@
                     <form method="GET" action="{{ route('anire-craft-store.inventory.index') }}">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <input type="text" name="search" class="form-control" placeholder="Search lounge.products..." value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request('search') }}">
                             </div>
                             <div class="col-md-3">
                                 <select name="category_id" class="form-select">
@@ -237,7 +237,7 @@
 <script>
 function exportInventory() {
     const params = new URLSearchParams(window.location.search);
-    window.location.href = '{{ route("lounge.inventory.export") }}?' + params.toString();
+    window.location.href = '{{ route("anire-craft-store.inventory.export") }}?' + params.toString();
 }
 </script>
 @endpush

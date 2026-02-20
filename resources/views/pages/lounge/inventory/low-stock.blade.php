@@ -388,7 +388,7 @@ async function submitQuickRestock() {
     }
     
     try {
-        const response = await fetch(`/app/lounge/products/${productId}/adjust-stock`, {
+        const response = await fetch(`{{ route('lounge.products.index') }}/${productId}/adjust-stock`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

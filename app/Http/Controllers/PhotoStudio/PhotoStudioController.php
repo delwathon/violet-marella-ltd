@@ -20,6 +20,9 @@ class PhotoStudioController extends Controller
     public function index()
     {
         $user = Auth::guard('user')->user();
+
+        // Auto-start sessions once preparation time elapses.
+        StudioSession::autoStartDueSessions();
         
         // Get all categories with session counts
         $categories = StudioCategory::withCount(['rooms', 'activeSessions'])
@@ -81,6 +84,8 @@ class PhotoStudioController extends Controller
     public function activeSessions()
     {
         $user = Auth::guard('user')->user();
+
+        StudioSession::autoStartDueSessions();
         
         $sessions = StudioSession::with(['category', 'customer'])
                                 ->active()
@@ -197,7 +202,7 @@ class PhotoStudioController extends Controller
                 'total_amount' => $baseAmount,
                 'status' => 'pending',
                 'payment_status' => 'pending',
-                'created_by' => auth()->id(),
+                'created_by' => Auth::guard('user')->id(),
             ]);
 
             DB::commit();
@@ -226,6 +231,8 @@ class PhotoStudioController extends Controller
      */
     public function checkout(Request $request, $id)
     {
+        StudioSession::autoStartDueSessions((int) $id);
+
         $validated = $request->validate([
             'payment_method' => 'required|in:cash,card,transfer,other',
             'discount_amount' => 'nullable|numeric|min:0',
@@ -246,14 +253,14 @@ class PhotoStudioController extends Controller
 
             // Checkout the session
             $discountAmount = $validated['discount_amount'] ?? 0;
-            $session->checkout($validated['payment_method'], $discountAmount, auth()->id());
+            $session->checkout($validated['payment_method'], $discountAmount, Auth::guard('user')->id());
 
             // Process payment if amount provided
             if (isset($validated['amount_paid']) && $validated['amount_paid'] > 0) {
                 $session->processPayment(
                     $validated['amount_paid'],
                     $validated['payment_method'],
-                    auth()->id()
+                    Auth::guard('user')->id()
                 );
             }
 
@@ -306,6 +313,8 @@ class PhotoStudioController extends Controller
      */
     public function getSession($id)
     {
+        StudioSession::autoStartDueSessions((int) $id);
+
         $session = StudioSession::with(['category', 'customer', 'payments'])
                                 ->findOrFail($id);
 
@@ -385,6 +394,8 @@ class PhotoStudioController extends Controller
      */
     public function getActiveSessions()
     {
+        StudioSession::autoStartDueSessions();
+
         $sessions = StudioSession::with(['category', 'customer'])
                                 ->active()
                                 ->orderBy('check_in_time', 'desc')
@@ -406,6 +417,7 @@ class PhotoStudioController extends Controller
                                         'status' => $session->status,
                                         'status_label' => $session->status_label,
                                         'has_timer_started' => $session->hasTimerStarted(),
+                                        'booked_duration' => $session->booked_duration,
                                     ];
                                 });
 

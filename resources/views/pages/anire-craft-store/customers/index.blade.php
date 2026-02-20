@@ -235,7 +235,7 @@ function deleteCustomer(customerId) {
     
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/app/anire-craft-store/customers/${customerId}`;
+    form.action = `{{ route('anire-craft-store.customers.index') }}/${customerId}`;
     
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
