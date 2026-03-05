@@ -37,10 +37,10 @@ return new class extends Migration
             $table->json('party_names')->nullable();                         // Optional: names of people in party
             
             // Time Management
-            $table->timestamp('check_in_time');                              // When customer checked in
-            $table->timestamp('scheduled_start_time');                       // check_in_time + offset_time
-            $table->timestamp('actual_start_time')->nullable();              // When timer actually started
-            $table->timestamp('check_out_time')->nullable();                 // When customer checked out
+            $table->dateTime('check_in_time');                               // When customer checked in
+            $table->dateTime('scheduled_start_time');                        // check_in_time + offset_time
+            $table->dateTime('actual_start_time')->nullable();               // When timer actually started
+            $table->dateTime('check_out_time')->nullable();                  // When customer checked out
             
             // Duration
             $table->integer('booked_duration');                              // Duration customer booked (minutes)
