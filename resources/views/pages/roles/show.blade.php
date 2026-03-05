@@ -50,23 +50,27 @@
                     <form action="{{ route('roles.permissions.update', $role->id) }}" method="POST">
                         @csrf
                         @php
-                            $permissionOptions = [
-                                'dashboard.view', 'users.view', 'users.manage', 'roles.manage', 'departments.manage',
-                                'products.view', 'products.manage', 'inventory.view', 'inventory.manage',
-                                'sales.view', 'sales.create', 'sales.refund', 'customers.view', 'customers.manage',
-                                'reports.view', 'reports.export', 'settings.manage', 'security.manage'
-                            ];
+                            $groupedPermissions = $permissionGroups ?? \App\Support\AccessControl::permissionGroups();
                             $selectedPermissions = $role->permissions ?? [];
                         @endphp
-                        <div class="row g-2 mb-3">
-                            @foreach($permissionOptions as $permission)
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="perm_{{ $permission }}" name="permissions[]" value="{{ $permission }}" {{ in_array($permission, $selectedPermissions, true) ? 'checked' : '' }}>
-                                        <label class="form-check-label small" for="perm_{{ $permission }}">{{ $permission }}</label>
-                                    </div>
+                        @foreach($groupedPermissions as $groupName => $permissionOptions)
+                            <div class="mb-3">
+                                <h6 class="small text-uppercase text-muted mb-2">{{ $groupName }}</h6>
+                                <div class="row g-2">
+                                    @foreach($permissionOptions as $permission)
+                                        <div class="col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="perm_{{ str_replace(['.', '*'], ['_', 'wildcard'], $permission) }}" name="permissions[]" value="{{ $permission }}" {{ in_array($permission, $selectedPermissions, true) ? 'checked' : '' }}>
+                                                <label class="form-check-label small" for="perm_{{ str_replace(['.', '*'], ['_', 'wildcard'], $permission) }}">{{ $permission }}</label>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            </div>
+                        @endforeach
+                        <div class="form-check border rounded p-2 mb-3">
+                            <input class="form-check-input" type="checkbox" id="perm_all" name="permissions[]" value="*" {{ in_array('*', $selectedPermissions, true) ? 'checked' : '' }}>
+                            <label class="form-check-label small fw-semibold" for="perm_all">* (Grant all permissions)</label>
                         </div>
                         <button class="btn btn-primary" type="submit">Save Permissions</button>
                     </form>

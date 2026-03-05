@@ -33,6 +33,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\SecurityController;
+use App\Http\Controllers\SystemUpdateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,39 +60,46 @@ Route::prefix('auth')->group(function () {
 // -------------------------------
 Route::prefix('app')->middleware(['auth:user'])->group(function () {
     // Dashboard
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:dashboard.view');
     
     // ==================== LOUNGE/POS ====================
-    Route::prefix('lounge')->name('lounge.')->group(function () {
-        // Main POS Interface
-        Route::get('/', [LoungeRootController::class, 'index'])->name('index');
-        
-        // Product Search & Management (used by POS)
-        Route::get('/products/search', [LoungeRootController::class, 'searchProducts'])->name('products.search');
-        Route::get('/product/{id}', [LoungeRootController::class, 'getProduct'])->name('product');
-        
-        // Cart Management
-        Route::post('/cart/add', [LoungeRootController::class, 'addToCart'])->name('cart.add');
-        Route::get('/cart', [LoungeRootController::class, 'getCart'])->name('cart.get');
-        Route::get('/cart/summary', [LoungeRootController::class, 'getCartSummary'])->name('cart.summary');
-        Route::post('/cart/update', [LoungeRootController::class, 'updateCart'])->name('cart.update');
-        Route::delete('/cart/remove/{productId}', [LoungeRootController::class, 'removeFromCart'])->name('cart.remove');
-        Route::post('/cart/clear', [LoungeRootController::class, 'clearCart'])->name('cart.clear');
-        
-        // Sales/Checkout
-        Route::post('/checkout', [LoungeRootController::class, 'processSale'])->name('checkout');
-        Route::get('/sale/{id}', [LoungeRootController::class, 'getSale'])->name('sale');
-        
-        // Customer Management (Quick access from POS)
-        Route::get('/search-customer', [LoungeRootController::class, 'searchCustomer'])->name('search-customer');
-        Route::post('/create-customer', [LoungeRootController::class, 'createCustomer'])->name('create-customer');
-        
-        // Reports
-        Route::get('/daily-report', [LoungeRootController::class, 'getDailyReport'])->name('daily-report');
+    Route::prefix('lounge')
+        ->name('lounge.')
+        ->middleware(['business:lounge', 'permission:lounge.access'])
+        ->group(function () {
+        Route::middleware('module:lounge.pos')->group(function () {
+            // Main POS Interface
+            Route::get('/', [LoungeRootController::class, 'index'])->name('index');
+            
+            // Product Search & Management (used by POS)
+            Route::get('/products/search', [LoungeRootController::class, 'searchProducts'])->name('products.search');
+            Route::get('/product/{id}', [LoungeRootController::class, 'getProduct'])->name('product');
+            
+            // Cart Management
+            Route::post('/cart/add', [LoungeRootController::class, 'addToCart'])->name('cart.add');
+            Route::get('/cart', [LoungeRootController::class, 'getCart'])->name('cart.get');
+            Route::get('/cart/summary', [LoungeRootController::class, 'getCartSummary'])->name('cart.summary');
+            Route::post('/cart/update', [LoungeRootController::class, 'updateCart'])->name('cart.update');
+            Route::delete('/cart/remove/{productId}', [LoungeRootController::class, 'removeFromCart'])->name('cart.remove');
+            Route::post('/cart/clear', [LoungeRootController::class, 'clearCart'])->name('cart.clear');
+            
+            // Sales/Checkout
+            Route::post('/checkout', [LoungeRootController::class, 'processSale'])->name('checkout');
+            Route::get('/sale/{id}', [LoungeRootController::class, 'getSale'])->name('sale');
+            
+            // Customer Management (Quick access from POS)
+            Route::get('/search-customer', [LoungeRootController::class, 'searchCustomer'])->name('search-customer');
+            Route::post('/create-customer', [LoungeRootController::class, 'createCustomer'])->name('create-customer');
+            
+            // Reports
+            Route::get('/daily-report', [LoungeRootController::class, 'getDailyReport'])->name('daily-report');
+        });
         
         
         // ==================== PRODUCT MANAGEMENT ====================
-        Route::prefix('products')->name('products.')->group(function () {
+        Route::prefix('products')->name('products.')->middleware('module:lounge.products')->group(function () {
             Route::get('/', [ProductsController::class, 'index'])->name('index');
             Route::get('/create', [ProductsController::class, 'create'])->name('create');
             Route::post('/', [ProductsController::class, 'store'])->name('store');
@@ -115,7 +123,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CUSTOMER MANAGEMENT ====================
-        Route::prefix('customers')->name('customers.')->group(function () {
+        Route::prefix('customers')->name('customers.')->middleware('module:lounge.customers')->group(function () {
             Route::get('/', [CustomersController::class, 'index'])->name('index');
             Route::get('/create', [CustomersController::class, 'create'])->name('create');
             Route::post('/', [CustomersController::class, 'store'])->name('store');
@@ -134,7 +142,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CATEGORY MANAGEMENT ====================
-        Route::prefix('categories')->name('categories.')->group(function () {
+        Route::prefix('categories')->name('categories.')->middleware('module:lounge.categories')->group(function () {
             Route::get('/', [CategoryController::class, 'index'])->name('index');
             Route::get('/create', [CategoryController::class, 'create'])->name('create');
             Route::post('/', [CategoryController::class, 'store'])->name('store');
@@ -148,7 +156,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== SALES MANAGEMENT ====================
-        Route::prefix('sales')->name('sales.')->group(function () {
+        Route::prefix('sales')->name('sales.')->middleware('module:lounge.sales')->group(function () {
             Route::get('/', [SalesController::class, 'index'])->name('index');
             Route::get('/today', [SalesController::class, 'today'])->name('today');
             Route::get('/create', [SalesController::class, 'create'])->name('create');
@@ -161,7 +169,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== INVENTORY MANAGEMENT ====================
-        Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::prefix('inventory')->name('inventory.')->middleware('module:lounge.inventory')->group(function () {
             Route::get('/', [InventoryController::class, 'index'])->name('index');
             Route::get('/logs', [InventoryController::class, 'logs'])->name('logs');
             Route::get('/{id}/adjust', [InventoryController::class, 'adjust'])->name('adjust');
@@ -176,35 +184,40 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     });
     
     // ==================== ANIRE CRAFT STORE ====================
-    Route::prefix('anire-craft-store')->name('anire-craft-store.')->group(function () {
-        // Main POS Interface
-        Route::get('/', [StoreRootController::class, 'index'])->name('index');
-        
-        // Product Search & Management (used by POS)
-        Route::get('/products/search', [StoreRootController::class, 'searchProducts'])->name('products.search');
-        Route::get('/product/{id}', [StoreRootController::class, 'getProduct'])->name('product');
-        
-        // Cart Management
-        Route::post('/cart/add', [StoreRootController::class, 'addToCart'])->name('cart.add');
-        Route::get('/cart', [StoreRootController::class, 'getCart'])->name('cart.get');
-        Route::get('/cart/summary', [StoreRootController::class, 'getCartSummary'])->name('cart.summary');
-        Route::post('/cart/update', [StoreRootController::class, 'updateCart'])->name('cart.update');
-        Route::delete('/cart/remove/{productId}', [StoreRootController::class, 'removeFromCart'])->name('cart.remove');
-        Route::post('/cart/clear', [StoreRootController::class, 'clearCart'])->name('cart.clear');
-        
-        // Sales/Checkout
-        Route::post('/checkout', [StoreRootController::class, 'processSale'])->name('checkout');
-        Route::get('/sale/{id}', [StoreRootController::class, 'getSale'])->name('sale');
-        
-        // Customer Management (Quick access from POS)
-        Route::get('/search-customer', [StoreRootController::class, 'searchCustomer'])->name('search-customer');
-        Route::post('/create-customer', [StoreRootController::class, 'createCustomer'])->name('create-customer');
+    Route::prefix('anire-craft-store')
+        ->name('anire-craft-store.')
+        ->middleware(['business:gift_store', 'permission:gift_store.access'])
+        ->group(function () {
+        Route::middleware('module:gift_store.pos')->group(function () {
+            // Main POS Interface
+            Route::get('/', [StoreRootController::class, 'index'])->name('index');
+            
+            // Product Search & Management (used by POS)
+            Route::get('/products/search', [StoreRootController::class, 'searchProducts'])->name('products.search');
+            Route::get('/product/{id}', [StoreRootController::class, 'getProduct'])->name('product');
+            
+            // Cart Management
+            Route::post('/cart/add', [StoreRootController::class, 'addToCart'])->name('cart.add');
+            Route::get('/cart', [StoreRootController::class, 'getCart'])->name('cart.get');
+            Route::get('/cart/summary', [StoreRootController::class, 'getCartSummary'])->name('cart.summary');
+            Route::post('/cart/update', [StoreRootController::class, 'updateCart'])->name('cart.update');
+            Route::delete('/cart/remove/{productId}', [StoreRootController::class, 'removeFromCart'])->name('cart.remove');
+            Route::post('/cart/clear', [StoreRootController::class, 'clearCart'])->name('cart.clear');
+            
+            // Sales/Checkout
+            Route::post('/checkout', [StoreRootController::class, 'processSale'])->name('checkout');
+            Route::get('/sale/{id}', [StoreRootController::class, 'getSale'])->name('sale');
+            
+            // Customer Management (Quick access from POS)
+            Route::get('/search-customer', [StoreRootController::class, 'searchCustomer'])->name('search-customer');
+            Route::post('/create-customer', [StoreRootController::class, 'createCustomer'])->name('create-customer');
 
-        // Reports
-        Route::get('/daily-report', [StoreRootController::class, 'getDailyReport'])->name('daily-report');
+            // Reports
+            Route::get('/daily-report', [StoreRootController::class, 'getDailyReport'])->name('daily-report');
+        });
         
         // ==================== PRODUCT MANAGEMENT ====================
-        Route::prefix('products')->name('products.')->group(function () {
+        Route::prefix('products')->name('products.')->middleware('module:gift_store.products')->group(function () {
             Route::get('/', [StoreProductsController::class, 'index'])->name('index');
             Route::get('/create', [StoreProductsController::class, 'create'])->name('create');
             Route::post('/', [StoreProductsController::class, 'store'])->name('store');
@@ -227,7 +240,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CATEGORY MANAGEMENT ====================
-        Route::prefix('categories')->name('categories.')->group(function () {
+        Route::prefix('categories')->name('categories.')->middleware('module:gift_store.categories')->group(function () {
             Route::get('/', [StoreCategoryController::class, 'index'])->name('index');
             Route::get('/create', [StoreCategoryController::class, 'create'])->name('create');
             Route::post('/', [StoreCategoryController::class, 'store'])->name('store');
@@ -241,7 +254,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CUSTOMER MANAGEMENT ====================
-        Route::prefix('customers')->name('customers.')->group(function () {
+        Route::prefix('customers')->name('customers.')->middleware('module:gift_store.customers')->group(function () {
             Route::get('/', [StoreCustomersController::class, 'index'])->name('index');
             Route::get('/create', [StoreCustomersController::class, 'create'])->name('create');
             Route::post('/', [StoreCustomersController::class, 'store'])->name('store');
@@ -260,7 +273,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== SALES MANAGEMENT ====================
-        Route::prefix('sales')->name('sales.')->group(function () {
+        Route::prefix('sales')->name('sales.')->middleware('module:gift_store.sales')->group(function () {
             Route::get('/', [StoreSalesController::class, 'index'])->name('index');
             Route::get('/today', [StoreSalesController::class, 'today'])->name('today');
             Route::get('/create', [StoreSalesController::class, 'create'])->name('create');
@@ -273,7 +286,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== INVENTORY MANAGEMENT ====================
-        Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::prefix('inventory')->name('inventory.')->middleware('module:gift_store.inventory')->group(function () {
             Route::get('/', [StoreInventoryController::class, 'index'])->name('index');
             Route::get('/logs', [StoreInventoryController::class, 'logs'])->name('logs');
             Route::get('/{id}/adjust', [StoreInventoryController::class, 'adjust'])->name('adjust');
@@ -288,16 +301,25 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
     });
 
     // ==================== PROP RENTAL ====================
-    Route::prefix('prop-rental')->name('prop-rental.')->group(function () {
+    Route::prefix('prop-rental')
+        ->name('prop-rental.')
+        ->middleware(['business:prop_rental', 'permission:prop_rental.access'])
+        ->group(function () {
         // Dashboard & Reports
-        Route::get('/dashboard', [PropRentalController::class, 'dashboard'])->name('dashboard');
-        Route::get('/reports', [PropRentalController::class, 'reports'])->name('reports');
+        Route::get('/dashboard', [PropRentalController::class, 'dashboard'])
+            ->name('dashboard')
+            ->middleware('module:prop_rental.dashboard');
+        Route::get('/reports', [PropRentalController::class, 'reports'])
+            ->name('reports')
+            ->middleware('module:prop_rental.reports');
         
         // Main page (All Props view)
-        Route::get('/', [PropRentalController::class, 'index'])->name('index');
+        Route::get('/', [PropRentalController::class, 'index'])
+            ->name('index')
+            ->middleware('module:prop_rental.props');
         
         // Props Management
-        Route::prefix('props')->name('props.')->group(function () {
+        Route::prefix('props')->name('props.')->middleware('module:prop_rental.props')->group(function () {
             Route::get('/create', [PropsController::class, 'create'])->name('create');
             Route::post('/', [PropsController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [PropsController::class, 'edit'])->name('edit');
@@ -310,7 +332,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // Rentals Management
-        Route::prefix('rentals')->name('rentals.')->group(function () {
+        Route::prefix('rentals')->name('rentals.')->middleware('module:prop_rental.rentals')->group(function () {
             Route::get('/create', [PropRentalController::class, 'create'])->name('create');
             Route::post('/', [PropRentalController::class, 'store'])->name('store');
             Route::get('/{id}', [PropRentalController::class, 'show'])->name('show');
@@ -324,7 +346,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // Customers Management
-        Route::prefix('customers')->name('customers.')->group(function () {
+        Route::prefix('customers')->name('customers.')->middleware('module:prop_rental.customers')->group(function () {
             Route::get('/create', [RentalCustomersController::class, 'create'])->name('create');
             Route::post('/', [RentalCustomersController::class, 'store'])->name('store');
             Route::get('/{id}', [RentalCustomersController::class, 'show'])->name('show');
@@ -336,37 +358,68 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // Calendar AJAX helper
-        Route::get('/calendar/data', [PropRentalController::class, 'calendarData'])->name('calendar-data');
+        Route::get('/calendar/data', [PropRentalController::class, 'calendarData'])
+            ->name('calendar-data')
+            ->middleware('module:prop_rental.calendar');
     });
     
-    Route::prefix('photo-studio')->name('photo-studio.')->group(function () {
+    Route::prefix('photo-studio')
+        ->name('photo-studio.')
+        ->middleware(['business:photo_studio', 'permission:photo_studio.access'])
+        ->group(function () {
         // Dashboard & Main Operations
-        Route::get('/', [PhotoStudioController::class, 'index'])->name('index');
-        Route::get('/dashboard', [PhotoStudioController::class, 'index'])->name('dashboard');
+        Route::get('/', [PhotoStudioController::class, 'index'])
+            ->name('index')
+            ->middleware('module:photo_studio.dashboard');
+        Route::get('/dashboard', [PhotoStudioController::class, 'index'])
+            ->name('dashboard')
+            ->middleware('module:photo_studio.dashboard');
         
         // Active Sessions
-        Route::get('/sessions/active', [PhotoStudioController::class, 'activeSessions'])->name('sessions.active');
-        Route::get('/active-sessions', [PhotoStudioController::class, 'getActiveSessions'])->name('get-active-sessions');
+        Route::get('/sessions/active', [PhotoStudioController::class, 'activeSessions'])
+            ->name('sessions.active')
+            ->middleware('module:photo_studio.sessions');
+        Route::get('/active-sessions', [PhotoStudioController::class, 'getActiveSessions'])
+            ->name('get-active-sessions')
+            ->middleware('module:photo_studio.sessions');
         
         // Check-in & Checkout
-        Route::post('/check-in', [PhotoStudioController::class, 'checkIn'])->name('check-in');
-        Route::post('/checkout/{id}', [PhotoStudioController::class, 'checkout'])->name('checkout');
+        Route::post('/check-in', [PhotoStudioController::class, 'checkIn'])
+            ->name('check-in')
+            ->middleware('module:photo_studio.sessions');
+        Route::post('/checkout/{id}', [PhotoStudioController::class, 'checkout'])
+            ->name('checkout')
+            ->middleware('module:photo_studio.sessions');
         
         // Session Operations
-        Route::post('/start-timer/{id}', [PhotoStudioController::class, 'startTimer'])->name('start-timer');
-        Route::get('/session/{id}', [PhotoStudioController::class, 'getSession'])->name('session');
-        Route::post('/extend/{id}', [PhotoStudioController::class, 'extendSession'])->name('extend');
-        Route::post('/cancel/{id}', [PhotoStudioController::class, 'cancelSession'])->name('cancel');
+        Route::post('/start-timer/{id}', [PhotoStudioController::class, 'startTimer'])
+            ->name('start-timer')
+            ->middleware('module:photo_studio.sessions');
+        Route::get('/session/{id}', [PhotoStudioController::class, 'getSession'])
+            ->name('session')
+            ->middleware('module:photo_studio.sessions');
+        Route::post('/extend/{id}', [PhotoStudioController::class, 'extendSession'])
+            ->name('extend')
+            ->middleware('module:photo_studio.sessions');
+        Route::post('/cancel/{id}', [PhotoStudioController::class, 'cancelSession'])
+            ->name('cancel')
+            ->middleware('module:photo_studio.sessions');
         
         // QR Code Operations
-        Route::get('/session/{id}/qr-code', [PhotoStudioController::class, 'generateQRCode'])->name('generate-qr');
-        Route::post('/scan-qr', [PhotoStudioController::class, 'scanQRCode'])->name('scan-qr');
+        Route::get('/session/{id}/qr-code', [PhotoStudioController::class, 'generateQRCode'])
+            ->name('generate-qr')
+            ->middleware('module:photo_studio.sessions');
+        Route::post('/scan-qr', [PhotoStudioController::class, 'scanQRCode'])
+            ->name('scan-qr')
+            ->middleware('module:photo_studio.sessions');
         
         // Customer Search
-        Route::get('/customers/search', [PhotoStudioController::class, 'searchCustomers'])->name('customers-search');
+        Route::get('/customers/search', [PhotoStudioController::class, 'searchCustomers'])
+            ->name('customers-search')
+            ->middleware('module:photo_studio.customers');
         
         // ==================== SETTINGS ====================
-        Route::prefix('settings')->name('settings.')->group(function () {
+        Route::prefix('settings')->name('settings.')->middleware('module:photo_studio.settings')->group(function () {
             Route::get('/', [StudioSettingsController::class, 'index'])->name('index');
             Route::post('/offset-time', [StudioSettingsController::class, 'updateOffsetTime'])->name('offset-time');
             Route::post('/base-time', [StudioSettingsController::class, 'updateDefaultBaseTime'])->name('base-time');
@@ -380,7 +433,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CATEGORIES ====================
-        Route::prefix('categories')->name('categories.')->group(function () {
+        Route::prefix('categories')->name('categories.')->middleware('module:photo_studio.categories')->group(function () {
             Route::get('/', [StudioCategoryController::class, 'index'])->name('index');
             Route::get('/create', [StudioCategoryController::class, 'create'])->name('create');
             Route::post('/', [StudioCategoryController::class, 'store'])->name('store');
@@ -400,7 +453,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== ROOMS (OPTIONAL) ====================
-        Route::prefix('rooms')->name('rooms.')->group(function () {
+        Route::prefix('rooms')->name('rooms.')->middleware('module:photo_studio.rooms')->group(function () {
             Route::get('/', [StudioRoomController::class, 'index'])->name('index');
             Route::get('/create', [StudioRoomController::class, 'create'])->name('create');
             Route::post('/', [StudioRoomController::class, 'store'])->name('store');
@@ -426,7 +479,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== CUSTOMERS ====================
-        Route::prefix('customers')->name('customers.')->group(function () {
+        Route::prefix('customers')->name('customers.')->middleware('module:photo_studio.customers')->group(function () {
             Route::get('/', [StudioCustomerController::class, 'index'])->name('index');
             Route::get('/create', [StudioCustomerController::class, 'create'])->name('create');
             Route::post('/', [StudioCustomerController::class, 'store'])->name('store');
@@ -444,7 +497,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== SESSIONS ====================
-        Route::prefix('sessions')->name('sessions.')->group(function () {
+        Route::prefix('sessions')->name('sessions.')->middleware('module:photo_studio.sessions')->group(function () {
             Route::get('/', [StudioSessionController::class, 'index'])->name('index');
             Route::get('/{id}', [StudioSessionController::class, 'show'])->name('show');
             Route::post('/{id}/payment', [StudioSessionController::class, 'processPayment'])->name('payment');
@@ -452,7 +505,7 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         });
         
         // ==================== REPORTS ====================
-        Route::prefix('reports')->name('reports.')->group(function () {
+        Route::prefix('reports')->name('reports.')->middleware('module:photo_studio.reports')->group(function () {
             Route::get('/', [StudioReportController::class, 'index'])->name('index');
             Route::get('/daily', [StudioReportController::class, 'daily'])->name('daily');
             Route::get('/revenue', [StudioReportController::class, 'revenue'])->name('revenue');
@@ -465,20 +518,29 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
 
     
     // Reports
-    Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('reports', [ReportsController::class, 'index'])
+        ->name('reports.index')
+        ->middleware('permission:reports.view');
     
     // Settings
-    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('role:admin');
-    Route::post('settings', [SettingsController::class, 'update'])->name('settings.update')->middleware('role:admin');
+    Route::get('settings', [SettingsController::class, 'index'])
+        ->name('settings.index')
+        ->middleware('permission:settings.manage');
+    Route::post('settings', [SettingsController::class, 'update'])
+        ->name('settings.update')
+        ->middleware('permission:settings.manage');
+
+    Route::post('system/update', [SystemUpdateController::class, 'run'])
+        ->name('system.update.run')
+        ->middleware('permission:system.update');
 
     // =============================================
     // ADMIN ROUTES
     // =============================================
-    Route::middleware('role:admin')->group(function () {
-        // USER MANAGEMENT ROUTES
+    Route::middleware('permission:users.manage')->group(function () {
+        // USER MANAGEMENT
         Route::get('/users/activity/log', [UserController::class, 'activity'])->name('users.activity');
         Route::get('/users/activity/export', [UserController::class, 'exportActivity'])->name('users.activity.export');
-        Route::get('/users/security/settings', [UserController::class, 'security'])->name('users.security');
         Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->name('users.download-template');
         Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
@@ -498,8 +560,10 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         Route::post('/users/bulk-suspend', [UserController::class, 'bulkSuspend'])->name('users.bulk-suspend');
         Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
         Route::post('/users/bulk-assign-role', [UserController::class, 'bulkAssignRole'])->name('users.bulk-assign-role');
+    });
 
-        // ROLE MANAGEMENT ROUTES
+    Route::middleware('permission:roles.manage')->group(function () {
+        // ROLE MANAGEMENT
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
         Route::get('/roles/{id}', [RoleController::class, 'show'])->name('roles.show');
@@ -507,8 +571,10 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
         Route::post('/roles/{id}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
         Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->name('roles.duplicate');
+    });
 
-        // DEPARTMENT MANAGEMENT ROUTES
+    Route::middleware('permission:departments.manage')->group(function () {
+        // DEPARTMENT MANAGEMENT
         Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
         Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
         Route::get('/departments/{id}', [DepartmentController::class, 'show'])->name('departments.show');
@@ -517,8 +583,11 @@ Route::prefix('app')->middleware(['auth:user'])->group(function () {
         Route::get('/departments/{id}/members', [DepartmentController::class, 'members'])->name('departments.members');
         Route::post('/departments/{id}/members', [DepartmentController::class, 'addMember'])->name('departments.add-member');
         Route::delete('/departments/{id}/members/{userId}', [DepartmentController::class, 'removeMember'])->name('departments.remove-member');
+    });
 
-        // SECURITY SETTINGS ROUTES
+    Route::middleware('permission:security.manage')->group(function () {
+        // SECURITY SETTINGS
+        Route::get('/users/security/settings', [UserController::class, 'security'])->name('users.security');
         Route::post('/security/password-policy', [SecurityController::class, 'updatePasswordPolicy'])->name('users.security.password-policy');
         Route::post('/security/authentication', [SecurityController::class, 'updateAuthentication'])->name('users.security.authentication');
         Route::post('/security/audit-log', [SecurityController::class, 'updateAuditLog'])->name('users.security.audit-log');

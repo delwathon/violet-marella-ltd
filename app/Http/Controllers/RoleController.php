@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Support\AccessControl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,7 @@ class RoleController extends Controller
             })
             ->unique()
             ->count();
+        $catalogPermissionGroups = AccessControl::permissionGroups();
 
         return view('pages.roles.index', compact(
             'user',
@@ -45,7 +47,8 @@ class RoleController extends Controller
             'totalRoles',
             'totalPermissions',
             'customRoles',
-            'permissionGroups'
+            'permissionGroups',
+            'catalogPermissionGroups'
         ));
     }
 
@@ -87,8 +90,9 @@ class RoleController extends Controller
         $users = User::where('role', $role->slug)
             ->orderBy('first_name')
             ->paginate(20);
+        $permissionGroups = AccessControl::permissionGroups();
 
-        return view('pages.roles.show', compact('user', 'role', 'users'));
+        return view('pages.roles.show', compact('user', 'role', 'users', 'permissionGroups'));
     }
 
     public function update(Request $request, int $id): RedirectResponse

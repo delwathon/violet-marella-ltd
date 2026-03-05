@@ -23,6 +23,14 @@ class EnsureUserHasRole
             return $next($request);
         }
 
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
+        if ($user->isAdmin() && in_array('admin', $allowedRoles, true)) {
+            return $next($request);
+        }
+
         if (!in_array($user->role, $allowedRoles, true)) {
             abort(403, 'You do not have permission to access this resource.');
         }

@@ -15,10 +15,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
     @stack('styles')
+    <link href="{{ asset('assets/css/ui-upgrade.css') }}" rel="stylesheet">
 </head>
 <body>
     <!-- Toast Container -->
@@ -90,14 +92,17 @@
         <div class="main-app" id="mainApp">
             <!-- Sidebar -->
             @include('layouts.sidebar')
+            <div class="sidebar-backdrop" onclick="document.querySelector('.sidebar')?.classList.remove('mobile-open')" aria-hidden="true"></div>
 
             <!-- Main Content -->
             <div class="main-content">
                 <nav class="top-navbar">
                     @include('layouts.header')
                 </nav>
-                @yield('content')
-                @include('layouts.footer')
+                <main class="app-stage">
+                    @yield('content')
+                    @include('layouts.footer')
+                </main>
             </div>
         </div>
     @else

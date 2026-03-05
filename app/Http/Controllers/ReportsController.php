@@ -26,37 +26,46 @@ class ReportsController extends Controller
     public function index(Request $request)
     {
         $user = Auth::guard('user')->user();
+        $allowedBusinesses = $user->accessibleBusinessSlugs();
+
+        if ($allowedBusinesses === []) {
+            abort(403, 'No business access has been assigned to your account.');
+        }
         
         // Get filter parameters
         $businessUnit = $request->get('business_unit', 'all');
         $dateRange = $request->get('date_range', 'month');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+
+        if ($businessUnit !== 'all' && !in_array($businessUnit, $allowedBusinesses, true)) {
+            $businessUnit = $allowedBusinesses[0];
+        }
         
         // Calculate date ranges
         $dates = $this->getDateRange($dateRange, $startDate, $endDate);
         $previousDates = $this->getPreviousDateRange($dateRange, $startDate, $endDate);
         
         // Get comprehensive statistics
-        $statistics = $this->calculateStatistics($businessUnit, $dates, $previousDates);
+        $statistics = $this->calculateStatistics($businessUnit, $dates, $previousDates, $allowedBusinesses);
         
         // Get revenue trend data
-        $revenueTrend = $this->getRevenueTrend($businessUnit, $dates);
+        $revenueTrend = $this->getRevenueTrend($businessUnit, $dates, $allowedBusinesses);
         
         // Get business unit comparison
-        $businessComparison = $this->getBusinessComparison($dates);
+        $businessComparison = $this->getBusinessComparison($dates, $allowedBusinesses);
         
         // Get top performing products/services
-        $topPerformers = $this->getTopPerformers($businessUnit, $dates);
+        $topPerformers = $this->getTopPerformers($businessUnit, $dates, $allowedBusinesses);
         
         // Get customer insights
-        $customerInsights = $this->getCustomerInsights($businessUnit, $dates);
+        $customerInsights = $this->getCustomerInsights($businessUnit, $dates, $allowedBusinesses);
         
         // Get payment status breakdown
-        $paymentStatus = $this->getPaymentStatusBreakdown($businessUnit, $dates);
+        $paymentStatus = $this->getPaymentStatusBreakdown($businessUnit, $dates, $allowedBusinesses);
         
         // Get hourly/daily trend
-        $timeTrend = $this->getTimeTrend($businessUnit, $dates);
+        $timeTrend = $this->getTimeTrend($businessUnit, $dates, $allowedBusinesses);
         
         return view('pages.reports', compact(
             'user',
@@ -69,7 +78,8 @@ class ReportsController extends Controller
             'topPerformers',
             'customerInsights',
             'paymentStatus',
-            'timeTrend'
+            'timeTrend',
+            'allowedBusinesses'
         ));
     }
     
@@ -138,11 +148,11 @@ class ReportsController extends Controller
     /**
      * Calculate comprehensive statistics
      */
-    private function calculateStatistics($businessUnit, $dates, $previousDates)
+    private function calculateStatistics($businessUnit, $dates, $previousDates, array $allowedBusinesses)
     {
         $stats = [
-            'current' => $this->calculatePeriodStats($businessUnit, $dates),
-            'previous' => $this->calculatePeriodStats($businessUnit, $previousDates),
+            'current' => $this->calculatePeriodStats($businessUnit, $dates, $allowedBusinesses),
+            'previous' => $this->calculatePeriodStats($businessUnit, $previousDates, $allowedBusinesses),
         ];
         
         // Calculate changes
@@ -171,13 +181,13 @@ class ReportsController extends Controller
     /**
      * Calculate statistics for a period
      */
-    private function calculatePeriodStats($businessUnit, $dates)
+    private function calculatePeriodStats($businessUnit, $dates, array $allowedBusinesses)
     {
         $revenue = 0;
         $transactions = 0;
         $customers = 0;
         
-        if ($businessUnit === 'all' || $businessUnit === 'lounge') {
+        if ($this->shouldIncludeBusiness('lounge', $businessUnit, $allowedBusinesses)) {
             $loungeRevenue = Sale::completed()
                 ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                 ->sum('total_amount');
@@ -193,7 +203,7 @@ class ReportsController extends Controller
             $customers += $loungeCustomers;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'gift_store') {
+        if ($this->shouldIncludeBusiness('gift_store', $businessUnit, $allowedBusinesses)) {
             $storeRevenue = StoreSale::completed()
                 ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                 ->sum('total_amount');
@@ -209,7 +219,7 @@ class ReportsController extends Controller
             $customers += $storeCustomers;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'photo_studio') {
+        if ($this->shouldIncludeBusiness('photo_studio', $businessUnit, $allowedBusinesses)) {
             $studioRevenue = StudioSession::completed()
                 ->whereBetween('check_out_time', [$dates['start'], $dates['end']])
                 ->where('payment_status', 'paid')
@@ -226,7 +236,7 @@ class ReportsController extends Controller
             $customers += $studioCustomers;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'prop_rental') {
+        if ($this->shouldIncludeBusiness('prop_rental', $businessUnit, $allowedBusinesses)) {
             $propRevenue = PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
                 ->sum('total_amount');
             $propTransactions = PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
@@ -263,7 +273,7 @@ class ReportsController extends Controller
     /**
      * Get revenue trend data
      */
-    private function getRevenueTrend($businessUnit, $dates)
+    private function getRevenueTrend($businessUnit, $dates, array $allowedBusinesses)
     {
         $days = $dates['start']->diffInDays($dates['end']) + 1;
         $trend = [];
@@ -274,26 +284,26 @@ class ReportsController extends Controller
             
             $dayRevenue = 0;
             
-            if ($businessUnit === 'all' || $businessUnit === 'lounge') {
+            if ($this->shouldIncludeBusiness('lounge', $businessUnit, $allowedBusinesses)) {
                 $dayRevenue += Sale::completed()
                     ->whereDate('sale_date', $dateString)
                     ->sum('total_amount');
             }
             
-            if ($businessUnit === 'all' || $businessUnit === 'gift_store') {
+            if ($this->shouldIncludeBusiness('gift_store', $businessUnit, $allowedBusinesses)) {
                 $dayRevenue += StoreSale::completed()
                     ->whereDate('sale_date', $dateString)
                     ->sum('total_amount');
             }
             
-            if ($businessUnit === 'all' || $businessUnit === 'photo_studio') {
+            if ($this->shouldIncludeBusiness('photo_studio', $businessUnit, $allowedBusinesses)) {
                 $dayRevenue += StudioSession::completed()
                     ->whereDate('check_out_time', $dateString)
                     ->where('payment_status', 'paid')
                     ->sum('total_amount');
             }
             
-            if ($businessUnit === 'all' || $businessUnit === 'prop_rental') {
+            if ($this->shouldIncludeBusiness('prop_rental', $businessUnit, $allowedBusinesses)) {
                 $dayRevenue += PropRental::whereDate('created_at', $dateString)
                     ->sum('total_amount');
             }
@@ -310,10 +320,12 @@ class ReportsController extends Controller
     /**
      * Get business unit comparison
      */
-    private function getBusinessComparison($dates)
+    private function getBusinessComparison($dates, array $allowedBusinesses)
     {
-        return [
-            [
+        $comparison = [];
+
+        if (in_array('lounge', $allowedBusinesses, true)) {
+            $comparison[] = [
                 'name' => 'Mini Lounge',
                 'revenue' => Sale::completed()
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
@@ -322,8 +334,11 @@ class ReportsController extends Controller
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                     ->count(),
                 'color' => '#10b981',
-            ],
-            [
+            ];
+        }
+
+        if (in_array('gift_store', $allowedBusinesses, true)) {
+            $comparison[] = [
                 'name' => 'Gift Store',
                 'revenue' => StoreSale::completed()
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
@@ -332,8 +347,11 @@ class ReportsController extends Controller
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                     ->count(),
                 'color' => '#ef4444',
-            ],
-            [
+            ];
+        }
+
+        if (in_array('photo_studio', $allowedBusinesses, true)) {
+            $comparison[] = [
                 'name' => 'Photo Studio',
                 'revenue' => StudioSession::completed()
                     ->whereBetween('check_out_time', [$dates['start'], $dates['end']])
@@ -343,26 +361,31 @@ class ReportsController extends Controller
                     ->whereBetween('check_out_time', [$dates['start'], $dates['end']])
                     ->count(),
                 'color' => '#6f42c1',
-            ],
-            [
+            ];
+        }
+
+        if (in_array('prop_rental', $allowedBusinesses, true)) {
+            $comparison[] = [
                 'name' => 'Prop Rental',
                 'revenue' => PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
                     ->sum('total_amount'),
                 'transactions' => PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
                     ->count(),
                 'color' => '#f59e0b',
-            ],
-        ];
+            ];
+        }
+
+        return $comparison;
     }
     
     /**
      * Get top performers - FIXED COLUMN NAMES
      */
-    private function getTopPerformers($businessUnit, $dates)
+    private function getTopPerformers($businessUnit, $dates, array $allowedBusinesses)
     {
         $performers = [];
         
-        if ($businessUnit === 'all' || $businessUnit === 'lounge') {
+        if ($this->shouldIncludeBusiness('lounge', $businessUnit, $allowedBusinesses)) {
             $topProducts = DB::table('sale_items')
                 ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
                 ->join('products', 'sale_items.product_id', '=', 'products.id')
@@ -381,7 +404,7 @@ class ReportsController extends Controller
             $performers['lounge'] = $topProducts;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'gift_store') {
+        if ($this->shouldIncludeBusiness('gift_store', $businessUnit, $allowedBusinesses)) {
             $topStoreProducts = DB::table('store_sale_items')
                 ->join('store_sales', 'store_sale_items.store_sale_id', '=', 'store_sales.id')
                 ->join('store_products', 'store_sale_items.store_product_id', '=', 'store_products.id')
@@ -406,7 +429,7 @@ class ReportsController extends Controller
     /**
      * Get customer insights
      */
-    private function getCustomerInsights($businessUnit, $dates)
+    private function getCustomerInsights($businessUnit, $dates, array $allowedBusinesses)
     {
         $insights = [
             'new_customers' => 0,
@@ -414,22 +437,22 @@ class ReportsController extends Controller
             'top_customers' => [],
         ];
         
-        if ($businessUnit === 'all' || $businessUnit === 'lounge') {
+        if ($this->shouldIncludeBusiness('lounge', $businessUnit, $allowedBusinesses)) {
             $newLounge = Customer::whereBetween('created_at', [$dates['start'], $dates['end']])->count();
             $insights['new_customers'] += $newLounge;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'gift_store') {
+        if ($this->shouldIncludeBusiness('gift_store', $businessUnit, $allowedBusinesses)) {
             $newStore = StoreCustomer::whereBetween('created_at', [$dates['start'], $dates['end']])->count();
             $insights['new_customers'] += $newStore;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'photo_studio') {
+        if ($this->shouldIncludeBusiness('photo_studio', $businessUnit, $allowedBusinesses)) {
             $newStudio = StudioCustomer::whereBetween('created_at', [$dates['start'], $dates['end']])->count();
             $insights['new_customers'] += $newStudio;
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'prop_rental') {
+        if ($this->shouldIncludeBusiness('prop_rental', $businessUnit, $allowedBusinesses)) {
             $newRental = RentalCustomer::whereBetween('created_at', [$dates['start'], $dates['end']])->count();
             $insights['new_customers'] += $newRental;
         }
@@ -440,12 +463,12 @@ class ReportsController extends Controller
     /**
      * Get payment status breakdown
      */
-    private function getPaymentStatusBreakdown($businessUnit, $dates)
+    private function getPaymentStatusBreakdown($businessUnit, $dates, array $allowedBusinesses)
     {
         $paid = 0;
         $pending = 0;
         
-        if ($businessUnit === 'all' || $businessUnit === 'lounge') {
+        if ($this->shouldIncludeBusiness('lounge', $businessUnit, $allowedBusinesses)) {
             $paid += Sale::whereBetween('sale_date', [$dates['start'], $dates['end']])
                 ->where('payment_status', 'completed')
                 ->sum('total_amount');
@@ -454,7 +477,7 @@ class ReportsController extends Controller
                 ->sum('total_amount');
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'gift_store') {
+        if ($this->shouldIncludeBusiness('gift_store', $businessUnit, $allowedBusinesses)) {
             $paid += StoreSale::whereBetween('sale_date', [$dates['start'], $dates['end']])
                 ->where('payment_status', 'completed')
                 ->sum('total_amount');
@@ -463,7 +486,7 @@ class ReportsController extends Controller
                 ->sum('total_amount');
         }
         
-        if ($businessUnit === 'all' || $businessUnit === 'photo_studio') {
+        if ($this->shouldIncludeBusiness('photo_studio', $businessUnit, $allowedBusinesses)) {
             $paid += StudioSession::whereBetween('check_in_time', [$dates['start'], $dates['end']])
                 ->where('payment_status', 'paid')
                 ->sum('total_amount');
@@ -478,11 +501,20 @@ class ReportsController extends Controller
             'total' => $paid + $pending,
         ];
     }
+
+    private function shouldIncludeBusiness(string $targetBusiness, string $selectedBusiness, array $allowedBusinesses): bool
+    {
+        if (!in_array($targetBusiness, $allowedBusinesses, true)) {
+            return false;
+        }
+
+        return $selectedBusiness === 'all' || $selectedBusiness === $targetBusiness;
+    }
     
     /**
      * Get time-based trend (hourly for today, daily otherwise)
      */
-    private function getTimeTrend($businessUnit, $dates)
+    private function getTimeTrend($businessUnit, $dates, array $allowedBusinesses)
     {
         // Implementation depends on requirements
         return [];

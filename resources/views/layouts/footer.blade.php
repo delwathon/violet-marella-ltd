@@ -1,5 +1,5 @@
-<footer class="footer mt-auto py-3 bg-light">
+<footer class="footer app-footer mt-auto py-3">
     <div class="container text-center">
-        <span class="text-muted">&copy; {{ date('Y') }} Violet Marella Limited. All rights reserved.</span>
+        <span class="text-muted">&copy; {{ date('Y') }} Violet Marella Limited. All rights reserved. Built for cross-business operations.</span>
     </div>
 </footer>

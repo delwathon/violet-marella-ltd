@@ -34,6 +34,16 @@
                     <div class="row g-3">
                         <div class="col-md-6"><strong>Role:</strong> {{ $targetUser->roleRecord?->name ?? $targetUser->role }}</div>
                         <div class="col-md-6"><strong>Department:</strong> {{ $targetUser->department?->name ?? '-' }}</div>
+                        <div class="col-12">
+                            <strong>Businesses:</strong>
+                            @if($targetUser->businesses->isNotEmpty())
+                                @foreach($targetUser->businesses as $business)
+                                    <span class="badge bg-light text-dark me-1">{{ $business->name }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-muted">None assigned</span>
+                            @endif
+                        </div>
                         <div class="col-md-6"><strong>Phone:</strong> {{ $targetUser->phone ?? '-' }}</div>
                         <div class="col-md-6"><strong>Hire Date:</strong> {{ optional($targetUser->hire_date)->format('Y-m-d') ?? '-' }}</div>
                         <div class="col-md-6"><strong>Hourly Rate:</strong> {{ $targetUser->hourly_rate !== null ? number_format((float) $targetUser->hourly_rate, 2) : '-' }}</div>

@@ -1,5 +1,27 @@
 <!-- Sidebar Navigation -->
-<aside class="d-flex flex-column bg-dark text-white vh-100 position-fixed start-0 top-0 overflow-auto" style="width: 300px; z-index: 1000;">
+<aside id="sidebar" class="sidebar d-flex flex-column bg-dark text-white vh-100 position-fixed start-0 top-0 overflow-auto" style="width: 300px; z-index: 1000;">
+    @php
+        $canDashboard = $user->hasPermission('dashboard.view');
+        $canLounge = $user->hasBusinessAccess('lounge') && $user->hasPermission('lounge.access');
+        $canGiftStore = $user->hasBusinessAccess('gift_store') && $user->hasPermission('gift_store.access');
+        $canPhotoStudio = $user->hasBusinessAccess('photo_studio') && $user->hasPermission('photo_studio.access');
+        $canPropRental = $user->hasBusinessAccess('prop_rental') && $user->hasPermission('prop_rental.access');
+
+        $canReports = $user->hasPermission('reports.view');
+        $canUsersManage = $user->hasPermission('users.manage');
+        $canRolesManage = $user->hasPermission('roles.manage');
+        $canDepartmentsManage = $user->hasPermission('departments.manage');
+        $canSecurityManage = $user->hasPermission('security.manage');
+        $canSystemUpdate = $user->hasPermission('system.update');
+
+        $dashboardLabel = ($user->isSuperAdmin() || $user->role === 'admin')
+            ? 'All Business Overview'
+            : ($user->role === 'manager' ? 'Managed Businesses' : 'My Dashboard');
+
+        $canSystemManagement = $canReports || $canUsersManage || $canRolesManage || $canDepartmentsManage || $canSecurityManage || $canSystemUpdate;
+        $canUserManagementMenu = $canUsersManage || $canRolesManage || $canDepartmentsManage || $canSecurityManage;
+    @endphp
+
     <!-- Sidebar Header -->
     <div class="p-4 border-bottom border-secondary border-opacity-25">
         <h3 class="h5 mb-0 fw-semibold">Violet Marella Ltd</h3>
@@ -9,21 +31,24 @@
     <nav class="flex-grow-1 py-3">
         <ul class="nav flex-column">
             
-            <!-- Overall Dashboard -->
-            <li class="nav-item">
-                <a href="{{ route('dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('dashboard') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-home me-3" style="width: 20px;"></i>
-                    <span>All Business Overview</span>
-                </a>
-            </li>
+            @if($canDashboard)
+                <!-- Overall Dashboard -->
+                <li class="nav-item">
+                    <a href="{{ route('dashboard') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('dashboard') ? 'bg-primary text-white' : '' }}">
+                        <i class="fas fa-home me-3" style="width: 20px;"></i>
+                        <span>{{ $dashboardLabel }}</span>
+                    </a>
+                </li>
+            @endif
             
-            <!-- Lounge Section Header -->
-            <li class="nav-item mt-3">
-                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-store me-2 small"></i>
-                    <span>Lounge</span>
-                </div>
-            </li>
+            @if($canLounge)
+                <!-- Lounge Section Header -->
+                <li class="nav-item mt-3">
+                    <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                        <i class="fas fa-store me-2 small"></i>
+                        <span>Lounge</span>
+                    </div>
+                </li>
             
             <!-- Point of Sale -->
             <li class="nav-item">
@@ -130,15 +155,17 @@
                     </ul>
                 </div>
             </li>
+            @endif
 
             
-            <!-- Anire Craft Store Section Header -->
-            <li class="nav-item mt-4">
-                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-gift me-2 small"></i>
-                    <span>Anire Craft Store</span>
-                </div>
-            </li>
+            @if($canGiftStore)
+                <!-- Anire Craft Store Section Header -->
+                <li class="nav-item mt-4">
+                    <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                        <i class="fas fa-gift me-2 small"></i>
+                        <span>Anire Craft Store</span>
+                    </div>
+                </li>
 
             <!-- Point of Sale -->
             <li class="nav-item">
@@ -255,13 +282,16 @@
 
 
 
-            <!-- Photo Studio Section Header -->
-            <li class="nav-item mt-3">
-                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-camera me-2 small"></i>
-                    <span>Photo Studio</span>
-                </div>
-            </li>
+            @endif
+
+            @if($canPhotoStudio)
+                <!-- Photo Studio Section Header -->
+                <li class="nav-item mt-3">
+                    <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                        <i class="fas fa-camera me-2 small"></i>
+                        <span>Photo Studio</span>
+                    </div>
+                </li>
 
             <!-- Photo Studio Dashboard -->
             <li class="nav-item">
@@ -411,13 +441,16 @@
             </li>
 
             
-            <!-- Prop Rental Section Header -->
-            <li class="nav-item mt-4">
-                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-guitar me-2 small"></i>
-                    <span>Prop Rental</span>
-                </div>
-            </li>
+            @endif
+
+            @if($canPropRental)
+                <!-- Prop Rental Section Header -->
+                <li class="nav-item mt-4">
+                    <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                        <i class="fas fa-guitar me-2 small"></i>
+                        <span>Prop Rental</span>
+                    </div>
+                </li>
                        
             <!-- Prop Rental Dashboard -->
             <li class="nav-item">
@@ -463,21 +496,40 @@
             
             
 
-            <!-- System & Settings Section Header -->
-            <li class="nav-item mt-3">
-                <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
-                    <i class="fas fa-cog me-2 small"></i>
-                    <span>System Management</span>
-                </div>
-            </li>
-            
-            <!-- Reports -->
-            <li class="nav-item">
-                <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">
-                    <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
-                    <span>Reports & Analytics</span>
-                </a>
-            </li>
+            @endif
+
+            @if($canSystemManagement)
+                <!-- System & Settings Section Header -->
+                <li class="nav-item mt-3">
+                    <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
+                        <i class="fas fa-cog me-2 small"></i>
+                        <span>System Management</span>
+                    </div>
+                </li>
+                
+                @if($canReports)
+                    <!-- Reports -->
+                    <li class="nav-item">
+                        <a href="{{ route('reports.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('reports.*') ? 'bg-primary text-white' : '' }}">
+                            <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
+                            <span>Reports & Analytics</span>
+                        </a>
+                    </li>
+                @endif
+
+                @if($canSystemUpdate)
+                    <li class="nav-item">
+                        <button
+                            type="button"
+                            class="nav-link text-white-50 d-flex align-items-center py-2 px-4 w-100 text-start border-0 bg-transparent"
+                            data-bs-toggle="modal"
+                            data-bs-target="#systemUpdateModal"
+                        >
+                            <i class="fas fa-cloud-arrow-down me-3" style="width: 20px;"></i>
+                            <span>Update Application</span>
+                        </button>
+                    </li>
+                @endif
             
             <!-- Settings -->
             {{-- <li class="nav-item">
@@ -507,48 +559,59 @@
                 </div>
             </li> --}}
             
-            <!-- User Management with Submenu -->
-            <li class="nav-item">
-                <a href="#userManagementMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'true' : 'false' }}">
-                    <i class="fas fa-user-shield me-3" style="width: 20px;"></i>
-                    <span class="flex-grow-1">User Management</span>
-                    <i class="fas fa-chevron-down small"></i>
-                </a>
-                <div class="collapse {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'show' : '' }}" id="userManagementMenu">
-                    <ul class="nav flex-column bg-black bg-opacity-25 py-1">
-                        <li class="nav-item">
-                            <a href="{{ route('users.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.index') || request()->is('users') ? 'text-white' : '' }}">
-                                <i class="fas fa-users me-2"></i> All Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('users.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.create') ? 'text-white' : '' }}">
-                                <i class="fas fa-user-plus me-2"></i> Add New User
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('roles.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('roles.*') ? 'text-white' : '' }}">
-                                <i class="fas fa-user-tag me-2"></i> Roles & Permissions
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('departments.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('departments.*') ? 'text-white' : '' }}">
-                                <i class="fas fa-sitemap me-2"></i> Departments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('users.activity') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.activity') ? 'text-white' : '' }}">
-                                <i class="fas fa-history me-2"></i> Activity Log
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('users.security') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.security') ? 'text-white' : '' }}">
-                                <i class="fas fa-shield-alt me-2"></i> Security Settings
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                @if($canUserManagementMenu)
+                    <!-- User Management with Submenu -->
+                    <li class="nav-item">
+                        <a href="#userManagementMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'true' : 'false' }}">
+                            <i class="fas fa-user-shield me-3" style="width: 20px;"></i>
+                            <span class="flex-grow-1">User Management</span>
+                            <i class="fas fa-chevron-down small"></i>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('departments.*') ? 'show' : '' }}" id="userManagementMenu">
+                            <ul class="nav flex-column bg-black bg-opacity-25 py-1">
+                                @if($canUsersManage)
+                                    <li class="nav-item">
+                                        <a href="{{ route('users.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.index') || request()->is('users') ? 'text-white' : '' }}">
+                                            <i class="fas fa-users me-2"></i> All Users
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('users.create') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.create') ? 'text-white' : '' }}">
+                                            <i class="fas fa-user-plus me-2"></i> Add New User
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('users.activity') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.activity') ? 'text-white' : '' }}">
+                                            <i class="fas fa-history me-2"></i> Activity Log
+                                        </a>
+                                    </li>
+                                @endif
+                                @if($canRolesManage)
+                                    <li class="nav-item">
+                                        <a href="{{ route('roles.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('roles.*') ? 'text-white' : '' }}">
+                                            <i class="fas fa-user-tag me-2"></i> Roles & Permissions
+                                        </a>
+                                    </li>
+                                @endif
+                                @if($canDepartmentsManage)
+                                    <li class="nav-item">
+                                        <a href="{{ route('departments.index') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('departments.*') ? 'text-white' : '' }}">
+                                            <i class="fas fa-sitemap me-2"></i> Departments
+                                        </a>
+                                    </li>
+                                @endif
+                                @if($canSecurityManage)
+                                    <li class="nav-item">
+                                        <a href="{{ route('users.security') }}" class="nav-link text-white-50 d-flex align-items-center py-2 small {{ request()->routeIs('users.security') ? 'text-white' : '' }}">
+                                            <i class="fas fa-shield-alt me-2"></i> Security Settings
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </div>
+                    </li>
+                @endif
+            @endif
             
         </ul>
     </nav>
@@ -572,3 +635,39 @@
         </div>
     </div>
 </aside>
+
+@if($canSystemUpdate)
+    <div class="modal fade" id="systemUpdateModal" tabindex="-1" aria-labelledby="systemUpdateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="systemUpdateModalLabel">
+                        <i class="fas fa-cloud-arrow-down me-2 text-primary"></i>
+                        Update Application
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">
+                        This will run a full system update now.
+                    </p>
+                    <ul class="mb-0 ps-3">
+                        <li>Create a database backup in <code>storage/backups</code></li>
+                        <li>Run <code>git pull</code></li>
+                        <li>Run <code>php artisan migrate --force</code></li>
+                        <li>Run <code>php artisan db:seed --force</code></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('system.update.run') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-rotate me-2"></i>Confirm Update
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif

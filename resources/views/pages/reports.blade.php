@@ -317,11 +317,21 @@
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Business Unit</label>
                     <select class="form-select" name="business_unit" onchange="this.form.submit()">
-                        <option value="all" {{ $businessUnit === 'all' ? 'selected' : '' }}>All Business Units</option>
-                        <option value="lounge" {{ $businessUnit === 'lounge' ? 'selected' : '' }}>Mini Lounge</option>
-                        <option value="gift_store" {{ $businessUnit === 'gift_store' ? 'selected' : '' }}>Gift Store</option>
-                        <option value="photo_studio" {{ $businessUnit === 'photo_studio' ? 'selected' : '' }}>Photo Studio</option>
-                        <option value="prop_rental" {{ $businessUnit === 'prop_rental' ? 'selected' : '' }}>Prop Rental</option>
+                        @if(count($allowedBusinesses) > 1)
+                            <option value="all" {{ $businessUnit === 'all' ? 'selected' : '' }}>All Assigned Businesses</option>
+                        @endif
+                        @if(in_array('lounge', $allowedBusinesses, true))
+                            <option value="lounge" {{ $businessUnit === 'lounge' ? 'selected' : '' }}>Mini Lounge</option>
+                        @endif
+                        @if(in_array('gift_store', $allowedBusinesses, true))
+                            <option value="gift_store" {{ $businessUnit === 'gift_store' ? 'selected' : '' }}>Gift Store</option>
+                        @endif
+                        @if(in_array('photo_studio', $allowedBusinesses, true))
+                            <option value="photo_studio" {{ $businessUnit === 'photo_studio' ? 'selected' : '' }}>Photo Studio</option>
+                        @endif
+                        @if(in_array('prop_rental', $allowedBusinesses, true))
+                            <option value="prop_rental" {{ $businessUnit === 'prop_rental' ? 'selected' : '' }}>Prop Rental</option>
+                        @endif
                     </select>
                 </div>
                 

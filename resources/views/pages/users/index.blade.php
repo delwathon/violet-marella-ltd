@@ -31,7 +31,7 @@
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('users.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label small mb-1">Search</label>
                     <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Name or email">
                 </div>
@@ -50,6 +50,15 @@
                         <option value="">All departments</option>
                         @foreach($departments as $department)
                             <option value="{{ $department->id }}" {{ (string) request('department') === (string) $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small mb-1">Business</label>
+                    <select name="business" class="form-select">
+                        <option value="">All businesses</option>
+                        @foreach($businesses as $business)
+                            <option value="{{ $business->slug }}" {{ request('business') === $business->slug ? 'selected' : '' }}>{{ $business->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -79,6 +88,7 @@
                             <th>Email</th>
                             <th>Role</th>
                             <th>Department</th>
+                            <th>Businesses</th>
                             <th>Status</th>
                             <th>Hire Date</th>
                             <th class="text-end pe-4">Actions</th>
@@ -103,6 +113,18 @@
                                 <td><span class="badge bg-light text-dark">{{ $targetUser->roleRecord?->name ?? $targetUser->role }}</span></td>
                                 <td>{{ $targetUser->department?->name ?? '-' }}</td>
                                 <td>
+                                    @if($targetUser->businesses->isNotEmpty())
+                                        @foreach($targetUser->businesses->take(2) as $business)
+                                            <span class="badge bg-light text-dark me-1">{{ $business->name }}</span>
+                                        @endforeach
+                                        @if($targetUser->businesses->count() > 2)
+                                            <span class="badge bg-secondary">+{{ $targetUser->businesses->count() - 2 }}</span>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <span class="badge bg-{{ $targetUser->is_active ? 'success' : 'secondary' }}">
                                         {{ $targetUser->is_active ? 'Active' : 'Inactive' }}
                                     </span>
@@ -120,7 +142,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="text-center text-muted py-4">No users found.</td></tr>
+                            <tr><td colspan="8" class="text-center text-muted py-4">No users found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

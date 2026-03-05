@@ -1,107 +1,144 @@
 @extends('layouts.app')
-@section('title', 'All Business Overview - Violet Marella Limited')
+@section('title', ($roleContext['title'] ?? 'Dashboard') . ' - Violet Marella Limited')
 
 @push('styles')
 <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
 <style>
-    /* Enhanced Dashboard Styles */
+    .dashboard-shell {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .dashboard-hero {
+        background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .hero-kpi {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.75rem;
+    }
+
+    .hero-kpi .label {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 0.25rem;
+    }
+
+    .hero-kpi .value {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .scope-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .today-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .today-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.1rem;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+        border-top: 4px solid transparent;
+    }
+
+    .today-card .value {
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .today-card .label {
+        color: #64748b;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.35px;
+    }
+
     .business-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 1rem;
     }
-    
-    .business-unit-card {
-        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-        border-radius: 16px;
-        padding: 1.5rem;
-        color: white;
+
+    .business-card {
+        border-radius: 14px;
+        padding: 1.25rem;
+        color: #fff;
+        background: linear-gradient(135deg, #1f2937, #374151);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
-    .business-unit-card::before {
+
+    .business-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        inset: 0 auto auto 0;
+        width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, var(--primary-violet), var(--secondary-violet));
+        background: var(--accent-color);
     }
-    
-    .business-unit-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+    .business-highlights {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
     }
-    
-    .business-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        margin-bottom: 1rem;
-    }
-    
-    .business-stats {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .business-stat-item {
+
+    .business-highlight {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        padding: 0.22rem 0;
     }
-    
-    .business-stat-label {
-        color: rgba(255, 255, 255, 0.7);
+
+    .business-highlight .label {
+        color: rgba(255, 255, 255, 0.75);
     }
-    
-    .business-stat-value {
-        font-weight: 600;
-        color: white;
+
+    .chart-card,
+    .activity-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.3rem;
+        box-shadow: 0 2px 14px rgba(15, 23, 42, 0.08);
     }
-    
-    .revenue-chart-container {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-    }
-    
-    .activity-feed {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-    
+
     .activity-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 1rem;
-        border-radius: 12px;
-        margin-bottom: 0.75rem;
-        transition: all 0.2s ease;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        display: grid;
+        grid-template-columns: 40px 1fr auto;
+        gap: 0.75rem;
+        align-items: center;
+        border: 1px solid #eef2f7;
+        border-radius: 10px;
+        padding: 0.8rem;
+        margin-bottom: 0.65rem;
     }
-    
-    .activity-item:hover {
-        background: #f9fafb;
-        transform: translateX(4px);
-    }
-    
+
     .activity-icon {
         width: 40px;
         height: 40px;
@@ -109,386 +146,214 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 1rem;
-        flex-shrink: 0;
     }
-    
-    .activity-details {
-        flex: 1;
-    }
-    
-    .activity-title {
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 0.25rem;
-        font-size: 0.9rem;
-    }
-    
-    .activity-description {
-        color: #6b7280;
-        font-size: 0.85rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .activity-time {
-        color: #9ca3af;
-        font-size: 0.75rem;
-    }
-    
-    .activity-amount {
-        font-weight: 600;
-        color: #059669;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        margin-left: 1rem;
-    }
-    
-    .today-summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    
-    .today-summary-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        border-left: 4px solid;
-    }
-    
-    .summary-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 0.25rem;
-    }
-    
-    .summary-label {
-        color: #6b7280;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-    }
-    
-    .section-header {
+
+    .activity-meta {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #1f2937;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.2rem;
     }
 </style>
 @endpush
 
 @section('content')
 <div class="content-area">
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h1 class="page-title">All Business Overview</h1>
-                <p class="page-subtitle">Consolidated view across all business units</p>
-            </div>
-            <div class="col-auto">
-                <a href="{{ route('reports.index') }}" class="btn btn-primary">
-                    <i class="fas fa-chart-line me-2"></i>Detailed Reports
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-value">₦{{ number_format($stats['total_revenue'], 2) }}</div>
-                <div class="stat-label">Total Revenue (This Month)</div>
-                <div class="stat-change {{ $stats['revenue_change'] >= 0 ? 'text-success' : 'text-danger' }}">
-                    <i class="fas fa-arrow-{{ $stats['revenue_change'] >= 0 ? 'up' : 'down' }}"></i> 
-                    {{ number_format(abs($stats['revenue_change']), 1) }}% from last month
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <div class="scope-toolbar">
+                <div>
+                    <h1 class="h4 mb-1">{{ $roleContext['title'] }}</h1>
+                    <p class="mb-0 text-white-50">{{ $roleContext['subtitle'] }}</p>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-value">{{ number_format($stats['total_transactions']) }}</div>
-                <div class="stat-label">Total Transactions (This Week)</div>
-                <div class="stat-change {{ $stats['transaction_change'] >= 0 ? 'text-success' : 'text-danger' }}">
-                    <i class="fas fa-arrow-{{ $stats['transaction_change'] >= 0 ? 'up' : 'down' }}"></i> 
-                    {{ number_format(abs($stats['transaction_change']), 1) }}% from last week
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-value">{{ number_format($stats['total_customers']) }}</div>
-                <div class="stat-label">Total Customers</div>
-                <div class="stat-change text-info">
-                    <i class="fas fa-users"></i> {{ $stats['active_customers'] }} active this month
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-value">{{ number_format($stats['total_products']) }}</div>
-                <div class="stat-label">Total Products & Props</div>
-                <div class="stat-change {{ $stats['total_low_stock'] > 0 ? 'text-warning' : 'text-success' }}">
-                    @if($stats['total_low_stock'] > 0)
-                        <i class="fas fa-exclamation-triangle"></i> {{ $stats['total_low_stock'] }} need attention
-                    @else
-                        <i class="fas fa-check-circle"></i> All in good stock
+                <div class="d-flex align-items-center gap-2">
+                    @if($canViewReports)
+                        <a href="{{ route('reports.index') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>Reports
+                        </a>
                     @endif
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        Scope: {{ $roleContext['scope_label'] }}
+                    </span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Today's Summary -->
-    <div class="section-header">
-        <h2 class="section-title">Today's Performance</h2>
-        <span class="text-muted">{{ now()->format('l, F d, Y') }}</span>
-    </div>
-    
-    <div class="today-summary-grid">
-        <div class="today-summary-card" style="border-left-color: #10b981;">
-            <div class="summary-value">₦{{ number_format($todaySummary['lounge']['revenue'], 2) }}</div>
-            <div class="summary-label">Mini Lounge</div>
-            <small class="text-muted">{{ $todaySummary['lounge']['transactions'] }} transactions</small>
-        </div>
-        
-        <div class="today-summary-card" style="border-left-color: #ef4444;">
-            <div class="summary-value">₦{{ number_format($todaySummary['store']['revenue'], 2) }}</div>
-            <div class="summary-label">Gift Store</div>
-            <small class="text-muted">{{ $todaySummary['store']['transactions'] }} sales</small>
-        </div>
-        
-        <div class="today-summary-card" style="border-left-color: #6f42c1;">
-            <div class="summary-value">₦{{ number_format($todaySummary['studio']['revenue'], 2) }}</div>
-            <div class="summary-label">Photo Studio</div>
-            <small class="text-muted">{{ $todaySummary['studio']['sessions'] }} sessions</small>
-        </div>
-        
-        <div class="today-summary-card" style="border-left-color: #f59e0b;">
-            <div class="summary-value">₦{{ number_format($todaySummary['props']['revenue'], 2) }}</div>
-            <div class="summary-label">Prop Rental</div>
-            <small class="text-muted">{{ $todaySummary['props']['rentals'] }} rentals</small>
-        </div>
-    </div>
+            @if($canSwitchScope)
+                <form method="GET" action="{{ route('dashboard') }}" class="row g-2 mt-3">
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="business" class="form-label text-white-50 mb-1">Dashboard Scope</label>
+                        <select id="business" name="business" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="all" {{ $selectedBusiness === 'all' ? 'selected' : '' }}>All assigned businesses</option>
+                            @foreach($scopeBusinessesMeta as $businessOption)
+                                <option value="{{ $businessOption['slug'] }}" {{ $selectedBusiness === $businessOption['slug'] ? 'selected' : '' }}>
+                                    {{ $businessOption['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            @endif
 
-    <!-- Business Units Grid -->
-    <div class="section-header">
-        <h2 class="section-title">Business Units</h2>
-    </div>
-    
-    <div class="business-grid">
-        <!-- Mini Lounge -->
-        <div class="business-unit-card">
-            <div class="business-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
-                <i class="fas fa-{{ $businessModules['lounge']['icon'] }}"></i>
+            <div class="hero-kpi-grid">
+                @foreach($roleContext['kpis'] as $kpi)
+                    <div class="hero-kpi">
+                        <div class="label">{{ $kpi['label'] }}</div>
+                        <div class="value">{{ $kpi['value'] }}</div>
+                    </div>
+                @endforeach
             </div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                {{ $businessModules['lounge']['name'] }}
-            </h3>
-            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
-                ₦{{ number_format($businessModules['lounge']['revenue'], 2) }}
-            </div>
-            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
-                This month's revenue
-            </div>
-            
-            <div class="business-stats">
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Transactions</span>
-                    <span class="business-stat-value">{{ $businessModules['lounge']['transactions'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Products</span>
-                    <span class="business-stat-value">{{ $businessModules['lounge']['products'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Low Stock</span>
-                    <span class="business-stat-value text-warning">{{ $businessModules['lounge']['low_stock'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Active Customers</span>
-                    <span class="business-stat-value">{{ $businessModules['lounge']['customers'] }}</span>
-                </div>
-            </div>
-            
-            <a href="{{ route('lounge.index') }}" class="btn btn-light btn-sm w-100 mt-3">
-                <i class="fas fa-arrow-right me-2"></i>View Details
-            </a>
         </div>
 
-        <!-- Gift Store -->
-        <div class="business-unit-card">
-            <div class="business-icon" style="background: linear-gradient(135deg, #ec4899, #f97316);">
-                <i class="fas fa-{{ $businessModules['gift_store']['icon'] }}"></i>
-            </div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                {{ $businessModules['gift_store']['name'] }}
-            </h3>
-            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
-                ₦{{ number_format($businessModules['gift_store']['revenue'], 2) }}
-            </div>
-            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
-                This month's revenue
-            </div>
-            
-            <div class="business-stats">
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Transactions</span>
-                    <span class="business-stat-value">{{ $businessModules['gift_store']['transactions'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Products</span>
-                    <span class="business-stat-value">{{ $businessModules['gift_store']['products'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Low Stock</span>
-                    <span class="business-stat-value text-warning">{{ $businessModules['gift_store']['low_stock'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Active Customers</span>
-                    <span class="business-stat-value">{{ $businessModules['gift_store']['customers'] }}</span>
+        <div class="row g-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-value">₦{{ number_format($stats['total_revenue'], 2) }}</div>
+                    <div class="stat-label">Revenue (This Month)</div>
+                    <div class="stat-change {{ $stats['revenue_change'] >= 0 ? 'text-success' : 'text-danger' }}">
+                        <i class="fas fa-arrow-{{ $stats['revenue_change'] >= 0 ? 'up' : 'down' }}"></i>
+                        {{ number_format(abs($stats['revenue_change']), 1) }}% vs last month
+                    </div>
                 </div>
             </div>
-            
-            <a href="{{ route('anire-craft-store.index') }}" class="btn btn-light btn-sm w-100 mt-3">
-                <i class="fas fa-arrow-right me-2"></i>View Details
-            </a>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-value">{{ number_format($stats['total_transactions']) }}</div>
+                    <div class="stat-label">Transactions (This Week)</div>
+                    <div class="stat-change {{ $stats['transaction_change'] >= 0 ? 'text-success' : 'text-danger' }}">
+                        <i class="fas fa-arrow-{{ $stats['transaction_change'] >= 0 ? 'up' : 'down' }}"></i>
+                        {{ number_format(abs($stats['transaction_change']), 1) }}% vs last week
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-value">{{ number_format($stats['total_customers']) }}</div>
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-change text-info">
+                        <i class="fas fa-users"></i> {{ number_format($stats['active_customers']) }} active this month
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-value">{{ number_format($stats['total_alerts']) }}</div>
+                    <div class="stat-label">Alerts</div>
+                    <div class="stat-change {{ $stats['total_alerts'] > 0 ? 'text-warning' : 'text-success' }}">
+                        @if($stats['total_alerts'] > 0)
+                            <i class="fas fa-exclamation-triangle"></i> Needs attention
+                        @else
+                            <i class="fas fa-check-circle"></i> No current alerts
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Photo Studio -->
-        <div class="business-unit-card">
-            <div class="business-icon" style="background: linear-gradient(135deg, #6f42c1, #9333ea);">
-                <i class="fas fa-{{ $businessModules['photo_studio']['icon'] }}"></i>
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="h6 mb-0">Today</h2>
+                <small class="text-muted">{{ now()->format('l, F d, Y') }}</small>
             </div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                {{ $businessModules['photo_studio']['name'] }}
-            </h3>
-            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
-                ₦{{ number_format($businessModules['photo_studio']['revenue'], 2) }}
+            <div class="today-grid">
+                @foreach($todaySummary as $summary)
+                    <div class="today-card" style="border-top-color: {{ $summary['color'] }};">
+                        <div class="value">₦{{ number_format($summary['revenue'], 2) }}</div>
+                        <div class="fw-semibold text-dark">{{ $summary['name'] }}</div>
+                        <div class="label">{{ number_format($summary['count']) }} {{ $summary['label'] }}</div>
+                    </div>
+                @endforeach
             </div>
-            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
-                This month's revenue
-            </div>
-            
-            <div class="business-stats">
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Sessions</span>
-                    <span class="business-stat-value">{{ $businessModules['photo_studio']['transactions'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Active Now</span>
-                    <span class="business-stat-value text-success">{{ $businessModules['photo_studio']['active_sessions'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Active Customers</span>
-                    <span class="business-stat-value">{{ $businessModules['photo_studio']['customers'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Pending Payment</span>
-                    <span class="business-stat-value text-warning">{{ $businessModules['photo_studio']['pending'] }}</span>
-                </div>
-            </div>
-            
-            <a href="{{ route('photo-studio.index') }}" class="btn btn-light btn-sm w-100 mt-3">
-                <i class="fas fa-arrow-right me-2"></i>View Details
-            </a>
         </div>
 
-        <!-- Prop Rental -->
-        <div class="business-unit-card">
-            <div class="business-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                <i class="fas fa-{{ $businessModules['prop_rental']['icon'] }}"></i>
-            </div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                {{ $businessModules['prop_rental']['name'] }}
-            </h3>
-            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
-                ₦{{ number_format($businessModules['prop_rental']['revenue'], 2) }}
-            </div>
-            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
-                This month's revenue
-            </div>
-            
-            <div class="business-stats">
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Rentals</span>
-                    <span class="business-stat-value">{{ $businessModules['prop_rental']['transactions'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Active Rentals</span>
-                    <span class="business-stat-value text-success">{{ $businessModules['prop_rental']['active_rentals'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Total Props</span>
-                    <span class="business-stat-value">{{ $businessModules['prop_rental']['props'] }}</span>
-                </div>
-                <div class="business-stat-item">
-                    <span class="business-stat-label">Overdue</span>
-                    <span class="business-stat-value text-danger">{{ $businessModules['prop_rental']['overdue'] }}</span>
-                </div>
-            </div>
-            
-            <a href="{{ route('prop-rental.index') }}" class="btn btn-light btn-sm w-100 mt-3">
-                <i class="fas fa-arrow-right me-2"></i>View Details
-            </a>
-        </div>
-    </div>
+        <div>
+            <h2 class="h6 mb-2">Businesses In Scope</h2>
+            <div class="business-grid">
+                @foreach($businessModules as $module)
+                    <div class="business-card" style="--accent-color: {{ $module['hex_color'] }};">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="small text-white-50">{{ $module['name'] }}</div>
+                                <div class="fs-5 fw-bold">₦{{ number_format($module['revenue'], 2) }}</div>
+                                <div class="small text-white-50">Revenue (this month)</div>
+                            </div>
+                            <div class="text-white-50">
+                                <i class="fas fa-{{ $module['icon'] }} fs-5"></i>
+                            </div>
+                        </div>
 
-    <!-- Revenue Trend Chart -->
-    <div class="revenue-chart-container">
-        <div class="section-header mb-3">
-            <h2 class="section-title">Revenue Trend (Last 7 Days)</h2>
-        </div>
-        <canvas id="revenueTrendChart" height="80"></canvas>
-    </div>
+                        <div class="business-highlights">
+                            @foreach($module['highlights'] as $highlight)
+                                @php
+                                    $toneClass = match($highlight['tone']) {
+                                        'warning' => 'text-warning',
+                                        'danger' => 'text-danger',
+                                        'success' => 'text-success',
+                                        default => 'text-white',
+                                    };
+                                @endphp
+                                <div class="business-highlight">
+                                    <span class="label">{{ $highlight['label'] }}</span>
+                                    <span class="fw-semibold {{ $toneClass }}">{{ number_format($highlight['value']) }}</span>
+                                </div>
+                            @endforeach
+                        </div>
 
-    <!-- Recent Activities -->
-    <div class="activity-feed">
-        <div class="section-header mb-3">
-            <h2 class="section-title">Recent Activities</h2>
-            <a href="{{ route('reports.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="{{ route($module['route']) }}" class="btn btn-light btn-sm w-100 mt-3">
+                            Open {{ $module['name'] }}
+                        </a>
+                    </div>
+                @endforeach
+            </div>
         </div>
-        
-        @forelse($recentActivities as $activity)
-            <div class="activity-item">
-                <div class="activity-icon" style="background: linear-gradient(135deg, 
-                    @if($activity['color'] == 'success') #10b981, #059669
-                    @elseif($activity['color'] == 'danger') #ef4444, #dc2626
-                    @elseif($activity['color'] == 'primary') #6f42c1, #9333ea
-                    @elseif($activity['color'] == 'warning') #f59e0b, #d97706
-                    @endif);">
-                    <i class="fas fa-{{ $activity['icon'] }} text-white"></i>
-                </div>
-                
-                <div class="activity-details">
-                    <div class="activity-title">{{ $activity['title'] }}</div>
-                    {{-- <div class="activity-description">{{ $activity['description'] }}</div> 
-                    <div class="activity-time">{{ $activity['time']->diffForHumans() }}</div> --}}
-                </div>
-                
-                {{-- <div class="activity-amount">₦{{ number_format($activity['amount'], 2) }}</div> --}}
+
+        <div class="chart-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 mb-0">Revenue Trend (Last 7 Days)</h2>
             </div>
-        @empty
-            <div class="text-center text-muted py-4">
-                <i class="fas fa-inbox fa-3x mb-3" style="opacity: 0.3;"></i>
-                <p>No recent activities</p>
+            <canvas id="revenueTrendChart" height="90"></canvas>
+        </div>
+
+        <div class="activity-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="h6 mb-0">Recent Activity</h2>
+                @if($canViewReports)
+                    <a href="{{ route('reports.index') }}" class="btn btn-outline-primary btn-sm">View Reports</a>
+                @endif
             </div>
-        @endforelse
+
+            @forelse($recentActivities as $activity)
+                @php
+                    $activityTime = $activity['time'] instanceof \Carbon\CarbonInterface
+                        ? $activity['time']
+                        : \Carbon\Carbon::parse($activity['time']);
+                    $gradient = match($activity['color']) {
+                        'danger' => 'linear-gradient(135deg, #ef4444, #dc2626)',
+                        'primary' => 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                        'warning' => 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        default => 'linear-gradient(135deg, #10b981, #047857)',
+                    };
+                @endphp
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: {{ $gradient }};">
+                        <i class="fas fa-{{ $activity['icon'] }} text-white"></i>
+                    </div>
+                    <div>
+                        <div class="activity-meta">
+                            <span class="badge bg-light text-dark">{{ $activity['business_name'] }}</span>
+                            <span class="fw-semibold text-dark">{{ $activity['title'] }}</span>
+                        </div>
+                        <div class="small text-muted">{{ $activity['description'] }}</div>
+                        <div class="small text-muted">{{ $activityTime->diffForHumans() }}</div>
+                    </div>
+                    <div class="fw-semibold text-success">₦{{ number_format($activity['amount'], 2) }}</div>
+                </div>
+            @empty
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-2" style="opacity: 0.35;"></i>
+                    <p class="mb-0">No recent activity for this scope.</p>
+                </div>
+            @endforelse
+        </div>
     </div>
 </div>
 @endsection
@@ -496,102 +361,92 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Revenue Trend Chart
+document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('revenueTrendChart');
-    if (ctx) {
-        const revenueTrendData = @json($revenueTrend);
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: revenueTrendData.map(item => item.date),
-                datasets: [
-                    {
-                        label: 'Mini Lounge',
-                        data: revenueTrendData.map(item => item.lounge),
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Gift Store',
-                        data: revenueTrendData.map(item => item.store),
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Photo Studio',
-                        data: revenueTrendData.map(item => item.studio),
-                        borderColor: '#6f42c1',
-                        backgroundColor: 'rgba(111, 66, 193, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Prop Rental',
-                        data: revenueTrendData.map(item => item.props),
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
+    if (!ctx) {
+        return;
+    }
+
+    const revenueTrendData = @json($revenueTrend);
+    const chartDatasets = @json($chartDatasets);
+
+    const datasets = chartDatasets.map((dataset) => ({
+        label: dataset.label,
+        data: revenueTrendData.map((item) => Number(item[dataset.key] || 0)),
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3,
+        pointHoverRadius: 4
+    }));
+
+    if (datasets.length > 1) {
+        datasets.push({
+            label: 'Combined Revenue',
+            data: revenueTrendData.map((item) => Number(item.total || 0)),
+            borderColor: '#111827',
+            backgroundColor: 'rgba(17, 24, 39, 0)',
+            borderDash: [6, 6],
+            tension: 0.25,
+            fill: false,
+            pointRadius: 0
+        });
+    }
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: revenueTrendData.map((item) => item.date),
+            datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 15,
-                            font: {
-                                size: 12,
-                                weight: 600
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ₦' + context.parsed.y.toLocaleString('en-NG', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                            }
-                        }
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 14
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₦' + value.toLocaleString();
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const value = Number(context.parsed.y || 0);
+                            return context.dataset.label + ': ₦' + value.toLocaleString('en-NG', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '₦' + Number(value).toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.06)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
             }
-        });
-    }
+        }
+    });
 });
 </script>
 @endpush

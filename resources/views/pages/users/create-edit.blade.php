@@ -94,22 +94,26 @@
                     <div class="card-body">
                         @php
                             $selectedPermissions = old('permissions', $targetUser?->permissions ?? []);
-                            $permissionOptions = [
-                                'users.view', 'users.manage', 'roles.manage', 'departments.manage',
-                                'products.view', 'products.manage', 'inventory.view', 'inventory.manage',
-                                'sales.view', 'sales.create', 'sales.refund', 'customers.view', 'customers.manage',
-                                'reports.view', 'reports.export', 'settings.manage', 'security.manage'
-                            ];
+                            $groupedPermissions = $permissionGroups ?? \App\Support\AccessControl::permissionGroups();
                         @endphp
-                        <div class="row g-2">
-                            @foreach($permissionOptions as $permission)
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="perm_{{ $permission }}" name="permissions[]" value="{{ $permission }}" {{ in_array($permission, $selectedPermissions, true) ? 'checked' : '' }}>
-                                        <label class="form-check-label small" for="perm_{{ $permission }}">{{ $permission }}</label>
-                                    </div>
+                        @foreach($groupedPermissions as $groupName => $permissionOptions)
+                            <div class="mb-3">
+                                <h6 class="small text-uppercase text-muted mb-2">{{ $groupName }}</h6>
+                                <div class="row g-2">
+                                    @foreach($permissionOptions as $permission)
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="perm_{{ str_replace(['.', '*'], ['_', 'wildcard'], $permission) }}" name="permissions[]" value="{{ $permission }}" {{ in_array($permission, $selectedPermissions, true) ? 'checked' : '' }}>
+                                                <label class="form-check-label small" for="perm_{{ str_replace(['.', '*'], ['_', 'wildcard'], $permission) }}">{{ $permission }}</label>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            </div>
+                        @endforeach
+                        <div class="form-check border rounded p-2">
+                            <input type="checkbox" class="form-check-input" id="perm_all" name="permissions[]" value="*" {{ in_array('*', $selectedPermissions, true) ? 'checked' : '' }}>
+                            <label class="form-check-label small fw-semibold" for="perm_all">* (Grant all permissions)</label>
                         </div>
                     </div>
                 </div>
@@ -119,6 +123,9 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3"><h5 class="mb-0">Access</h5></div>
                     <div class="card-body">
+                        @php
+                            $selectedBusinesses = old('businesses', $targetUser?->businesses?->pluck('slug')->all() ?? []);
+                        @endphp
                         <div class="mb-3">
                             <label class="form-label">Role</label>
                             <select name="role" class="form-select @error('role') is-invalid @enderror" required>
@@ -128,6 +135,23 @@
                                 @endforeach
                             </select>
                             @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Business Access</label>
+                            <div class="border rounded p-3" style="max-height: 220px; overflow-y: auto;">
+                                @foreach($businesses as $business)
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="business_{{ $business->slug }}" name="businesses[]" value="{{ $business->slug }}" {{ in_array($business->slug, $selectedBusinesses, true) ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="business_{{ $business->slug }}">
+                                            <span class="fw-semibold">{{ $business->name }}</span>
+                                            <span class="text-muted d-block">{{ $business->slug }}</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="form-text">Required for non-admin roles. Super admins are auto-assigned to all businesses.</div>
+                            @error('businesses')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Department</label>

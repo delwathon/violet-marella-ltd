@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Business;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,24 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = [
+        $allBusinessSlugs = Business::query()->pluck('slug')->all();
+        $businessIdsBySlug = Business::query()->pluck('id', 'slug');
+
+        $users = [
+            [
+                'first_name' => 'Super',
+                'last_name' => 'Admin',
+                'email' => 'superadmin@violetmarella.com',
+                'phone' => '+234 800 000 0009',
+                'password' => Hash::make('superadmin123'),
+                'role' => 'superadmin',
+                'hire_date' => now()->subYears(2),
+                'address' => '1 Violet Marella HQ, Lagos',
+                'emergency_contact' => 'Executive Assistant',
+                'emergency_phone' => '+234 800 000 0010',
+                'permissions' => ['*'],
+                'business_slugs' => $allBusinessSlugs,
+            ],
             [
                 'first_name' => 'Admin',
                 'last_name' => 'User',
@@ -25,7 +43,8 @@ class UserSeeder extends Seeder
                 'address' => '123 Admin Street, Lagos',
                 'emergency_contact' => 'Admin Emergency',
                 'emergency_phone' => '+234 800 000 0001',
-                'permissions' => ['all'],
+                'permissions' => ['*'],
+                'business_slugs' => $allBusinessSlugs,
             ],
             [
                 'first_name' => 'Manager',
@@ -38,38 +57,60 @@ class UserSeeder extends Seeder
                 'address' => '456 Manager Avenue, Lagos',
                 'emergency_contact' => 'Manager Emergency',
                 'emergency_phone' => '+234 800 000 0003',
-                'permissions' => ['sales', 'inventory', 'reports', 'customers'],
+                'permissions' => [],
+                'business_slugs' => ['lounge', 'gift_store'],
             ],
             [
-                'first_name' => 'Cashier',
-                'last_name' => 'User',
-                'email' => 'cashier@violetmarella.com',
+                'first_name' => 'Sales',
+                'last_name' => 'Rep',
+                'email' => 'salesrep@violetmarella.com',
                 'phone' => '+234 800 000 0004',
-                'password' => Hash::make('cashier123'),
-                'role' => 'cashier',
+                'password' => Hash::make('salesrep123'),
+                'role' => 'sales_representative',
                 'hire_date' => now()->subMonths(3),
                 'address' => '789 Cashier Road, Lagos',
-                'emergency_contact' => 'Cashier Emergency',
+                'emergency_contact' => 'Sales Emergency',
                 'emergency_phone' => '+234 800 000 0005',
-                'permissions' => ['sales', 'customers'],
+                'permissions' => [],
+                'business_slugs' => ['lounge', 'gift_store'],
             ],
             [
-                'first_name' => 'User',
-                'last_name' => 'User',
-                'email' => 'staff@violetmarella.com',
+                'first_name' => 'Studio',
+                'last_name' => 'Reception',
+                'email' => 'reception@violetmarella.com',
                 'phone' => '+234 800 000 0006',
-                'password' => Hash::make('staff123'),
-                'role' => 'stock_keeper',
+                'password' => Hash::make('reception123'),
+                'role' => 'receptionist',
                 'hire_date' => now()->subMonths(2),
                 'address' => '321 Stock Street, Lagos',
-                'emergency_contact' => 'Stock Emergency',
+                'emergency_contact' => 'Reception Emergency',
                 'emergency_phone' => '+234 800 000 0007',
-                'permissions' => ['inventory'],
+                'permissions' => [],
+                'business_slugs' => ['photo_studio', 'prop_rental'],
             ],
         ];
 
-        foreach ($user as $users) {
-            User::create($users);
+        foreach ($users as $record) {
+            $businessSlugs = $record['business_slugs'] ?? [];
+            unset($record['business_slugs']);
+
+            $user = User::updateOrCreate(
+                ['email' => $record['email']],
+                $record
+            );
+
+            if ($user->role === 'admin' || $user->role === 'superadmin') {
+                $user->businesses()->sync($businessIdsBySlug->values()->all());
+                continue;
+            }
+
+            $businessIds = collect($businessSlugs)
+                ->map(fn ($slug) => $businessIdsBySlug[$slug] ?? null)
+                ->filter()
+                ->values()
+                ->all();
+
+            $user->businesses()->sync($businessIds);
         }
     }
 }

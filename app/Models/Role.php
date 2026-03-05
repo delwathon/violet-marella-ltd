@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Role extends Model
 {
@@ -31,6 +32,18 @@ class Role extends Model
 
     public function hasPermission(string $permission): bool
     {
-        return in_array($permission, $this->permissions ?? [], true);
+        foreach ($this->permissions ?? [] as $grantedPermission) {
+            $grantedPermission = trim((string) $grantedPermission);
+
+            if ($grantedPermission === '') {
+                continue;
+            }
+
+            if ($grantedPermission === '*' || $grantedPermission === $permission || Str::is($grantedPermission, $permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

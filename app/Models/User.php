@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Support\AccessControl;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -90,6 +93,11 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
+    public function businesses(): BelongsToMany
+    {
+        return $this->belongsToMany(Business::class)->withTimestamps();
+    }
+
     /**
      * Scope a query to only include active staff.
      */
@@ -128,7 +136,15 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['superadmin', 'admin'], true);
+    }
+
+    /**
+     * Check if staff member is super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
     }
 
     /**
@@ -136,7 +152,7 @@ class User extends Authenticatable
      */
     public function isManager()
     {
-        return in_array($this->role, ['admin', 'manager']);
+        return in_array($this->role, ['superadmin', 'admin', 'manager'], true);
     }
 
     /**
@@ -144,7 +160,7 @@ class User extends Authenticatable
      */
     public function canAccessCashier()
     {
-        return in_array($this->role, ['admin', 'manager', 'cashier']);
+        return in_array($this->role, ['superadmin', 'admin', 'manager', 'cashier', 'sales_representative'], true);
     }
 
     /**
@@ -152,7 +168,7 @@ class User extends Authenticatable
      */
     public function canManageInventory()
     {
-        return in_array($this->role, ['admin', 'manager', 'stock_keeper']);
+        return in_array($this->role, ['superadmin', 'admin', 'manager', 'stock_keeper'], true);
     }
 
     /**
@@ -188,25 +204,164 @@ class User extends Authenticatable
      */
     public function getTenureDaysAttribute()
     {
+        if ($this->hire_date === null) {
+            return 0;
+        }
+
         $endDate = $this->termination_date ?? now();
         return $this->hire_date->diffInDays($endDate);
     }
 
     /**
-     * Check if staff member has a specific permission.
+     * Return business slugs assigned to this user.
+     *
+     * @return array<int, string>
      */
-    public function hasPermission($permission)
+    public function accessibleBusinessSlugs(): array
+    {
+        if ($this->isAdmin()) {
+            return AccessControl::businessSlugs();
+        }
+
+        if (!$this->exists) {
+            return [];
+        }
+
+        if ($this->relationLoaded('businesses')) {
+            return $this->businesses
+                ->pluck('slug')
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        return $this->businesses()
+            ->pluck('slug')
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    public function hasBusinessAccess(string $business): bool
     {
         if ($this->isAdmin()) {
             return true;
         }
 
-        $permissions = $this->permissions ?? [];
-        $rolePermissions = $this->roleRecord?->permissions ?? [];
+        $businessSlug = AccessControl::resolveBusinessSlug($business);
 
-        return in_array('*', $permissions, true)
-            || in_array($permission, $permissions, true)
-            || in_array('*', $rolePermissions, true)
-            || in_array($permission, $rolePermissions, true);
+        if ($businessSlug === null) {
+            return false;
+        }
+
+        return in_array($businessSlug, $this->accessibleBusinessSlugs(), true);
+    }
+
+    /**
+     * Check if staff member has any of the provided permissions.
+     *
+     * @param array<int, string> $permissions
+     */
+    public function hasAnyPermission(array $permissions, ?string $business = null): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission, $business)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if staff member has a specific permission.
+     */
+    public function hasPermission($permission, ?string $business = null): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $required = trim((string) $permission);
+
+        if ($required === '') {
+            return false;
+        }
+
+        $businessSlug = $business ? AccessControl::resolveBusinessSlug($business) : null;
+        if ($businessSlug !== null && !$this->hasBusinessAccess($businessSlug)) {
+            return false;
+        }
+
+        $directPermissions = $this->normalizePermissions($this->permissions ?? []);
+
+        $rolePermissions = [];
+        if ($this->relationLoaded('roleRecord')) {
+            $rolePermissions = $this->normalizePermissions($this->roleRecord?->permissions ?? []);
+        } elseif ($this->exists) {
+            $rolePermissions = $this->normalizePermissions($this->roleRecord()->first()?->permissions ?? []);
+        }
+
+        return $this->permissionMatches($directPermissions, $required)
+            || $this->permissionMatches($rolePermissions, $required);
+    }
+
+    /**
+     * @param array<int, mixed> $permissions
+     * @return array<int, string>
+     */
+    private function normalizePermissions(array $permissions): array
+    {
+        $normalized = [];
+
+        foreach ($permissions as $permission) {
+            $value = trim((string) $permission);
+
+            if ($value === '') {
+                continue;
+            }
+
+            if ($value === 'all') {
+                $normalized[] = '*';
+                continue;
+            }
+
+            if (!str_contains($value, '.')) {
+                $legacyMap = [
+                    'sales' => '*.sales.*',
+                    'inventory' => '*.inventory.*',
+                    'customers' => '*.customers.*',
+                    'products' => '*.products.*',
+                    'reports' => 'reports.*',
+                    'users' => 'users.*',
+                    'roles' => 'roles.*',
+                ];
+
+                $normalized[] = $legacyMap[$value] ?? $value;
+                continue;
+            }
+
+            $normalized[] = $value;
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    /**
+     * @param array<int, string> $grantedPermissions
+     */
+    private function permissionMatches(array $grantedPermissions, string $required): bool
+    {
+        foreach ($grantedPermissions as $granted) {
+            if ($granted === '*') {
+                return true;
+            }
+
+            if ($granted === $required || Str::is($granted, $required)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
