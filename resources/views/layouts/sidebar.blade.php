@@ -523,20 +523,6 @@
                     </li>
                 @endif
 
-                @if($canSystemUpdate)
-                    <li class="nav-item">
-                        <button
-                            type="button"
-                            class="nav-link text-white-50 d-flex align-items-center py-2 px-4 w-100 text-start border-0 bg-transparent"
-                            data-bs-toggle="modal"
-                            data-bs-target="#systemUpdateModal"
-                        >
-                            <i class="fas fa-cloud-arrow-down me-3" style="width: 20px;"></i>
-                            <span>Update Application</span>
-                        </button>
-                    </li>
-                @endif
-            
             <!-- Settings -->
             {{-- <li class="nav-item">
                 <a href="#settingsMenu" class="nav-link text-white-50 d-flex align-items-center py-2 px-4 {{ request()->routeIs('settings.*') ? 'bg-primary text-white' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
@@ -615,6 +601,19 @@
                                 @endif
                             </ul>
                         </div>
+                    </li>
+                @endif
+                @if($canSystemUpdate)
+                    <li class="nav-item">
+                        <button
+                            type="button"
+                            class="nav-link text-white-50 d-flex align-items-center py-2 px-4 w-100 text-start border-0 bg-transparent"
+                            data-bs-toggle="modal"
+                            data-bs-target="#systemUpdateModal"
+                        >
+                            <i class="fas fa-cloud-arrow-down me-3" style="width: 20px;"></i>
+                            <span>Update Application</span>
+                        </button>
                     </li>
                 @endif
             @endif
