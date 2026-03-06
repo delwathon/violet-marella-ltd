@@ -13,6 +13,7 @@ use App\Models\StoreProduct;
 use App\Models\StoreSale;
 use App\Models\StudioCustomer;
 use App\Models\StudioSession;
+use App\Support\BusinessProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -108,7 +109,7 @@ class DashboardController extends Controller
         $recentActivities = $this->getRecentActivities($scopeBusinesses);
         $scopeBusinessesMeta = array_map(fn (string $slug): array => [
             'slug' => $slug,
-            'name' => self::BUSINESS_META[$slug]['name'] ?? ucfirst(str_replace('_', ' ', $slug)),
+            'name' => $this->businessName($slug),
         ], $availableBusinesses);
 
         $roleContext = $this->buildRoleContext(
@@ -232,7 +233,7 @@ class DashboardController extends Controller
 
         $module = [
             'slug' => $businessSlug,
-            'name' => $meta['name'],
+            'name' => $this->businessName($businessSlug),
             'icon' => $meta['icon'],
             'color' => $meta['color'],
             'hex_color' => $meta['chart_border'],
@@ -451,7 +452,7 @@ class DashboardController extends Controller
         foreach ($scopeBusinesses as $businessSlug) {
             $meta = self::BUSINESS_META[$businessSlug];
             $datasets[] = [
-                'label' => $meta['name'],
+                'label' => $this->businessName($businessSlug),
                 'key' => $meta['trend_key'],
                 'borderColor' => $meta['chart_border'],
                 'backgroundColor' => $meta['chart_bg'],
@@ -478,7 +479,7 @@ class DashboardController extends Controller
                     ->map(function (Sale $sale): array {
                         return [
                             'business_slug' => 'lounge',
-                            'business_name' => self::BUSINESS_META['lounge']['name'],
+                            'business_name' => $this->businessName('lounge'),
                             'icon' => self::BUSINESS_META['lounge']['icon'],
                             'color' => self::BUSINESS_META['lounge']['color'],
                             'title' => 'Lounge Sale',
@@ -499,7 +500,7 @@ class DashboardController extends Controller
                     ->map(function (StoreSale $sale): array {
                         return [
                             'business_slug' => 'gift_store',
-                            'business_name' => self::BUSINESS_META['gift_store']['name'],
+                            'business_name' => $this->businessName('gift_store'),
                             'icon' => self::BUSINESS_META['gift_store']['icon'],
                             'color' => self::BUSINESS_META['gift_store']['color'],
                             'title' => 'Store Sale',
@@ -520,7 +521,7 @@ class DashboardController extends Controller
                     ->map(function (StudioSession $session): array {
                         return [
                             'business_slug' => 'photo_studio',
-                            'business_name' => self::BUSINESS_META['photo_studio']['name'],
+                            'business_name' => $this->businessName('photo_studio'),
                             'icon' => self::BUSINESS_META['photo_studio']['icon'],
                             'color' => self::BUSINESS_META['photo_studio']['color'],
                             'title' => 'Studio Session',
@@ -541,7 +542,7 @@ class DashboardController extends Controller
                     ->map(function (PropRental $rental): array {
                         return [
                             'business_slug' => 'prop_rental',
-                            'business_name' => self::BUSINESS_META['prop_rental']['name'],
+                            'business_name' => $this->businessName('prop_rental'),
                             'icon' => self::BUSINESS_META['prop_rental']['icon'],
                             'color' => self::BUSINESS_META['prop_rental']['color'],
                             'title' => 'Prop Rental',
@@ -577,7 +578,7 @@ class DashboardController extends Controller
     ): array {
         $scopeLabel = $selectedBusiness === 'all'
             ? 'All assigned businesses'
-            : (self::BUSINESS_META[$selectedBusiness]['name'] ?? 'Assigned Business');
+            : $this->businessName($selectedBusiness);
 
         if ($dashboardMode === 'superadmin') {
             return [
@@ -639,6 +640,15 @@ class DashboardController extends Controller
             })
             ->distinct('users.id')
             ->count('users.id');
+    }
+
+    private function businessName(string $businessSlug): string
+    {
+        $fallback = self::BUSINESS_META[$businessSlug]['name']
+            ?? ucfirst(str_replace('_', ' ', $businessSlug));
+        $name = BusinessProfile::forSlug($businessSlug)['name'] ?? '';
+
+        return trim((string) $name) !== '' ? (string) $name : $fallback;
     }
 
     /**

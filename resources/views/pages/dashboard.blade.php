@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', ($roleContext['title'] ?? 'Dashboard') . ' - Violet Marella Limited')
+@section('title', ($roleContext['title'] ?? 'Dashboard') . ' - ' . ($companyProfile['name'] ?? 'Violet Marella Limited'))
 
 @push('styles')
 <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">

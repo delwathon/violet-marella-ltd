@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Setting;
+use App\Support\BusinessProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -259,7 +261,9 @@ class SalesController extends Controller
     {
         $user = Auth::guard('user')->user();
         $sale = Sale::with(['customer', 'staff', 'saleItems.product'])->findOrFail($id);
-        
-        return view('pages.lounge.sales.receipt', compact('user', 'sale'));
+        $businessProfile = BusinessProfile::forSlug('lounge');
+        $receiptFooterMessage = Setting::get('receipt_footer_message', 'Thank you for shopping with us!');
+
+        return view('pages.lounge.sales.receipt', compact('user', 'sale', 'businessProfile', 'receiptFooterMessage'));
     }
 }

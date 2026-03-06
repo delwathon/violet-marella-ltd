@@ -1,5 +1,8 @@
 @extends('layouts.app')
-@section('title', 'Photo Studio Reports')
+@php
+    $photoStudioName = optional(collect($businessDirectory ?? [])->get('photo_studio'))->name ?? 'Photo Studio';
+@endphp
+@section('title', $photoStudioName . ' Reports')
 
 @push('styles')
 <link href="{{ asset('assets/css/photo-studio.css') }}" rel="stylesheet">
@@ -10,7 +13,7 @@
     <div class="page-header mb-4">
         <div class="row align-items-center gy-3">
             <div class="col-md">
-                <h1 class="page-title mb-1">Photo Studio Reports</h1>
+                <h1 class="page-title mb-1">{{ $photoStudioName }} Reports</h1>
                 <p class="text-muted mb-0">Analyze operational, financial, occupancy, and customer performance.</p>
             </div>
             <div class="col-md-auto d-flex gap-2 flex-wrap">

@@ -1,5 +1,8 @@
 @extends('layouts.app')
-@section('title', 'Photo Studio Settings')
+@php
+    $photoStudioName = optional(collect($businessDirectory ?? [])->get('photo_studio'))->name ?? 'Photo Studio';
+@endphp
+@section('title', $photoStudioName . ' Settings')
 
 @push('styles')
 <link href="{{ asset('assets/css/photo-studio.css') }}" rel="stylesheet">
@@ -18,7 +21,7 @@
     <div class="page-header mb-4">
         <div class="row align-items-center gy-3">
             <div class="col-md">
-                <h1 class="page-title mb-1">Photo Studio Settings</h1>
+                <h1 class="page-title mb-1">{{ $photoStudioName }} Settings</h1>
                 <p class="text-muted mb-0">Manage global defaults for bookings, timing, billing, and overtime.</p>
             </div>
             <div class="col-md-auto d-flex gap-2 flex-wrap">

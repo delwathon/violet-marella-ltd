@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Setting;
+use App\Support\BusinessProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +15,16 @@ class SettingsController extends Controller
     public function index(): View
     {
         $user = Auth::guard('user')->user();
+        $businesses = Business::query()->orderBy('name')->get();
 
         $settings = [
             'store_name' => Setting::get('store_name', 'Violet Marella Limited'),
+            'store_legal_name' => Setting::get('store_legal_name', Setting::get('store_name', 'Violet Marella Limited')),
             'store_address' => Setting::get('store_address', ''),
             'store_phone' => Setting::get('store_phone', ''),
             'store_email' => Setting::get('store_email', ''),
+            'store_rc_number' => Setting::get('store_rc_number', ''),
+            'store_website' => Setting::get('store_website', ''),
             'store_currency' => Setting::get('store_currency', 'NGN'),
             'store_currency_symbol' => Setting::get('store_currency_symbol', '₦'),
             'default_tax_rate' => Setting::get('default_tax_rate', 7.5),
@@ -36,16 +42,19 @@ class SettingsController extends Controller
             'auto_logout_minutes' => Setting::get('auto_logout_minutes', 30),
         ];
 
-        return view('pages.settings', compact('user', 'settings'));
+        return view('pages.settings', compact('user', 'settings', 'businesses'));
     }
 
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'store_name' => 'required|string|max:255',
+            'store_legal_name' => 'nullable|string|max:255',
             'store_address' => 'nullable|string|max:500',
             'store_phone' => 'nullable|string|max:30',
             'store_email' => 'nullable|email|max:255',
+            'store_rc_number' => 'nullable|string|max:120',
+            'store_website' => 'nullable|string|max:255',
             'store_currency' => 'required|string|max:10',
             'store_currency_symbol' => 'required|string|max:10',
             'default_tax_rate' => 'required|numeric|min:0|max:100',
@@ -57,12 +66,27 @@ class SettingsController extends Controller
             'loyalty_points_rate' => 'required|numeric|min:0',
             'loyalty_discount_rate' => 'required|numeric|min:0|max:100',
             'auto_logout_minutes' => 'required|integer|min:5|max:1440',
+            'business_profiles' => 'nullable|array',
+            'business_profiles.*.id' => 'required|integer|exists:businesses,id',
+            'business_profiles.*.name' => 'required|string|max:255',
+            'business_profiles.*.legal_name' => 'nullable|string|max:255',
+            'business_profiles.*.phone' => 'nullable|string|max:30',
+            'business_profiles.*.email' => 'nullable|email|max:255',
+            'business_profiles.*.address' => 'nullable|string|max:500',
+            'business_profiles.*.rc_number' => 'nullable|string|max:120',
+            'business_profiles.*.website' => 'nullable|string|max:255',
+            'business_profiles.*.tax_id' => 'nullable|string|max:120',
+            'business_profiles.*.contact_person' => 'nullable|string|max:255',
+            'business_profiles.*.description' => 'nullable|string|max:1000',
         ]);
 
         Setting::set('store_name', $validated['store_name'], 'string', 'store', 'Name of the store', true);
+        Setting::set('store_legal_name', $validated['store_legal_name'] ?? $validated['store_name'], 'string', 'store', 'Legal business name', true);
         Setting::set('store_address', $validated['store_address'] ?? '', 'string', 'store', 'Store address', true);
         Setting::set('store_phone', $validated['store_phone'] ?? '', 'string', 'store', 'Store phone number', true);
         Setting::set('store_email', $validated['store_email'] ?? '', 'string', 'store', 'Store email address', true);
+        Setting::set('store_rc_number', $validated['store_rc_number'] ?? '', 'string', 'store', 'Company registration number', true);
+        Setting::set('store_website', $validated['store_website'] ?? '', 'string', 'store', 'Company website', true);
         Setting::set('store_currency', $validated['store_currency'], 'string', 'store', 'Store currency code', true);
         Setting::set('store_currency_symbol', $validated['store_currency_symbol'], 'string', 'store', 'Store currency symbol', true);
 
@@ -85,7 +109,29 @@ class SettingsController extends Controller
         Setting::set('backup_enabled', $request->boolean('backup_enabled') ? '1' : '0', 'boolean', 'system', 'Enable automatic backups', false);
         Setting::set('auto_logout_minutes', (string) $validated['auto_logout_minutes'], 'integer', 'system', 'Auto logout after inactivity (minutes)', false);
 
+        foreach ($validated['business_profiles'] ?? [] as $profile) {
+            $business = Business::query()->find($profile['id']);
+
+            if (!$business) {
+                continue;
+            }
+
+            $business->update([
+                'name' => $profile['name'],
+                'legal_name' => $profile['legal_name'] ?? null,
+                'phone' => $profile['phone'] ?? null,
+                'email' => $profile['email'] ?? null,
+                'address' => $profile['address'] ?? null,
+                'rc_number' => $profile['rc_number'] ?? null,
+                'website' => $profile['website'] ?? null,
+                'tax_id' => $profile['tax_id'] ?? null,
+                'contact_person' => $profile['contact_person'] ?? null,
+                'description' => $profile['description'] ?? $business->description,
+            ]);
+        }
+
         Setting::clearCache();
+        BusinessProfile::clearCache();
 
         return redirect()->route('settings.index')
             ->with('success', 'Settings updated successfully.');

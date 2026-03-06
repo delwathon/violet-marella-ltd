@@ -1,5 +1,8 @@
 @extends('layouts.app')
-@section('title', 'Anire Craft Store')
+@php
+    $giftStoreName = optional(collect($businessDirectory ?? [])->get('gift_store'))->name ?? 'Anire Craft Store';
+@endphp
+@section('title', $giftStoreName)
 @push('styles')
 <link href="{{ asset('assets/css/lounge.css') }}" rel="stylesheet">
 @endpush
@@ -9,7 +12,7 @@
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h1 class="page-title">Anire Craft Store</h1>
+                <h1 class="page-title">{{ $giftStoreName }}</h1>
                 <p class="page-subtitle">Point of Sale system with inventory management</p>
             </div>
             <div class="col-auto">
@@ -179,7 +182,7 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="input-group input-group-lg">
-                            <input type="text" class="form-control" id="productSearch" placeholder="Search products by name or barcode...">
+                            <input type="text" class="form-control" id="productSearch" placeholder="Search products by name, SKU, or barcode...">
                             <button class="btn btn-outline-primary" type="button">
                                 <i class="fas fa-search"></i>
                             </button>

@@ -159,8 +159,9 @@ class ProductsController extends Controller
         
         // Get recent sales
         $recentSales = $product->saleItems()
-            ->with('sale')
-            ->latest()
+            ->whereHas('sale')
+            ->with(['sale.customer'])
+            ->latest('created_at')
             ->limit(10)
             ->get();
         

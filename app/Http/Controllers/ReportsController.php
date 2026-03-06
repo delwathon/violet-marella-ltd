@@ -13,6 +13,7 @@ use App\Models\StudioCustomer;
 use App\Models\PropRental;
 use App\Models\RentalCustomer;
 use App\Models\Prop;
+use App\Support\BusinessProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -326,7 +327,8 @@ class ReportsController extends Controller
 
         if (in_array('lounge', $allowedBusinesses, true)) {
             $comparison[] = [
-                'name' => 'Mini Lounge',
+                'slug' => 'lounge',
+                'name' => $this->resolveBusinessName('lounge', 'Mini Lounge'),
                 'revenue' => Sale::completed()
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                     ->sum('total_amount'),
@@ -339,7 +341,8 @@ class ReportsController extends Controller
 
         if (in_array('gift_store', $allowedBusinesses, true)) {
             $comparison[] = [
-                'name' => 'Gift Store',
+                'slug' => 'gift_store',
+                'name' => $this->resolveBusinessName('gift_store', 'Gift Store'),
                 'revenue' => StoreSale::completed()
                     ->whereBetween('sale_date', [$dates['start'], $dates['end']])
                     ->sum('total_amount'),
@@ -352,7 +355,8 @@ class ReportsController extends Controller
 
         if (in_array('photo_studio', $allowedBusinesses, true)) {
             $comparison[] = [
-                'name' => 'Photo Studio',
+                'slug' => 'photo_studio',
+                'name' => $this->resolveBusinessName('photo_studio', 'Photo Studio'),
                 'revenue' => StudioSession::completed()
                     ->whereBetween('check_out_time', [$dates['start'], $dates['end']])
                     ->where('payment_status', 'paid')
@@ -366,7 +370,8 @@ class ReportsController extends Controller
 
         if (in_array('prop_rental', $allowedBusinesses, true)) {
             $comparison[] = [
-                'name' => 'Prop Rental',
+                'slug' => 'prop_rental',
+                'name' => $this->resolveBusinessName('prop_rental', 'Prop Rental'),
                 'revenue' => PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
                     ->sum('total_amount'),
                 'transactions' => PropRental::whereBetween('created_at', [$dates['start'], $dates['end']])
@@ -376,6 +381,13 @@ class ReportsController extends Controller
         }
 
         return $comparison;
+    }
+
+    private function resolveBusinessName(string $slug, string $fallback): string
+    {
+        $name = BusinessProfile::forSlug($slug)['name'] ?? '';
+
+        return trim((string) $name) !== '' ? (string) $name : $fallback;
     }
     
     /**

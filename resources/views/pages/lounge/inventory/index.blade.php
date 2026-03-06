@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Inventory Management - Violet Marella Limited')
+@section('title', 'Inventory Management - ' . ($companyProfile['name'] ?? 'Violet Marella Limited'))
 @push('styles')
 <link href="{{ asset('assets/css/lounge.css') }}" rel="stylesheet">
 @endpush

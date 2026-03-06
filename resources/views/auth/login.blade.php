@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Secure Login - Violet Marella Limited')
+@section('title', 'Secure Login - ' . ($companyProfile['name'] ?? 'Violet Marella Limited'))
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,14 +9,23 @@
 @endpush
 
 @section('content')
+@php
+    $availableBusinessNames = collect($businessDirectory ?? [])->pluck('name')->filter()->values()->all();
+    $showcaseBusinessNames = !empty($availableBusinessNames)
+        ? implode(', ', $availableBusinessNames)
+        : 'all assigned businesses';
+    $emailPlaceholder = ($companyProfile['email'] ?? '') !== ''
+        ? $companyProfile['email']
+        : 'name@example.com';
+@endphp
 <div class="auth-shell row g-0">
     <section class="col-lg-6 auth-showcase">
         <div class="showcase-overlay"></div>
         <div class="showcase-content">
-            <span class="eyebrow">Violet Marella Limited</span>
+            <span class="eyebrow">{{ $companyProfile['name'] ?? 'Violet Marella Limited' }}</span>
             <h1 class="showcase-title">Multi-Business Operations, One Secure Entry Point.</h1>
             <p class="showcase-text">
-                Access Lounge, Anire Craft Store, Photo Studio, and Prop Rental workflows from one unified platform.
+                Access {{ $showcaseBusinessNames }} workflows from one unified platform.
             </p>
 
             <div class="showcase-pills">
@@ -46,7 +55,7 @@
                             name="email"
                             value="{{ old('email') }}"
                             class="form-control @error('email') is-invalid @enderror"
-                            placeholder="name@violetmarella.com"
+                            placeholder="{{ $emailPlaceholder }}"
                             autocomplete="username"
                             required
                             autofocus

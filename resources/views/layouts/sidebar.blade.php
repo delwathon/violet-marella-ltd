@@ -1,6 +1,12 @@
 <!-- Sidebar Navigation -->
 <aside id="sidebar" class="sidebar d-flex flex-column bg-dark text-white vh-100 position-fixed start-0 top-0 overflow-auto" style="width: 300px; z-index: 1000;">
     @php
+        $companyName = $companyProfile['name'] ?? 'Violet Marella Ltd';
+        $directory = collect($businessDirectory ?? []);
+        $loungeName = optional($directory->get('lounge'))->name ?? 'Lounge';
+        $giftStoreName = optional($directory->get('gift_store'))->name ?? 'Anire Craft Store';
+        $photoStudioName = optional($directory->get('photo_studio'))->name ?? 'Photo Studio';
+        $propRentalName = optional($directory->get('prop_rental'))->name ?? 'Prop Rental';
         $canDashboard = $user->hasPermission('dashboard.view');
         $canLounge = $user->hasBusinessAccess('lounge') && $user->hasPermission('lounge.access');
         $canGiftStore = $user->hasBusinessAccess('gift_store') && $user->hasPermission('gift_store.access');
@@ -24,7 +30,7 @@
 
     <!-- Sidebar Header -->
     <div class="p-4 border-bottom border-secondary border-opacity-25">
-        <h3 class="h5 mb-0 fw-semibold">Violet Marella Ltd</h3>
+        <h3 class="h5 mb-0 fw-semibold">{{ $companyName }}</h3>
     </div>
     
     <!-- Sidebar Navigation -->
@@ -46,7 +52,7 @@
                 <li class="nav-item mt-3">
                     <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                         <i class="fas fa-store me-2 small"></i>
-                        <span>Lounge</span>
+                        <span>{{ $loungeName }}</span>
                     </div>
                 </li>
             
@@ -163,7 +169,7 @@
                 <li class="nav-item mt-4">
                     <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                         <i class="fas fa-gift me-2 small"></i>
-                        <span>Anire Craft Store</span>
+                        <span>{{ $giftStoreName }}</span>
                     </div>
                 </li>
 
@@ -289,7 +295,7 @@
                 <li class="nav-item mt-3">
                     <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                         <i class="fas fa-camera me-2 small"></i>
-                        <span>Photo Studio</span>
+                        <span>{{ $photoStudioName }}</span>
                     </div>
                 </li>
 
@@ -448,7 +454,7 @@
                 <li class="nav-item mt-4">
                     <div class="px-4 py-2 text-secondary text-uppercase fw-semibold small d-flex align-items-center">
                         <i class="fas fa-guitar me-2 small"></i>
-                        <span>Prop Rental</span>
+                        <span>{{ $propRentalName }}</span>
                     </div>
                 </li>
                        

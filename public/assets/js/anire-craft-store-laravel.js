@@ -122,6 +122,18 @@ function bindLoungeEvents() {
         amountReceived.addEventListener('input', calculateChange);
     }
 
+    // Barcode button focus
+    const barcodeButton = document.querySelector('.search-section .btn[title="Barcode Scanner"]');
+    if (barcodeButton) {
+        barcodeButton.addEventListener('click', () => {
+            const searchInput = document.getElementById('productSearch');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+    }
+
     // Barcode scanner simulation
     document.addEventListener('keydown', handleBarcodeInput);
 }
@@ -932,9 +944,55 @@ function updateStats() {
 function handleBarcodeInput(event) {
     // Simulate barcode scanner input (when Enter is pressed in search field)
     if (event.key === 'Enter' && event.target.id === 'productSearch') {
+        event.preventDefault();
         const barcode = event.target.value;
-        // Search for product by barcode
-        searchProducts(barcode);
+        handleBarcodeScan(barcode);
+    }
+}
+
+async function handleBarcodeScan(rawBarcode) {
+    const barcode = String(rawBarcode || '').trim();
+    if (!barcode) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${buildAnireCraftStoreUrl('/products/search')}?q=${encodeURIComponent(barcode)}`);
+        const data = await response.json();
+        const products = data.success && Array.isArray(data.data) ? data.data : [];
+
+        const normalizedBarcode = barcode.toLowerCase();
+        const exactMatch = products.find((product) => {
+            const productBarcode = String(product.barcode || '').trim().toLowerCase();
+            const productSku = String(product.sku || '').trim().toLowerCase();
+
+            return productBarcode === normalizedBarcode || productSku === normalizedBarcode;
+        });
+        const matchedProduct = exactMatch || (products.length === 1 ? products[0] : null);
+
+        if (!matchedProduct) {
+            searchProducts(barcode);
+
+            if (products.length > 1) {
+                showNotification('Multiple products matched this barcode. Please refine the scan.', 'warning');
+            } else {
+                showNotification('No product found for scanned barcode.', 'warning');
+            }
+            return;
+        }
+
+        await addToCart(matchedProduct.id, 1);
+
+        const searchInput = document.getElementById('productSearch');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+
+        searchProducts('');
+    } catch (error) {
+        console.error('Error scanning barcode:', error);
+        showNotification('Failed to process barcode scan.', 'error');
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Login - Violet Marella Limited</title>
+    <title>Staff Login - {{ $companyProfile['name'] ?? 'Violet Marella Limited' }}</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -101,7 +101,7 @@
                             <i class="fas fa-store fa-2x"></i>
                         </div>
                         <h4 class="mb-0">Staff Login</h4>
-                        <p class="mb-0 opacity-75">Violet Marella Limited</p>
+                        <p class="mb-0 opacity-75">{{ $companyProfile['name'] ?? 'Violet Marella Limited' }}</p>
                     </div>
 
                     <div class="login-body">

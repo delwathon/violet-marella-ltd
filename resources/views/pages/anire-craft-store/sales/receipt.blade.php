@@ -7,22 +7,89 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
         @media print {
             .no-print { display: none !important; }
-            body { margin: 0; padding: 0; }
+            @page {
+                size: 72mm auto;
+                margin: 0;
+            }
+
+            html, body {
+                width: 72mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+
             .receipt-a4 { max-width: 100%; }
+
+            #receipt-a4 { display: none !important; }
+            #receipt-thermal {
+                display: block !important;
+                width: 72mm !important;
+                max-width: 72mm !important;
+                margin: 0 !important;
+                padding: 1.8mm 1.6mm !important;
+                font-size: 12px !important;
+                font-weight: 600 !important;
+            }
+
+            #receipt-thermal .small {
+                font-size: 11.5px !important;
+            }
         }
+
         .receipt-thermal { 
-            width: 80mm; 
+            width: 72mm;
+            max-width: 72mm;
             margin: 0 auto; 
-            font-family: 'Courier New', monospace; 
-            font-size: 11px;
+            padding: 1.8mm 1.6mm !important;
+            font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.35;
+            color: #000;
+            font-weight: 600;
         }
-        .thermal-header { font-size: 14px; font-weight: bold; }
-        .thermal-separator { border-top: 1px dashed #333; margin: 10px 0; }
+
+        .receipt-thermal * {
+            color: #000 !important;
+            text-shadow: none !important;
+        }
+
+        .receipt-thermal .small {
+            font-size: 11.6px !important;
+            font-weight: 600;
+        }
+
+        .receipt-thermal strong,
+        .receipt-thermal .fw-bold {
+            font-weight: 800 !important;
+        }
+
+        .thermal-header {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .thermal-separator {
+            border-top: 2px dashed #000;
+            margin: 8px 0;
+        }
     </style>
 </head>
 <body class="bg-light">
+    @php
+        $business = $businessProfile ?? \App\Support\BusinessProfile::forSlug('gift_store');
+        $company = $companyProfile ?? \App\Support\BusinessProfile::company();
+        $receiptFooter = $receiptFooterMessage ?? \App\Models\Setting::get('receipt_footer_message', 'Thank you for shopping with us!');
+    @endphp
+
     <!-- Print Controls -->
     <div class="no-print position-fixed top-0 end-0 m-3 p-3 bg-white rounded shadow" style="z-index: 1000;">
         <h6 class="mb-3">Print Options</h6>
@@ -49,11 +116,23 @@
             <div class="card-body p-5">
                 <!-- Company Header -->
                 <div class="text-center border-bottom pb-4 mb-4">
-                    <h2 class="fw-bold text-primary mb-2">Anire Craft Store</h2>
-                    <p class="text-muted mb-1">Gift Store</p>
+                    <h2 class="fw-bold text-primary mb-2">{{ $business['name'] ?? $company['name'] }}</h2>
+                    @if(!empty($business['legal_name']) && ($business['legal_name'] !== ($business['name'] ?? '')))
+                        <p class="text-muted mb-1">{{ $business['legal_name'] }}</p>
+                    @endif
+                    @if(!empty($business['address']))
+                        <p class="text-muted mb-1">{{ $business['address'] }}</p>
+                    @endif
                     <p class="text-muted small mb-0">
-                        123 Business Street, Ibadan, Oyo State<br>
-                        Phone: +234 814 648 2898 | Email: info@violetmarella.com
+                        @if(!empty($business['phone']))
+                            Phone: {{ $business['phone'] }}
+                        @endif
+                        @if(!empty($business['email']))
+                            {{ !empty($business['phone']) ? ' | ' : '' }}Email: {{ $business['email'] }}
+                        @endif
+                        @if(!empty($business['rc_number']))
+                            <br>RC: {{ $business['rc_number'] }}
+                        @endif
                     </p>
                 </div>
 
@@ -137,9 +216,11 @@
 
                 <!-- Footer -->
                 <div class="text-center mt-5 pt-4 border-top border-dashed">
-                    <p class="fw-bold mb-2">Thank you for shopping with us!</p>
+                    <p class="fw-bold mb-2">{{ $receiptFooter }}</p>
                     <p class="text-muted small mb-1">Please keep this receipt for your records</p>
-                    <p class="text-muted small">For inquiries, please contact us at +234 XXX XXX XXXX</p>
+                    @if(!empty($business['phone']))
+                        <p class="text-muted small">For inquiries, please contact us at {{ $business['phone'] }}</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -149,12 +230,18 @@
     <div id="receipt-thermal" class="receipt-thermal p-3 bg-white">
         <!-- Company Header -->
         <div class="text-center thermal-header mb-2">
-            ANIRE CRAFT STORE
+            {{ strtoupper($business['name'] ?? $company['name']) }}
         </div>
         <div class="text-center small mb-2">
-            Gift Store<br>
-            Ibadan, Oyo State<br>
-            Tel: +234 814 648 2898
+            @if(!empty($business['legal_name']) && ($business['legal_name'] !== ($business['name'] ?? '')))
+                {{ $business['legal_name'] }}<br>
+            @endif
+            @if(!empty($business['address']))
+                {{ $business['address'] }}<br>
+            @endif
+            @if(!empty($business['phone']))
+                Tel: {{ $business['phone'] }}
+            @endif
         </div>
         <div class="thermal-separator"></div>
 
@@ -226,9 +313,11 @@
         <!-- Footer -->
         <div class="thermal-separator"></div>
         <div class="text-center small">
-            <p class="mb-1 fw-bold">Thank you for shopping!</p>
+            <p class="mb-1 fw-bold">{{ $receiptFooter }}</p>
             <p class="mb-1">Please keep this receipt</p>
-            <p class="mb-0">Tel: +234 XXX XXX XXXX</p>
+            @if(!empty($business['phone']))
+                <p class="mb-0">Tel: {{ $business['phone'] }}</p>
+            @endif
         </div>
     </div>
 

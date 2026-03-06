@@ -15,11 +15,16 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white py-3"><h5 class="mb-0">Business</h5></div>
                     <div class="card-body">
-                        <div class="mb-3"><label class="form-label">Store Name</label><input type="text" name="store_name" class="form-control" value="{{ old('store_name', $settings['store_name']) }}" required></div>
+                        <div class="mb-3"><label class="form-label">Business Name</label><input type="text" name="store_name" class="form-control" value="{{ old('store_name', $settings['store_name']) }}" required></div>
+                        <div class="mb-3"><label class="form-label">Legal Name</label><input type="text" name="store_legal_name" class="form-control" value="{{ old('store_legal_name', $settings['store_legal_name']) }}"></div>
                         <div class="mb-3"><label class="form-label">Address</label><textarea name="store_address" class="form-control" rows="2">{{ old('store_address', $settings['store_address']) }}</textarea></div>
                         <div class="row g-3">
                             <div class="col-md-6"><label class="form-label">Phone</label><input type="text" name="store_phone" class="form-control" value="{{ old('store_phone', $settings['store_phone']) }}"></div>
                             <div class="col-md-6"><label class="form-label">Email</label><input type="email" name="store_email" class="form-control" value="{{ old('store_email', $settings['store_email']) }}"></div>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-6"><label class="form-label">RC Number</label><input type="text" name="store_rc_number" class="form-control" value="{{ old('store_rc_number', $settings['store_rc_number']) }}"></div>
+                            <div class="col-md-6"><label class="form-label">Website</label><input type="text" name="store_website" class="form-control" value="{{ old('store_website', $settings['store_website']) }}"></div>
                         </div>
                         <div class="row g-3 mt-1">
                             <div class="col-md-6"><label class="form-label">Currency Code</label><input type="text" name="store_currency" class="form-control" value="{{ old('store_currency', $settings['store_currency']) }}"></div>
@@ -49,6 +54,73 @@
                         </div>
                         <div class="mb-0"><label class="form-label">Receipt Footer Message</label><textarea name="receipt_footer_message" class="form-control" rows="2">{{ old('receipt_footer_message', $settings['receipt_footer_message']) }}</textarea></div>
                         <div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="receipt_show_tax_breakdown" id="receipt_show_tax_breakdown" {{ old('receipt_show_tax_breakdown', $settings['receipt_show_tax_breakdown']) ? 'checked' : '' }}><label class="form-check-label" for="receipt_show_tax_breakdown">Show tax breakdown on receipt</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3"><h5 class="mb-0">Business Units Profile</h5></div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            @foreach($businesses as $index => $business)
+                                <div class="col-lg-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <input type="hidden" name="business_profiles[{{ $index }}][id]" value="{{ $business->id }}">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h6 class="mb-0">{{ $business->name }}</h6>
+                                            <span class="badge bg-light text-dark">{{ $business->slug }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small">Business Name</label>
+                                            <input type="text" name="business_profiles[{{ $index }}][name]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.name", $business->name) }}" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small">Legal Name</label>
+                                            <input type="text" name="business_profiles[{{ $index }}][legal_name]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.legal_name", $business->legal_name) }}">
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Phone</label>
+                                                <input type="text" name="business_profiles[{{ $index }}][phone]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.phone", $business->phone) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Email</label>
+                                                <input type="email" name="business_profiles[{{ $index }}][email]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.email", $business->email) }}">
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="form-label small">Address</label>
+                                            <textarea name="business_profiles[{{ $index }}][address]" rows="2" class="form-control form-control-sm">{{ old("business_profiles.$index.address", $business->address) }}</textarea>
+                                        </div>
+                                        <div class="row g-2 mt-1">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">RC Number</label>
+                                                <input type="text" name="business_profiles[{{ $index }}][rc_number]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.rc_number", $business->rc_number) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Tax ID</label>
+                                                <input type="text" name="business_profiles[{{ $index }}][tax_id]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.tax_id", $business->tax_id) }}">
+                                            </div>
+                                        </div>
+                                        <div class="row g-2 mt-1">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Website</label>
+                                                <input type="text" name="business_profiles[{{ $index }}][website]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.website", $business->website) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Contact Person</label>
+                                                <input type="text" name="business_profiles[{{ $index }}][contact_person]" class="form-control form-control-sm" value="{{ old("business_profiles.$index.contact_person", $business->contact_person) }}">
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="form-label small">Description</label>
+                                            <textarea name="business_profiles[{{ $index }}][description]" rows="2" class="form-control form-control-sm">{{ old("business_profiles.$index.description", $business->description) }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>

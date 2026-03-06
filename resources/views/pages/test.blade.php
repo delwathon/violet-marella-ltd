@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Test Dashboard - Violet Marella Limited')
+@section('title', 'Test Dashboard - ' . ($companyProfile['name'] ?? 'Violet Marella Limited'))
 @push('styles')
 <!-- Add custom styles for test dashboard if needed -->
 @endpush

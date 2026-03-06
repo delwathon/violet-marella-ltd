@@ -4,7 +4,7 @@
             <i class="fas fa-bars fa-lg"></i>
         </button>
         <div class="header-context">
-            <span class="workspace-chip">Violet Marella Workspace</span>
+            <span class="workspace-chip">{{ $companyProfile['name'] ?? 'Business' }} Workspace</span>
             <h5 class="mb-0 header-title" id="currentPageTitle">Business Suite</h5>
             <small class="header-subtitle" id="currentPageSubtitle">Unified operations across all business units</small>
         </div>

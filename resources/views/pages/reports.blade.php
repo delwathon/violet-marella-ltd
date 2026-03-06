@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'All Business Reports - Violet Marella Limited')
+@section('title', 'All Business Reports - ' . ($companyProfile['name'] ?? 'Violet Marella Limited'))
 
 @push('styles')
 <style>
@@ -289,6 +289,21 @@
 @endpush
 
 @section('content')
+@php
+    $directory = collect($businessDirectory ?? []);
+    $businessLabels = [
+        'lounge' => optional($directory->get('lounge'))->name ?? 'Mini Lounge',
+        'gift_store' => optional($directory->get('gift_store'))->name ?? 'Gift Store',
+        'photo_studio' => optional($directory->get('photo_studio'))->name ?? 'Photo Studio',
+        'prop_rental' => optional($directory->get('prop_rental'))->name ?? 'Prop Rental',
+    ];
+    $businessIcons = [
+        'lounge' => 'shopping-cart',
+        'gift_store' => 'gift',
+        'photo_studio' => 'camera',
+        'prop_rental' => 'guitar',
+    ];
+@endphp
 <div class="content-area">
     <!-- Page Header -->
     <div class="page-header">
@@ -321,16 +336,16 @@
                             <option value="all" {{ $businessUnit === 'all' ? 'selected' : '' }}>All Assigned Businesses</option>
                         @endif
                         @if(in_array('lounge', $allowedBusinesses, true))
-                            <option value="lounge" {{ $businessUnit === 'lounge' ? 'selected' : '' }}>Mini Lounge</option>
+                            <option value="lounge" {{ $businessUnit === 'lounge' ? 'selected' : '' }}>{{ $businessLabels['lounge'] }}</option>
                         @endif
                         @if(in_array('gift_store', $allowedBusinesses, true))
-                            <option value="gift_store" {{ $businessUnit === 'gift_store' ? 'selected' : '' }}>Gift Store</option>
+                            <option value="gift_store" {{ $businessUnit === 'gift_store' ? 'selected' : '' }}>{{ $businessLabels['gift_store'] }}</option>
                         @endif
                         @if(in_array('photo_studio', $allowedBusinesses, true))
-                            <option value="photo_studio" {{ $businessUnit === 'photo_studio' ? 'selected' : '' }}>Photo Studio</option>
+                            <option value="photo_studio" {{ $businessUnit === 'photo_studio' ? 'selected' : '' }}>{{ $businessLabels['photo_studio'] }}</option>
                         @endif
                         @if(in_array('prop_rental', $allowedBusinesses, true))
-                            <option value="prop_rental" {{ $businessUnit === 'prop_rental' ? 'selected' : '' }}>Prop Rental</option>
+                            <option value="prop_rental" {{ $businessUnit === 'prop_rental' ? 'selected' : '' }}>{{ $businessLabels['prop_rental'] }}</option>
                         @endif
                     </select>
                 </div>
@@ -444,11 +459,7 @@
             @foreach($businessComparison as $business)
             <div class="business-card">
                 <div class="business-card-icon" style="background: linear-gradient(135deg, {{ $business['color'] }}, {{ $business['color'] }}dd);">
-                    <i class="fas fa-{{ 
-                        $business['name'] === 'Mini Lounge' ? 'shopping-cart' : 
-                        ($business['name'] === 'Gift Store' ? 'gift' : 
-                        ($business['name'] === 'Photo Studio' ? 'camera' : 'guitar'))
-                    }}"></i>
+                    <i class="fas fa-{{ $businessIcons[$business['slug'] ?? ''] ?? 'building' }}"></i>
                 </div>
                 <div class="business-card-revenue">₦{{ number_format($business['revenue'], 2) }}</div>
                 <div class="business-card-label">{{ $business['name'] }}</div>
@@ -472,7 +483,7 @@
                 @if(isset($topPerformers['lounge']) && $topPerformers['lounge']->count() > 0)
                 <div class="mb-4">
                     <h5 class="fw-semibold mb-3" style="color: #10b981;">
-                        <i class="fas fa-shopping-cart me-2"></i>Mini Lounge
+                        <i class="fas fa-shopping-cart me-2"></i>{{ $businessLabels['lounge'] }}
                     </h5>
                     <ul class="top-performers-list">
                         @foreach($topPerformers['lounge'] as $index => $product)
@@ -492,7 +503,7 @@
                 @if(isset($topPerformers['gift_store']) && $topPerformers['gift_store']->count() > 0)
                 <div class="mb-4">
                     <h5 class="fw-semibold mb-3" style="color: #ef4444;">
-                        <i class="fas fa-gift me-2"></i>Gift Store
+                        <i class="fas fa-gift me-2"></i>{{ $businessLabels['gift_store'] }}
                     </h5>
                     <ul class="top-performers-list">
                         @foreach($topPerformers['gift_store'] as $index => $product)

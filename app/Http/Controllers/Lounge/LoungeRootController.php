@@ -56,9 +56,7 @@ class LoungeRootController extends Controller
         $query = Product::active()->with('category');
         
         // Search functionality
-        if ($request->has('search') && $request->search) {
-            $query->search($request->search);
-        }
+        $this->applyProductSearch($query, $request->get('search'));
         
         // Category filter
         if ($request->has('category') && $request->category) {
@@ -97,9 +95,7 @@ class LoungeRootController extends Controller
         
         $query = Product::active()->with('category');
         
-        if ($search) {
-            $query->search($search);
-        }
+        $this->applyProductSearch($query, $search);
         
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -113,6 +109,27 @@ class LoungeRootController extends Controller
             'data' => $products,
             'total' => $products->count()
         ]);
+    }
+
+    private function applyProductSearch($query, ?string $rawSearch): void
+    {
+        $search = trim((string) $rawSearch);
+        if ($search === '') {
+            return;
+        }
+
+        $normalized = preg_replace('/[^A-Za-z0-9]/', '', $search) ?? '';
+
+        $query->where(function ($q) use ($search, $normalized) {
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('barcode', 'like', "%{$search}%")
+                ->orWhere('sku', 'like', "%{$search}%");
+
+            if ($normalized !== '') {
+                $q->orWhereRaw("REPLACE(REPLACE(sku, '-', ''), ' ', '') LIKE ?", ["%{$normalized}%"])
+                    ->orWhereRaw("REPLACE(REPLACE(barcode, '-', ''), ' ', '') LIKE ?", ["%{$normalized}%"]);
+            }
+        });
     }
     
     /**

@@ -23,6 +23,14 @@ class SettingSeeder extends Seeder
                 'is_public' => true,
             ],
             [
+                'key' => 'store_legal_name',
+                'value' => 'Violet Marella Limited',
+                'type' => 'string',
+                'group' => 'store',
+                'description' => 'Legal business name',
+                'is_public' => true,
+            ],
+            [
                 'key' => 'store_address',
                 'value' => '123 Main Street, Lagos, Nigeria',
                 'type' => 'string',
@@ -44,6 +52,22 @@ class SettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'store',
                 'description' => 'Store email address',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'store_rc_number',
+                'value' => '',
+                'type' => 'string',
+                'group' => 'store',
+                'description' => 'Store RC number',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'store_website',
+                'value' => '',
+                'type' => 'string',
+                'group' => 'store',
+                'description' => 'Store website',
                 'is_public' => true,
             ],
             [

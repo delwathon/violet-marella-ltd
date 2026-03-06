@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Prop Rental Reports')
+@php
+    $propRentalName = optional(collect($businessDirectory ?? [])->get('prop_rental'))->name ?? 'Prop Rental';
+@endphp
+@section('title', $propRentalName . ' Reports')
 
 @push('styles')
 <link href="{{ asset('assets/css/prop-rental.css') }}" rel="stylesheet">
@@ -13,7 +16,7 @@
         <div class="row align-items-center">
             <div class="col">
                 <h1 class="page-title">
-                    <i class="fas fa-file-alt me-2"></i>Rental Reports
+                    <i class="fas fa-file-alt me-2"></i>{{ $propRentalName }} Reports
                 </h1>
                 <p class="page-subtitle">Comprehensive analytics and insights</p>
             </div>

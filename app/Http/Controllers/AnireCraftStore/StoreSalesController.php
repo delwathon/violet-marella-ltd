@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\StoreSale;
 use App\Models\StoreCustomer;
 use App\Models\StoreProduct;
+use App\Models\Setting;
+use App\Support\BusinessProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -259,7 +261,9 @@ class StoreSalesController extends Controller
     {
         $user = Auth::guard('user')->user();
         $sale = StoreSale::with(['customer', 'staff', 'saleItems.product'])->findOrFail($id);
-        
-        return view('pages.anire-craft-store.sales.receipt', compact('user', 'sale'));
+        $businessProfile = BusinessProfile::forSlug('gift_store');
+        $receiptFooterMessage = Setting::get('receipt_footer_message', 'Thank you for shopping with us!');
+
+        return view('pages.anire-craft-store.sales.receipt', compact('user', 'sale', 'businessProfile', 'receiptFooterMessage'));
     }
 }

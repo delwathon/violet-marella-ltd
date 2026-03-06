@@ -177,6 +177,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Action</th>
+                                    <th>Change</th>
                                     <th>Previous</th>
                                     <th>New</th>
                                     <th>Staff</th>
@@ -235,14 +236,19 @@
                             </thead>
                             <tbody>
                                 @forelse($recentSales as $saleItem)
+                                    @php($sale = $saleItem->sale)
                                     <tr>
-                                        <td>{{ $saleItem->sale->sale_date->format('M d, Y') }}</td>
+                                        <td>{{ optional($sale?->sale_date)->format('M d, Y') ?? '-' }}</td>
                                         <td>
-                                            <a href="{{ route('anire-craft-store.sales.show', $saleItem->sale_id) }}">
-                                                {{ $saleItem->sale->receipt_number }}
-                                            </a>
+                                            @if($sale)
+                                                <a href="{{ route('anire-craft-store.sales.show', $sale->id) }}">
+                                                    {{ $sale->receipt_number }}
+                                                </a>
+                                            @else
+                                                <span class="text-muted">Archived sale</span>
+                                            @endif
                                         </td>
-                                        <td>{{ $saleItem->sale->customer->full_name ?? 'Walk-in' }}</td>
+                                        <td>{{ $sale?->customer?->full_name ?? 'Walk-in' }}</td>
                                         <td>{{ $saleItem->quantity }}</td>
                                         <td>₦{{ number_format($saleItem->unit_price, 2) }}</td>
                                         <td><strong>₦{{ number_format($saleItem->total_price, 2) }}</strong></td>
@@ -450,9 +456,10 @@
                         <div class="mb-3">
                             <label class="form-label">Label Size</label>
                             <select class="form-select" id="labelSize" onchange="updateBarcodePreview()">
-                                <option value="small">Small (40x25mm)</option>
-                                <option value="medium" selected>Medium (50x30mm)</option>
-                                <option value="large">Large (60x40mm)</option>
+                                <option value="smaller">Smaller (12 x 8)</option>
+                                <option value="small">Small (16 x 12)</option>
+                                <option value="medium" selected>Medium (25 x 16)</option>
+                                <option value="big">Big (40 x 25)</option>
                             </select>
                         </div>
                         
@@ -538,8 +545,8 @@
 .barcode-label {
     display: inline-block;
     border: 1px dashed #ccc;
-    padding: 10px 8px;
-    margin: 8px;
+    padding: 1mm;
+    margin: 1.5mm;
     text-align: center;
     background: white;
     page-break-inside: avoid;
@@ -547,78 +554,117 @@
     box-sizing: border-box;
 }
 
+.barcode-label.smaller {
+    width: 12mm;
+    min-height: 8mm;
+    padding: 0.6mm;
+}
+
 .barcode-label.small {
-    width: 150px;
-    min-height: 95px;
+    width: 16mm;
+    min-height: 12mm;
+    padding: 0.8mm;
 }
 
 .barcode-label.medium {
-    width: 190px;
-    min-height: 115px;
+    width: 25mm;
+    min-height: 16mm;
+    padding: 1.2mm;
 }
 
-.barcode-label.large {
-    width: 225px;
-    min-height: 150px;
+.barcode-label.big {
+    width: 40mm;
+    min-height: 25mm;
+    padding: 1.6mm;
 }
 
 .barcode-label .product-name {
-    font-size: 11px;
+    font-size: 6px;
     font-weight: bold;
-    margin-bottom: 4px;
-    line-height: 1.2;
+    margin-bottom: 0;
+    line-height: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.barcode-label.medium .product-name {
-    font-size: 12px;
+.barcode-label.smaller .product-name {
+    font-size: 4.8px;
 }
 
-.barcode-label.large .product-name {
-    font-size: 14px;
+.barcode-label.small .product-name {
+    font-size: 6px;
+}
+
+.barcode-label.medium .product-name {
+    font-size: 8px;
+}
+
+.barcode-label.big .product-name {
+    font-size: 11px;
 }
 
 .barcode-label .barcode-img {
-    margin: 5px 0;
+    margin: 0;
+    display: block;
     max-width: 100%;
     height: auto;
 }
 
 .barcode-label .barcode-number {
-    font-size: 10px;
-    margin-top: 2px;
+    font-size: 4.8px;
+    margin-top: 0;
+    line-height: 1;
     font-family: monospace;
 }
 
-.barcode-label.medium .barcode-number {
-    font-size: 11px;
+.barcode-label.small .barcode-number {
+    font-size: 5.5px;
 }
 
-.barcode-label.large .barcode-number {
-    font-size: 12px;
+.barcode-label.medium .barcode-number {
+    font-size: 7px;
+}
+
+.barcode-label.big .barcode-number {
+    font-size: 9px;
 }
 
 .barcode-label .price {
-    font-size: 13px;
+    font-size: 5.2px;
     font-weight: bold;
-    margin-top: 4px;
+    margin-top: 1px;
     color: #2c5f2d;
 }
 
-.barcode-label.medium .price {
-    font-size: 14px;
+.barcode-label.small .price {
+    font-size: 6px;
 }
 
-.barcode-label.large .price {
-    font-size: 16px;
+.barcode-label.medium .price {
+    font-size: 8px;
+}
+
+.barcode-label.big .price {
+    font-size: 11px;
 }
 
 .barcode-label .sku {
-    font-size: 9px;
+    font-size: 4.6px;
     color: #666;
-    margin-top: 2px;
+    margin-top: 1px;
+}
+
+.barcode-label.small .sku {
+    font-size: 5.2px;
+}
+
+.barcode-label.medium .sku {
+    font-size: 6.2px;
+}
+
+.barcode-label.big .sku {
+    font-size: 7.6px;
 }
 
 /* Print styles */
@@ -788,24 +834,30 @@ function createBarcodeLabel(size, showName, showPrice, showSKU, price) {
     label.appendChild(barcodeSvg);
     
     // Generate barcode
+    const barcodeSettings = getBarcodeSettings(size);
+
     try {
         JsBarcode(barcodeSvg, productData.barcode, {
             format: productData.barcode.length === 13 ? 'EAN13' : 
                     productData.barcode.length === 12 ? 'UPC' : 
                     productData.barcode.length === 8 ? 'EAN8' : 'CODE128',
-            width: size === 'small' ? 1 : size === 'medium' ? 1.2 : 1.5,
-            height: size === 'small' ? 40 : size === 'medium' ? 50 : 60,
+            width: barcodeSettings.width,
+            height: barcodeSettings.height,
             displayValue: false,
-            margin: 2
+            margin: 0,
+            marginTop: 0,
+            marginBottom: 0
         });
     } catch (e) {
         // Fallback if barcode generation fails
         JsBarcode(barcodeSvg, productData.barcode, {
             format: 'CODE128',
-            width: size === 'small' ? 1 : size === 'medium' ? 1.2 : 1.5,
-            height: size === 'small' ? 40 : size === 'medium' ? 50 : 60,
+            width: barcodeSettings.width,
+            height: barcodeSettings.height,
             displayValue: false,
-            margin: 2
+            margin: 0,
+            marginTop: 0,
+            marginBottom: 0
         });
     }
     
@@ -832,6 +884,17 @@ function createBarcodeLabel(size, showName, showPrice, showSKU, price) {
     }
     
     return label;
+}
+
+function getBarcodeSettings(size) {
+    const settingsBySize = {
+        smaller: { width: 0.55, height: 14 },
+        small: { width: 0.7, height: 20 },
+        medium: { width: 1.0, height: 32 },
+        big: { width: 1.4, height: 54 }
+    };
+
+    return settingsBySize[size] || settingsBySize.medium;
 }
 
 function printBarcodeLabels() {
