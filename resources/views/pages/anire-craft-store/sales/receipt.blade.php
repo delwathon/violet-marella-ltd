@@ -259,7 +259,7 @@
         <!-- Items -->
         @foreach($sale->saleItems as $item)
             <div class="mb-2">
-                <div class="fw-bold">{{ $item->product_name }}</div>
+                <div class="fw-bold">{{ $item->product->name }}</div>
                 <div class="d-flex justify-content-between small">
                     <span>{{ $item->quantity }} x ₦{{ number_format($item->unit_price, 2) }}</span>
                     <span>₦{{ number_format($item->total_price, 2) }}</span>
@@ -306,9 +306,9 @@
         </div>
 
         <!-- Barcode -->
-        <div class="text-center my-3" style="font-family: 'Libre Barcode 39', cursive; font-size: 24px;">
+        <!-- <div class="text-center my-3" style="font-family: 'Libre Barcode 39', cursive; font-size: 24px;">
             *{{ $sale->receipt_number }}*
-        </div>
+        </div> -->
 
         <!-- Footer -->
         <div class="thermal-separator"></div>

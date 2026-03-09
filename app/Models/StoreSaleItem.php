@@ -42,7 +42,7 @@ class StoreSaleItem extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(StoreProduct::class);
+        return $this->belongsTo(StoreProduct::class, 'store_product_id');
     }
 
     /**

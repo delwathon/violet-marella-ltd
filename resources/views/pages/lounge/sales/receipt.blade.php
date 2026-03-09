@@ -306,9 +306,9 @@
         </div>
 
         <!-- Barcode -->
-        <div class="text-center my-3" style="font-family: 'Libre Barcode 39', cursive; font-size: 24px;">
+        <!-- <div class="text-center my-3" style="font-family: 'Libre Barcode 39', cursive; font-size: 24px;">
             *{{ $sale->receipt_number }}*
-        </div>
+        </div> -->
 
         <!-- Footer -->
         <div class="thermal-separator"></div>

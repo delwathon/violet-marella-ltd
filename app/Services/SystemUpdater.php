@@ -23,13 +23,13 @@ class SystemUpdater
             throw new RuntimeException('Migration failed: ' . $this->normalizeOutput(Artisan::output()));
         }
 
-        $seedExitCode = Artisan::call('db:seed', [
-            '--class' => 'Database\\Seeders\\SystemUpdateSeeder',
-            '--force' => true,
-        ]);
-        if ($seedExitCode !== 0) {
-            throw new RuntimeException('Database seeding failed: ' . $this->normalizeOutput(Artisan::output()));
-        }
+        // $seedExitCode = Artisan::call('db:seed', [
+        //     '--class' => 'Database\\Seeders\\SystemUpdateSeeder',
+        //     '--force' => true,
+        // ]);
+        // if ($seedExitCode !== 0) {
+        //     throw new RuntimeException('Database seeding failed: ' . $this->normalizeOutput(Artisan::output()));
+        // }
 
         return [
             'backup_file' => $backupFile,
