@@ -66,13 +66,21 @@ class SystemUpdater
 
         $fileName = "{$connectionName}_{$timestamp}.sql";
         $fullPath = $backupDirectory . DIRECTORY_SEPARATOR . $fileName;
+        $mysqldump = 'C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe';
 
         $command = [
-            'mysqldump',
+            $mysqldump,
             '--single-transaction',
             '--quick',
             '--lock-tables=false',
         ];
+
+        // $command = [
+        //     'mysqldump',
+        //     '--single-transaction',
+        //     '--quick',
+        //     '--lock-tables=false',
+        // ];
 
         $socket = trim((string) ($connection['unix_socket'] ?? ''));
         if ($socket !== '') {

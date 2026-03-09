@@ -694,7 +694,7 @@ html {
     box-shadow: 0 8px 40px rgba(111, 66, 193, 0.12);
     position: sticky;
     top: 1rem;
-    max-height: calc(100vh - 2rem);
+    max-height: calc(150vh - 2rem);
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(111, 66, 193, 0.08);
@@ -893,7 +893,7 @@ html {
 /* Enhanced Cart Summary */
 .cart-summary {
     background: #f9fafb;
-    padding: 1.75rem;
+    padding: 0.3rem 1.75rem;
     border-top: 1px solid #e5e7eb;
 }
 
@@ -901,9 +901,9 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.85rem;
+    /* margin-bottom: 0.85rem; */
     font-weight: 500;
-    padding: 0.35rem 0;
+    padding: 0.15rem 0;
     color: var(--text-secondary);
     transition: all 0.3s ease;
 }
