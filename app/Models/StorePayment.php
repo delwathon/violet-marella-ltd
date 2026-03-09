@@ -31,7 +31,7 @@ class StorePayment extends Model
      */
     public function sale(): BelongsTo
     {
-        return $this->belongsTo(StoreSale::class);
+        return $this->belongsTo(StoreSale::class, 'store_sale_id');
     }
 
     /**
