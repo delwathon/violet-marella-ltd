@@ -170,9 +170,9 @@
                             
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Tax Rate (%)</label>
-                                <input type="number" step="0.01" name="tax_rate" 
-                                       class="form-control @error('tax_rate') is-invalid @enderror" 
-                                       value="{{ old('tax_rate', 7.5) }}">
+                                <input type="number" step="0.01" name="tax_rate"
+                                       class="form-control @error('tax_rate') is-invalid @enderror"
+                                       value="{{ old('tax_rate', 0) }}">
                                 @error('tax_rate')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

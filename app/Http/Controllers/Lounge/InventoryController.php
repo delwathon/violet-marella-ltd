@@ -49,21 +49,23 @@ class InventoryController extends Controller
         // Statistics
         $totalProducts = Product::active()->count();
         $totalStockValue = Product::active()->sum(DB::raw('stock_quantity * cost_price'));
+        $totalStockValueSelling = Product::active()->sum(DB::raw('stock_quantity * price'));
         $lowStockCount = Product::lowStock()->count();
         $outOfStockCount = Product::where('stock_quantity', '<=', 0)->count();
-        
+
         // Recent inventory activities
         $recentActivities = InventoryLog::with(['product', 'staff'])
             ->latest('action_date')
             ->limit(10)
             ->get();
-        
+
         return view('pages.lounge.inventory.index', compact(
             'user',
             'products',
             'categories',
             'totalProducts',
             'totalStockValue',
+            'totalStockValueSelling',
             'lowStockCount',
             'outOfStockCount',
             'recentActivities'

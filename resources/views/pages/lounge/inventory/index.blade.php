@@ -29,8 +29,8 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 mb-4">
+        <div class="col mb-3">
             <div class="stat-card">
                 <div class="stat-icon bg-primary">
                     <i class="fas fa-boxes"></i>
@@ -41,18 +41,29 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col mb-3">
             <div class="stat-card">
                 <div class="stat-icon bg-success">
                     <i class="fas fa-money-bill-wave"></i>
                 </div>
                 <div class="stat-info">
                     <div class="stat-value">₦{{ number_format($totalStockValue, 2) }}</div>
-                    <div class="stat-label">Stock Value</div>
+                    <div class="stat-label">Stock Value (Cost Price)</div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col mb-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">₦{{ number_format($totalStockValueSelling, 2) }}</div>
+                    <div class="stat-label">Stock Value (Selling Price)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col mb-3">
             <div class="stat-card">
                 <div class="stat-icon bg-warning">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -63,7 +74,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col mb-3">
             <div class="stat-card">
                 <div class="stat-icon bg-danger">
                     <i class="fas fa-times-circle"></i>

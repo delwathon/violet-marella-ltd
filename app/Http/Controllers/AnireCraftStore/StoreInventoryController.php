@@ -49,21 +49,23 @@ class StoreInventoryController extends Controller
         // Statistics
         $totalProducts = StoreProduct::active()->count();
         $totalStockValue = StoreProduct::active()->sum(DB::raw('stock_quantity * cost_price'));
+        $totalStockValueSelling = StoreProduct::active()->sum(DB::raw('stock_quantity * price'));
         $lowStockCount = StoreProduct::lowStock()->count();
         $outOfStockCount = StoreProduct::where('stock_quantity', '<=', 0)->count();
-        
+
         // Recent inventory activities
         $recentActivities = StoreInventoryLog::with(['product', 'staff'])
             ->latest('action_date')
             ->limit(10)
             ->get();
-        
+
         return view('pages.anire-craft-store.inventory.index', compact(
             'user',
             'products',
             'categories',
             'totalProducts',
             'totalStockValue',
+            'totalStockValueSelling',
             'lowStockCount',
             'outOfStockCount',
             'recentActivities'
